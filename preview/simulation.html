@@ -1,0 +1,1478 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23052e16'/%3E%3Cstop offset='50%25' stop-color='%23065f46'/%3E%3Cstop offset='100%25' stop-color='%2310b981'/%3E%3C/linearGradient%3E%3ClinearGradient id='leaf' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23a7f3d0'/%3E%3Cstop offset='50%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%23059669'/%3E%3C/linearGradient%3E%3Cdefs%3E%3Crect width='64' height='64' rx='18' fill='url(%23bg)' stroke='%2334d399' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='23' fill='none' stroke='%236ee7b7' stroke-width='1.2' stroke-dasharray='4 3' opacity='0.55'/%3E%3Cpath d='M48 16C31 16 18 26 18 43c0 3 2 5 5 5 17 0 27-13 27-30 0-1.1-.9-2-2-2z' fill='url(%23leaf)'/%3E%3Cpath d='M19 47L44 22M32 34l9-2M27 39l-2-8M37 29l-2-7' stroke='%23022c22' stroke-width='2.6' stroke-linecap='round'/%3E%3Ccircle cx='44' cy='22' r='3' fill='%23fef08a'/%3E%3Ccircle cx='32' cy='34' r='2.8' fill='%23ffffff'/%3E%3Ccircle cx='25' cy='31' r='2.2' fill='%23a7f3d0'/%3E%3Ccircle cx='41' cy='32' r='2.2' fill='%23a7f3d0'/%3E%3C/svg%3E" />
+<title>Green Factory Brain — Simulation Control Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<script>
+  /* Complete suppression of Netlify badges, deploy preview drawers, and branding */
+  window.NETLIFY_PREVIEW_FEEDBACK = false;
+  window.__NETLIFY_PREVIEW_FEEDBACK__ = false;
+  window.__NETLIFY_FEEDBACK_DISABLED__ = true;
+  (function () {
+    function purgeNetlifyElements() {
+      try {
+        const targets = document.querySelectorAll('iframe[src*="netlify"], iframe#netlify-drawer, div[id*="netlify"], div[class*="netlify"], .netlify-badge, #netlify-badge, .netlify-feedback-badge, [data-netlify-deploy-id]');
+        targets.forEach(el => el.remove());
+        const walker = document.createTreeWalker(document.body || document.documentElement, NodeFilter.SHOW_ELEMENT);
+        let node = walker.nextNode();
+        while (node) {
+          if (node.childElementCount === 0 && /powered\s*by\s*netlify/i.test(node.textContent || '')) {
+            node.remove();
+          }
+          node = walker.nextNode();
+        }
+      } catch (e) {}
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', purgeNetlifyElements);
+    } else {
+      purgeNetlifyElements();
+    }
+    window.addEventListener('load', purgeNetlifyElements);
+    try {
+      new MutationObserver(purgeNetlifyElements).observe(document.documentElement, { childList: true, subtree: true });
+    } catch (e) {}
+  })();
+</script>
+<style>
+/* Complete suppression of Netlify badges, deploy preview drawers, and branding */
+iframe[src*="netlify"],
+iframe#netlify-drawer,
+div[id*="netlify"],
+div[class*="netlify"],
+[data-netlify-deploy-id],
+.netlify-badge,
+#netlify-badge,
+.netlify-feedback-badge,
+#netlify-feedback-badge,
+[aria-label*="Netlify" i],
+[title*="Netlify" i] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  z-index: -9999 !important;
+}
+:root{
+  color-scheme:dark;
+  --bg:#04121b; --bg2:#071a26;
+  --panel:#0a2534; --panel2:#0c2c3f; --panel3:#10374e;
+  --line:#17404f; --line2:#1f5064;
+  --ink:#e8f3f0; --ink2:#c3d8de; --muted:#85a5b1; --faint:#5f7f8d;
+  --teal:#0bb894; --teal-b:#2fe0bd; --green:#22b573; --sky:#2ea6cf;
+  --amber:#f0a12b; --red:#e5534b; --violet:#7a6ff0;
+  --chip:#0d3049;
+  --term-bg:#030b11; --term-line:#12303f;
+  --shadow:0 18px 44px rgba(0,0,0,.42);
+  --r-lg:18px; --r-md:13px; --r-sm:9px;
+}
+@media (prefers-color-scheme: light){
+  :root{
+    color-scheme:light;
+    --bg:#dcebe4; --bg2:#e7f1ec;
+    --panel:#ffffff; --panel2:#f2f8f5; --panel3:#e7f2ec;
+    --line:#cfe0d8; --line2:#b9d2c6;
+    --ink:#0b2233; --ink2:#274b5c; --muted:#5c7684; --faint:#8299a4;
+    --teal:#078a6e; --teal-b:#0aa582; --green:#159a5c; --sky:#1b84ad;
+    --amber:#c47d0e; --red:#cf3a33; --violet:#5f52d6;
+    --chip:#e3efe9;
+    --term-bg:#06222f; --term-line:#17404f;
+    --shadow:0 18px 44px rgba(6,34,47,.14);
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:
+    radial-gradient(1100px 480px at 85% -120px, rgba(11,184,148,.14), transparent 60%),
+    radial-gradient(900px 420px at -10% 0, rgba(46,166,207,.10), transparent 55%),
+    linear-gradient(180deg,var(--bg2),var(--bg) 340px);
+  color:var(--ink);
+  font-family:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Sora",sans-serif;margin:0}
+button{font-family:inherit;cursor:pointer}
+.mono{font-family:"IBM Plex Mono",monospace}
+.wrap{max-width:1460px;margin:0 auto;padding:0 20px 100px}
+.in-iframe .wrap, body.in-iframe .wrap{padding:12px 16px 40px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:60;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom:1px solid var(--line);
+}
+.in-iframe .topbar,
+body.in-iframe .topbar{
+  position:relative;top:auto;
+}
+.topbar-in{max-width:1460px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none;color:inherit}
+.leaf{width:40px;height:40px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;
+  background:linear-gradient(140deg,#0bb894,#078a6e);box-shadow:0 8px 20px rgba(11,184,148,.35)}
+.brand h1{font-size:18px;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
+.brand h1 em{font-style:normal;color:var(--teal-b)}
+.brand small{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--muted);font-weight:500}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:8px;background:var(--chip);border:1px solid var(--line);
+  border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--ink2);text-decoration:none}
+.chip .mono{font-weight:600}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--green);flex:0 0 auto}
+.dot.live{animation:pulse 1.6s infinite}
+.dot.off{background:var(--red);animation:none}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,181,115,.55)}70%{box-shadow:0 0 0 8px rgba(34,181,115,0)}100%{box-shadow:0 0 0 0 rgba(34,181,115,0)}}
+.eng-pill.running{border-color:rgba(34,181,115,.5);color:var(--green)}
+.eng-pill.paused{border-color:rgba(240,161,43,.55);color:var(--amber)}
+
+/* ---------- hero strip ---------- */
+.hero{padding:24px 0 6px}
+.hero h2{font-size:clamp(24px,3.2vw,36px);font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.hero h2 .grad{color:var(--teal-b)}
+.hero p{color:var(--muted);max-width:760px;margin:10px 0 0;font-size:14.5px;line-height:1.5}
+.hero p b{color:var(--ink2)}
+
+/* ---------- data flow ---------- */
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:10px;align-items:stretch;margin:16px 0}
+.flow-node{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:13px 15px;min-width:0;overflow:hidden;word-break:break-word}
+.flow-node .fn-tag{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.15em;color:var(--teal-b);font-weight:600}
+.flow-node h3{font-size:14px;margin:3px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.flow-node p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
+.flow-node .fn-live{margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink2);
+  border-top:1px dashed var(--line);padding-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.flow-node.hot{border-color:rgba(11,184,148,.55);box-shadow:0 0 0 1px rgba(11,184,148,.25),0 10px 26px rgba(0,0,0,.25)}
+.flow-arrow{display:grid;place-items:center;color:var(--teal);font-size:19px;font-weight:800;flex-shrink:0}
+
+/* ---------- layout grid ---------- */
+.grid{display:grid;grid-template-columns:320px minmax(0,1fr) 340px;gap:16px;align-items:start}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);
+  border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow)}
+.card h3{font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:9px}
+.card h3 .tag{margin-left:auto}
+.card .sub{color:var(--muted);font-size:12.5px;margin:4px 0 0}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;font-weight:600;
+  padding:4px 8px;border-radius:6px;background:var(--chip);border:1px solid var(--line);color:var(--muted)}
+.tag.ok{color:var(--green);border-color:rgba(34,181,115,.4)}
+.tag.warn{color:var(--amber);border-color:rgba(240,161,43,.45)}
+.ico{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:0 0 auto;
+  background:rgba(11,184,148,.14);color:var(--teal-b);border:1px solid rgba(11,184,148,.3)}
+.ico.amber{background:rgba(240,161,43,.13);color:var(--amber);border-color:rgba(240,161,43,.35)}
+.ico.red{background:rgba(229,83,75,.13);color:var(--red);border-color:rgba(229,83,75,.35)}
+.ico.sky{background:rgba(46,166,207,.13);color:var(--sky);border-color:rgba(46,166,207,.35)}
+
+/* engine */
+.clock-big{font-family:"IBM Plex Mono",monospace;font-size:27px;font-weight:600;letter-spacing:.01em;margin:12px 0 2px}
+.clock-sub{color:var(--muted);font-size:12.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.shift-badge{font-weight:800;font-size:11px;padding:3px 9px;border-radius:999px;letter-spacing:.06em}
+.shift-badge.day{background:rgba(240,161,43,.16);color:var(--amber);border:1px solid rgba(240,161,43,.4)}
+.shift-badge.night{background:rgba(122,111,240,.16);color:#a79dff;border:1px solid rgba(122,111,240,.4)}
+@media (prefers-color-scheme: light){.shift-badge.night{color:var(--violet)}}
+.transport{display:flex;gap:8px;margin:14px 0 4px}
+.btn{border:1px solid var(--line2);background:var(--panel3);color:var(--ink);border-radius:11px;
+  padding:10px 14px;font-weight:800;font-size:13.5px;display:inline-flex;align-items:center;gap:8px;justify-content:center;
+  transition:transform .12s,border-color .12s,background .12s}
+.btn:hover{border-color:var(--teal);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn.primary{background:linear-gradient(135deg,#0bb894,#078a6e);border-color:transparent;color:#fff;
+  box-shadow:0 10px 22px rgba(11,184,148,.3)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent}
+.btn.danger{border-color:rgba(229,83,75,.5);color:var(--red);background:rgba(229,83,75,.07)}
+.btn.sm{padding:7px 11px;font-size:12.5px;border-radius:9px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.seg{display:flex;background:var(--chip);border:1px solid var(--line);border-radius:11px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);font-weight:800;font-size:12.5px;
+  padding:7px 4px;border-radius:8px;font-family:"IBM Plex Mono",monospace}
+.seg button.on{background:var(--teal);color:#fff;box-shadow:0 4px 12px rgba(11,184,148,.35)}
+.ctl-label{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;color:var(--faint);
+  font-weight:600;margin:15px 0 7px;text-transform:uppercase}
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+.stat{background:var(--chip);border:1px solid var(--line);border-radius:11px;padding:9px 11px}
+.stat b{display:block;font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:600}
+.stat span{font-size:10.5px;color:var(--muted);font-weight:700;letter-spacing:.04em}
+
+/* scenarios */
+.scen{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.scen button{display:flex;gap:11px;align-items:flex-start;text-align:left;width:100%;
+  background:var(--panel3);border:1px solid var(--line);border-radius:12px;padding:11px 13px;color:var(--ink);
+  transition:border-color .12s,transform .12s}
+.scen button:hover{border-color:var(--teal);transform:translateY(-1px)}
+.scen button.active{border-color:var(--amber);background:rgba(240,161,43,.08)}
+.scen button b{font-size:13.5px;display:block}
+.scen button span{font-size:12px;color:var(--muted);display:block;line-height:1.4}
+.scen .s-ico{font-size:17px;line-height:1.2;flex:0 0 auto}
+.story-btn{width:100%;margin-top:12px;padding:13px;font-size:14px}
+
+/* inputs */
+.field{margin-top:13px}
+.field label{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--ink2);margin-bottom:6px}
+.field label output{font-family:"IBM Plex Mono",monospace;color:var(--teal-b);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--teal);height:26px;cursor:pointer}
+textarea,input[type=text],input[type=number]{
+  width:100%;background:var(--chip);border:1px solid var(--line);border-radius:10px;color:var(--ink);
+  padding:10px 12px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;resize:vertical}
+textarea:focus,input:focus{outline:2px solid rgba(11,184,148,.5);outline-offset:1px}
+.hint{font-size:11.5px;color:var(--faint);margin-top:5px}
+details.json-in{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+details.json-in summary{cursor:pointer;font-weight:800;font-size:13px;color:var(--ink2)}
+details.json-in summary:hover{color:var(--teal-b)}
+
+/* meters */
+.meter-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.meter-table-in{min-width:480px}
+.meter-head,.meter-row{display:grid;grid-template-columns:14px minmax(130px,1.6fr) minmax(90px,1.2fr) minmax(64px,0.9fr) minmax(76px,1fr) minmax(78px,1fr);gap:8px 10px;align-items:center;position:relative}
+.meter-head{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;color:var(--faint);
+  padding:12px 4px 8px;border-bottom:1px solid var(--line)}
+.meter-row{padding:11px 4px;border-bottom:1px solid var(--line)}
+.meter-row:last-child{border-bottom:0}
+.m-dot{width:10px;height:10px;border-radius:50%;background:var(--green);flex:0 0 auto}
+.m-dot.warn{background:var(--amber)} .m-dot.bad{background:var(--red)} .m-dot.off{background:var(--faint)}
+.m-name{min-width:0;overflow:hidden}
+.m-name b{font-size:13.5px;display:block;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-name span{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.m-status{font-size:10px;font-weight:800;letter-spacing:.05em;padding:2px 7px;border-radius:5px;display:inline-block;margin-top:3px}
+.st-run{background:rgba(34,181,115,.14);color:var(--green)}
+.st-waste{background:rgba(229,83,75,.15);color:var(--red)}
+.st-fault{background:var(--red);color:#fff}
+.st-off{background:var(--chip);color:var(--muted)}
+.st-gen{background:rgba(240,161,43,.16);color:var(--amber)}
+.loadbar{height:8px;border-radius:99px;background:var(--chip);border:1px solid var(--line);overflow:hidden}
+.loadbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--green));transition:width .5s ease}
+.loadbar i.hot{background:linear-gradient(90deg,var(--amber),var(--red))}
+.load-pct{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);margin-top:4px;white-space:nowrap}
+.m-kw{font-family:"IBM Plex Mono",monospace;font-size:14.5px;font-weight:600;text-align:right;white-space:nowrap}
+.m-kw small{display:block;font-size:10px;color:var(--faint);font-weight:500}
+.m-kwh{font-family:"IBM Plex Mono",monospace;font-size:12px;text-align:right;color:var(--ink2);white-space:nowrap}
+.m-kwh small{display:block;font-size:10px;color:var(--faint)}
+.health{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.health .h-num{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px}
+.health .h-bar{width:40px;height:6px;border-radius:99px;background:var(--chip);overflow:hidden;flex-shrink:0}
+.health .h-bar i{display:block;height:100%}
+.m-actions{grid-column:1/-1;grid-row:auto;width:100%;display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:6px 0 2px 24px;border-top:1px dashed var(--line);margin-top:6px;box-sizing:border-box}
+.m-actions .mini{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);font-weight:700}
+.m-actions input[type=range]{width:120px;max-width:100%;height:20px}
+.switch{position:relative;width:40px;height:22px;flex:0 0 auto}
+.switch input{opacity:0;width:100%;height:100%;position:absolute;margin:0;cursor:pointer;z-index:2}
+.switch i{position:absolute;inset:0;background:var(--chip);border:1px solid var(--line2);border-radius:99px;transition:.15s}
+.switch i:after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:.15s}
+.switch input:checked + i{background:rgba(229,83,75,.25);border-color:var(--red)}
+.switch input:checked + i:after{left:20px;background:var(--red)}
+.switch input:focus-visible + i{outline:2px solid var(--sky);outline-offset:2px}
+.mini-btn{border:1px solid rgba(229,83,75,.5);background:rgba(229,83,75,.08);color:var(--red);
+  font-weight:800;font-size:11.5px;border-radius:8px;padding:5px 10px}
+.mini-btn:hover{background:rgba(229,83,75,.16)}
+.mini-btn.fix{border-color:rgba(34,181,115,.5);background:rgba(34,181,115,.09);color:var(--green)}
+.mini-btn.fix:hover{background:rgba(34,181,115,.18)}
+.meter-total{display:flex;justify-content:space-between;align-items:center;margin-top:12px;
+  background:var(--chip);border:1px solid var(--line);border-radius:11px;padding:11px 14px;flex-wrap:wrap;gap:8px}
+.meter-total b{font-family:"IBM Plex Mono",monospace;font-size:17px}
+
+/* chart */
+.chart-wrap{margin-top:10px}
+.chart-wrap svg{width:100%;height:auto;display:block}
+.chart-meta{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px}
+.chart-meta b{color:var(--ink2);font-family:"IBM Plex Mono",monospace;font-weight:600}
+
+/* alerts */
+.alert{display:flex;gap:11px;padding:11px 12px;border-radius:12px;border:1px solid var(--line);
+  background:var(--panel3);margin-top:9px;align-items:flex-start}
+.alert.crit{border-color:rgba(229,83,75,.55);background:rgba(229,83,75,.07)}
+.alert.warn{border-color:rgba(240,161,43,.5);background:rgba(240,161,43,.06)}
+.alert.info{border-color:rgba(46,166,207,.4)}
+.alert .a-ico{font-size:16px;line-height:1.3}
+.alert b{font-size:13px;display:block}
+.alert p{margin:1px 0 0;font-size:12px;color:var(--muted);line-height:1.45}
+.alert time{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint);white-space:nowrap}
+.alert .a-x{border:0;background:transparent;color:var(--faint);font-size:15px;padding:0 2px;line-height:1}
+.alert .a-x:hover{color:var(--ink)}
+.empty-note{color:var(--faint);font-size:12.5px;padding:10px 2px 2px}
+
+/* terminal + api */
+.term{background:var(--term-bg);border:1px solid var(--term-line);border-radius:12px;margin-top:12px;
+  font-family:"IBM Plex Mono",monospace;font-size:11.8px;line-height:1.65;padding:12px 13px;
+  height:218px;overflow-y:auto;color:#9fd8c8}
+.term .t-time{color:#5f8ea0}
+.term .t-ev{color:#e8f3f0}
+.term .t-warn{color:#f5bc58}.term .t-crit{color:#ff8d85}.term .t-ok{color:#3ddc97}.term .t-api{color:#6ec3e8}
+.term div{white-space:pre-wrap;word-break:break-word}
+.api-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 0}
+.api-tabs button{border:1px solid var(--line);background:var(--chip);color:var(--muted);border-radius:8px;
+  font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:600;padding:6px 10px}
+.api-tabs button.on{color:#fff;background:var(--teal);border-color:transparent}
+.api-json{background:var(--term-bg);border:1px solid var(--term-line);border-radius:12px;margin-top:10px;
+  padding:13px 14px;font-family:"IBM Plex Mono",monospace;font-size:11.8px;line-height:1.6;color:#c9e6dc;
+  height:300px;overflow:auto;white-space:pre}
+.api-json .jk{color:#6ec3e8}.api-json .js{color:#3ddc97}.api-json .jn{color:#f5bc58}.api-json .jb{color:#c792ea}
+.push-row{display:flex;gap:9px;align-items:baseline;font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+  padding:7px 2px;border-bottom:1px dashed var(--line);color:var(--ink2);flex-wrap:wrap}
+.push-row .ep{white-space:nowrap}.push-row .ok{white-space:nowrap}
+.push-row:last-child{border-bottom:0}
+.push-row .ok{color:var(--green);font-weight:600}
+.push-row time{color:var(--faint)}
+.push-row .sz{margin-left:auto;color:var(--muted)}
+
+/* ---------- real-time bridge status ---------- */
+.bridge-card{margin-top:18px;background:linear-gradient(135deg,var(--panel2),var(--panel));border:1px solid rgba(11,184,148,.4);border-radius:var(--r-lg);padding:18px 20px;box-shadow:var(--shadow)}
+.bridge-in{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.bridge-info{display:flex;align-items:center;gap:14px;min-width:260px;flex:1}
+.bridge-icon{width:40px;height:40px;border-radius:12px;background:rgba(11,184,148,.18);border:1px solid rgba(11,184,148,.4);color:var(--teal-b);display:grid;place-items:center;font-size:20px;flex:0 0 auto}
+.bridge-info h4{font-size:14.5px;color:var(--ink);margin:0 0 3px;font-family:"Sora",sans-serif;font-weight:700}
+.bridge-info p{font-size:12px;color:var(--muted);margin:0;line-height:1.45}
+.bridge-links{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.in-iframe .bridge-card, body.in-iframe .bridge-card{display:none!important}
+.hidden{display:none!important}
+.foot-note{margin-top:16px;color:var(--faint);font-size:12.5px;text-align:center}
+.foot-note b{color:var(--muted)}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,80px);z-index:90;background:#06222f;color:#e8f3f0;
+  border:1px solid rgba(11,184,148,.5);border-radius:12px;padding:12px 18px;font-weight:700;font-size:13.5px;
+  box-shadow:0 18px 40px rgba(0,0,0,.4);transition:transform .3s ease;max-width:min(92vw,560px);text-align:center;pointer-events:none}
+.toast.show{transform:translate(-50%,0);pointer-events:auto}
+
+/* responsive */
+@media (max-width:1320px){
+  .grid{grid-template-columns:310px minmax(0,1fr)}
+  .col-right{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+}
+@media (max-width:1240px){
+  .flow{grid-template-columns:1fr 1fr;gap:12px}
+  .flow-arrow{display:none}
+}
+@media (max-width:900px){
+  .grid{grid-template-columns:1fr}
+  .col-right{display:flex;flex-direction:column;gap:16px}
+}
+@media (max-width:640px){
+  .flow{grid-template-columns:1fr;gap:10px}
+  .flow-arrow{display:none}
+  .brand h1{font-size:16px;white-space:normal}
+  .clock-big{font-size:22px}
+}
+@media (prefers-reduced-motion: reduce){
+  .dot.live{animation:none}
+  html{scroll-behavior:auto}
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a href="index.html#/dashboard" class="brand" title="Open Main Green Factory Brain Application">
+      <div class="leaf" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 21c-4.5-1.2-7-4.6-7-9.5C5 6.6 8.2 3.4 19 3c.6 10.8-2.4 14-7 18Z" fill="#fff" opacity=".95"/><path d="M5.5 18.5C8 13 12 9.5 17 7" stroke="#078a6e" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <h1>Green Factory Brain <em>· Simulation Control Center</em></h1>
+        <small>CANONICAL SIMULATION ENGINE — FEEDS ALL 13 VIEWS</small>
+      </div>
+    </a>
+    <div class="top-right">
+      <a href="index.html#/dashboard" class="chip" style="color:var(--teal-b);border-color:rgba(11,184,148,.4)">← Main Dashboard</a>
+      <a href="digital-twin.html" class="chip" style="color:var(--sky);border-color:rgba(46,166,207,.4)">3D Digital Twin ↗</a>
+      <span class="chip"><span class="mono" id="clockChip">—</span></span>
+      <span class="chip eng-pill running" id="enginePill"><span class="dot live" id="engineDot"></span><span id="enginePillTxt">ENGINE RUNNING</span></span>
+      <span class="chip">Push&nbsp;<span class="mono" id="pushCount">0</span></span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h2>The backend that <span class="grad">pretends to be the factory</span> —<br/>and the main website believes it.</h2>
+    <p>This console is the <b>simulation server &amp; control center</b> for Green Factory Brain AI. It generates live meter readings for
+    Rupsha Garments Ltd., pushes real-time telemetry to the canonical domain store, and feeds the <b>main website and 3D digital twin live</b> —
+    exactly how real smart meters feed the production site. Change anything here and watch the entire platform synchronize.</p>
+  </section>
+
+  <!-- data flow -->
+  <section class="flow" aria-label="Data flow">
+    <div class="flow-node">
+      <span class="fn-tag">STEP 1 · SOURCE</span>
+      <h3>Simulated Meters</h3>
+      <p>18 virtual sub-meters generate readings — in production these are real clamp meters on each machine.</p>
+      <div class="fn-live" id="flowMeters">— kW total draw</div>
+    </div>
+    <div class="flow-arrow" aria-hidden="true">→</div>
+    <div class="flow-node" id="flowEngineNode">
+      <span class="fn-tag">STEP 2 · ENGINE</span>
+      <h3>Simulation Engine</h3>
+      <p>Advances factory time, applies shift patterns, waste events and faults, totals energy, bill &amp; carbon.</p>
+      <div class="fn-live" id="flowEngine">tick #0</div>
+    </div>
+    <div class="flow-arrow" aria-hidden="true">→</div>
+    <div class="flow-node" id="flowApiNode">
+      <span class="fn-tag">STEP 3 · API</span>
+      <h3>JSON Push</h3>
+      <p>The same 4 endpoints the production backend exposes — the website and copilot only ever read this data.</p>
+      <div class="fn-live" id="flowApi">waiting for first push…</div>
+    </div>
+    <div class="flow-arrow" aria-hidden="true">→</div>
+    <div class="flow-node" id="flowSite">
+      <span class="fn-tag">STEP 4 · WEBSITE</span>
+      <h3>Main Website Platform</h3>
+      <p>Dashboard KPIs, 3D Digital Twin, machine monitoring, forecast, savings and CarbonIQ re-render from every live push.</p>
+      <div class="fn-live" id="flowSiteText">last synced —</div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <!-- LEFT -->
+    <div class="col">
+      <section class="card" aria-label="Simulation engine">
+        <h3><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor" stroke="none"/></svg></span>Simulation Engine <span class="tag ok" id="tickTag">TICK #0</span></h3>
+        <div class="clock-big" id="clockBig">—</div>
+        <div class="clock-sub"><span id="clockDate">—</span><span class="shift-badge day" id="shiftBadge">DAY SHIFT</span><span id="shiftHours">06:00 – 22:00 production</span></div>
+        <div class="transport">
+          <button class="btn primary" id="btnPlay" style="flex:1">Pause engine</button>
+          <button class="btn" id="btnStep" title="Advance 1 simulated hour">+1 hr</button>
+          <button class="btn ghost" id="btnReset" title="Reset to the baseline shown on the main website">Reset</button>
+        </div>
+        <div class="ctl-label">Engine speed (simulated time)</div>
+        <div class="seg" id="speedSeg" role="group" aria-label="Engine speed">
+          <button data-speed="1">1×</button>
+          <button data-speed="4">4×</button>
+          <button data-speed="12" class="on">12×</button>
+          <button data-speed="60">60×</button>
+        </div>
+        <div class="ctl-label">Shift pattern</div>
+        <div class="seg" id="shiftSeg" role="group" aria-label="Shift pattern">
+          <button data-shift="auto" class="on">Auto</button>
+          <button data-shift="day">Force day</button>
+          <button data-shift="night">Force night</button>
+        </div>
+        <div class="stat-row">
+          <div class="stat"><b id="stTicks">0</b><span>TICKS RUN</span></div>
+          <div class="stat"><b id="stPushes">0</b><span>API PUSHES</span></div>
+          <div class="stat"><b id="stUptime">0m</b><span>SIM UPTIME</span></div>
+        </div>
+      </section>
+
+      <section class="card" aria-label="Scenario presets">
+        <h3><span class="ico amber"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 4.5 13.5H11L9.5 22 19 9.5h-6.5L13 2Z" fill="currentColor" stroke="none"/></svg></span>Scenario Presets</h3>
+        <p class="sub">One click sets up the story. Everything downstream — alarms, API, website — reacts on its own.</p>
+        <div class="scen">
+          <button data-scen="waste"><span class="s-ico"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span><span><b>Night shift — Machine 3 waste</b><span>Jumps the clock to 23:10. Machine 3 idles at 38 kW producing nothing; the waste alarm fires.</span></span></button>
+          <button data-scen="surge"><span class="s-ico"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span><span><b>Peak demand surge</b><span>All loads × the level below for 30 simulated minutes. Past the 218 kW contract peak the breach alarm fires and a demand charge lands on the bill.</span></span></button>
+          <button data-scen="breakdown"><span class="s-ico"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><span><b>Machine breakdown — Boiler</b><span>The boiler stops dead: meter reads 0 kW, health crashes to 31, steam is lost and a production-loss alarm fires. Repair it from its meter row.</span></span></button>
+          <button data-scen="outage"><span class="s-ico"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg></span><span><b>Grid power cut</b><span>Mains supply drops for the length below, then auto-restores. Machines stop; the diesel generator carries lighting &amp; HVAC only. Click again to restore early.</span></span></button>
+          <button data-scen="normal"><span class="s-ico"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span><span><b>Normal operations</b><span>Clears every event and returns to a clean day-shift pattern.</span></span></button>
+        </div>
+        <div class="ctl-label">Peak demand level</div>
+        <div class="seg" id="surgeSeg" role="group" aria-label="Peak demand surge level">
+          <button data-level="1.15">×1.15</button>
+          <button data-level="1.25" class="on">×1.25</button>
+          <button data-level="1.4">×1.40</button>
+        </div>
+        <div class="ctl-label">Power cut length</div>
+        <div class="seg" id="outageSeg" role="group" aria-label="Power cut duration">
+          <button data-dur="15" class="on">15 min</button>
+          <button data-dur="30">30 min</button>
+          <button data-dur="60">60 min</button>
+        </div>
+        <button class="btn primary story-btn" id="btnStory">▶ Run the 60-second judge story</button>
+        <p class="hint">Night waste → alarm → AI fix applied from the website preview → savings &amp; carbon move. Fully automatic; touch any control to take over.</p>
+      </section>
+
+      <section class="card" aria-label="Global inputs">
+        <h3><span class="ico sky"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span>Global Inputs</h3>
+        <p class="sub">The numbers a factory manager sets — tariff, targets, and monthly bill import.</p>
+        <div class="field">
+          <label>Electricity tariff <output id="tariffOut">৳12.40 /kWh</output></label>
+          <input type="range" id="tariffRange" min="8" max="20" step="0.05" value="12.40" aria-label="Electricity tariff in taka per kilowatt hour" />
+          <div class="hint">Blended industrial rate — the main website's baseline bill (৳6,48,750 for 52,300 kWh) works out to ≈ ৳12.40/kWh.</div>
+        </div>
+        <div class="field">
+          <label>Monthly savings target <output id="targetOut">৳95,000</output></label>
+          <input type="range" id="targetRange" min="60000" max="150000" step="5000" value="95000" aria-label="Monthly savings target in taka" />
+        </div>
+        <div class="field">
+          <label>Production today <output id="prodOut">12,000 pcs</output></label>
+          <input type="range" id="prodRange" min="0" max="20000" step="250" value="12000" aria-label="Production today in pieces" />
+        </div>
+        <details class="json-in">
+          <summary>⌄ Import a monthly bill (JSON)</summary>
+          <div class="field">
+            <textarea id="billJson" rows="4" spellcheck="false">{ "month": "Oct 2026", "kwh": 52300, "bill_bdt": 648750, "source": "DPDC e-bill" }</textarea>
+            <div class="hint">In production this arrives from utility bill upload. Pasting it re-bases the whole simulation.</div>
+            <button class="btn sm" id="btnImport" style="margin-top:9px">Apply bill to simulation</button>
+            <span class="hint" id="importMsg" role="status"></span>
+          </div>
+        </details>
+      </section>
+    </div>
+
+    <!-- CENTER -->
+    <div class="col">
+      <section class="card" aria-label="Simulated meters">
+        <h3><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span>Simulated Meters — Rupsha Garments Ltd. <span class="tag ok" id="meterTag">8 / 8 ONLINE</span></h3>
+        <div class="meter-table-wrap">
+          <div class="meter-table-in">
+            <div class="meter-head" aria-hidden="true"><span></span><span>METER</span><span>LOAD</span><span style="text-align:right">DRAW</span><span style="text-align:right">TODAY</span><span style="text-align:right">HEALTH</span></div>
+            <div id="meterRows"></div>
+          </div>
+        </div>
+        <div class="meter-total">
+          <span style="font-size:12.5px;color:var(--muted);font-weight:700">TOTAL FACTORY DRAW</span>
+          <b><span id="totalKw">0</span> kW</b>
+          <span style="font-size:12px;color:var(--muted)">peak today <b class="mono" id="peakKw" style="font-size:13px">0 kW</b> · contract peak 218 kW</span>
+        </div>
+      </section>
+
+      <section class="card" aria-label="Live load chart">
+        <h3><span class="ico sky"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-5 3 3 5-7"/></svg></span>Live Factory Load <span class="tag">LAST 60 TICKS</span></h3>
+        <div class="chart-wrap">
+          <svg id="loadChart" viewBox="0 0 640 190" role="img" aria-label="Line chart of total factory power draw over the last 60 simulation ticks"></svg>
+        </div>
+        <div class="chart-meta">
+          <span>Now <b id="cmNow">0 kW</b></span>
+          <span>Min <b id="cmMin">0 kW</b></span>
+          <span>Max <b id="cmMax">0 kW</b></span>
+          <span>Energy this session <b id="cmEnergy">0 kWh</b></span>
+          <span style="margin-left:auto">Dashed line = 218 kW contract peak</span>
+        </div>
+      </section>
+
+      <section class="card" aria-label="Alerts">
+        <h3><span class="ico red"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17.2v.3"/></svg></span>Alarms &amp; Events <span class="tag warn" id="alertTag">0 ACTIVE</span></h3>
+        <div id="alertList"></div>
+      </section>
+
+      <section class="card" aria-label="Engine event log">
+        <h3><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 7 5 5-5 5M12 19h7"/></svg></span>Engine Event Log</h3>
+        <div class="term" id="termLog" aria-live="polite"></div>
+      </section>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="col col-right">
+      <section class="card" aria-label="Live API response">
+        <h3><span class="ico sky"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg></span>Live API Response <span class="tag ok">200 OK</span></h3>
+        <p class="sub">Exactly what the main website receives on every push. Switch endpoints to inspect each payload.</p>
+        <div class="api-tabs" id="apiTabs" role="group" aria-label="API endpoint">
+          <button data-ep="energy" class="on">/api/energy</button>
+          <button data-ep="machines">/api/machines</button>
+          <button data-ep="forecast">/api/forecast</button>
+          <button data-ep="alerts">/api/alerts</button>
+        </div>
+        <div class="api-json" id="apiJson">starting engine…</div>
+      </section>
+
+      <section class="card" aria-label="Push log">
+        <h3><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>Push Log — Backend → Website</h3>
+        <div id="pushLog"><p class="empty-note">No pushes yet — the engine sends the first payload as soon as it starts.</p></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- REAL-TIME TELEMETRY BRIDGE STATUS -->
+  <section class="card bridge-card" aria-label="Live Website Synchronization Bridge">
+    <div class="bridge-in">
+      <div class="bridge-info">
+        <div class="bridge-icon"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div>
+          <h4>Real-Time Telemetry Synchronization Active</h4>
+          <p>Every simulated tick is broadcast via BroadcastChannel, postMessage, and local storage to the Green Factory Brain application suite.</p>
+        </div>
+      </div>
+      <div class="bridge-links">
+        <a href="index.html#/dashboard" target="_top" class="btn primary sm" style="text-decoration:none">
+          <span><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg> Open Main Dashboard ↗</span>
+        </a>
+        <a href="index.html#/monitoring" target="_top" class="btn sm" style="text-decoration:none">
+          <span><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Machine Telemetry ↗</span>
+        </a>
+        <a href="digital-twin.html" target="_top" class="btn sm" style="text-decoration:none">
+          <span><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-9 5-9-5V8l9-5 9 5v8Z"/><path d="m3.27 6.96 8.73 4.89 8.73-4.89"/><path d="M12 22V12"/></svg> 3D EPMS Twin ↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+  <p class="foot-note"><b>How to demo:</b> press <b>▶ Run the 60-second judge story</b>, or jump to the night shift — the simulation engine pushes live telemetry via REST and WebSockets directly to the Green Factory Brain main website in real-time. All data is simulated; no real factory is connected.</p>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+var BASE = { energy: 52300, bill: 648750, carbon: 34.2, savings: 68000,
+             fcBill: 420000, fcCarbon: 12.0, carbonRed: 2.0, scope1: 12.8, scope2: 21.4 };
+var CO2_KG_PER_KWH = 0.654;
+
+var FIXES = [
+  { id:"f1", name:"Optimize Machine 3 (Night Shift)", desc:"Reduce idle time & fix compressed air leaks",
+    saveLabel:"Save 18,500 /month", money:28000, payback:"2.1 months", impact:"high", machine:"m3" },
+  { id:"f2", name:"Adjust Boiler Operation", desc:"Improve set temperature & scheduling",
+    saveLabel:"Save 12,400 /month", money:19000, payback:"3.8 months", impact:"med", machine:"boiler" },
+  { id:"f3", name:"Upgrade to LED Lighting", desc:"Replace old lights in production hall",
+    saveLabel:"Save 8,600 /month", money:12000, payback:"4.5 months", impact:"med", machine:"light" }
+];
+
+function mkMachines(){ return [
+  { id:"m1", name:"Machine 1 · Sewing Line 1", area:"Sewing Workshop", rated:24, day:.78, night:.10, health:88, month:5600,  adj:0, today:212 },
+  { id:"m2", name:"Machine 2 · Sewing Line 2", area:"Sewing Workshop", rated:30, day:.84, night:.12, health:84, month:7980,  adj:0, today:286 },
+  { id:"m3", name:"Machine 3 · Sewing Line 3", area:"Sewing Workshop", rated:34, day:.85, night:.08, health:58, month:8240,  adj:0, today:301, wasteArmed:true, fault:false },
+  { id:"m4", name:"Machine 4 · Cutting",      area:"Cutting Section", rated:33, day:.72, night:.05, health:79, month:6320,  adj:0, today:228 },
+  { id:"m5", name:"Machine 5 · Finishing & Iron", area:"Finishing Section", rated:28, day:.74, night:.06, health:81, month:5960, adj:0, today:209 },
+  { id:"boiler", name:"Boiler & Steam",       area:"Boiler House",     rated:41, day:.72, night:.55, health:92, month:7300,  adj:0, today:342 },
+  { id:"comp", name:"Compressor & Air",       area:"Compressor Room",  rated:32, day:.68, night:.40, health:76, month:6100,  adj:0, today:264 },
+  { id:"light", name:"Lighting & HVAC",       area:"Whole Factory",    rated:26, day:.90, night:.25, health:90, month:4800,  adj:0, today:171 }
+];}
+
+var S;
+function freshState(){
+  return {
+    running:true, speed:12, tick:0, pushes:0, simMin: 18*1440 + 9*60,
+    dayIdx: 18, energy: BASE.energy, peakKw: 0, sessionKwh: 0,
+    tariff: 12.40, fixedCharge: 230, demandCharge: 0, target: 95000, prodToday: 12000,
+    shiftOverride:"auto", surgeUntil:-1, surgeLevel:1.25, outage:false, outageUntil:-1, outageDur:15,
+    wastePct: 22, realized: 0, wasteLoss: 0, avoidedKwh: 0, fixesApplied: {}, appliedCount: 0,
+    machines: mkMachines(), history: [], alerts: [], lastSync: Date.now(),
+    storyTimers: [], fcRange: 1, apiTab: "energy", lastPayload: null, view: null, aiTouched: false
+  };
+}
+S = freshState();
+
+function loadStoredStateIfPresent(){
+  try {
+    if(typeof localStorage === 'undefined') return;
+    var raw = localStorage.getItem('gfb_simulation_state');
+    if(!raw) return;
+    var st = JSON.parse(raw);
+    if(typeof st.tariff === 'number') S.tariff = st.tariff;
+    if(typeof st.speed === 'number') S.speed = st.speed;
+    if(typeof st.running === 'boolean') S.running = st.running;
+    if(typeof st.energy === 'number') S.energy = st.energy;
+    if(st.fixesApplied && typeof st.fixesApplied === 'object'){
+      S.fixesApplied = st.fixesApplied;
+      S.appliedCount = Object.keys(st.fixesApplied).filter(function(k){ return st.fixesApplied[k]; }).length;
+    }
+  } catch(e){}
+}
+loadStoredStateIfPresent();
+
+try {
+  if (typeof window !== 'undefined' && (window.self !== window.top || (window.location && window.location.search && window.location.search.indexOf('embed=1') !== -1))) {
+    if (document.documentElement) document.documentElement.classList.add('in-iframe');
+    if (document.body) document.body.classList.add('in-iframe');
+  }
+} catch(e){}
+
+function $(id){ return document.getElementById(id); }
+function inr(n){ return Math.round(n).toLocaleString("en-IN"); }
+function bn(s){ return String(s).replace(/\d/g, function(d){ return "০১২৩৪৫৬৭৮৯"[+d]; }); }
+function bdt(n){ return "৳ " + inr(n); }
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+function pad(n){ return (n<10?"0":"")+n; }
+var DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function simNow(){ return new Date(2026, 9, 18, 9, 0, 0).getTime() + (S.simMin - (18*1440 + 540)) * 60000; }
+function clockStr(){ var d = new Date(simNow()); return pad(d.getHours()) + ":" + pad(d.getMinutes()); }
+function dateStr(){ var d = new Date(simNow()); return DAYS[d.getDay()] + ", " + d.getDate() + " " + MON[d.getMonth()] + " " + d.getFullYear(); }
+function isNight(){ if(S.shiftOverride==="night") return true; if(S.shiftOverride==="day") return false;
+  var h = new Date(simNow()).getHours(); return h>=22 || h<6; }
+function toast(msg){ var t=$("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove("show"); }, 3400); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+
+function deltaKwh(){ return S.energy - BASE.energy; }
+function billNow(){ return S.energy * S.tariff + S.fixedCharge + S.demandCharge; }
+function carbonNow(){ return BASE.carbon + deltaKwh()*CO2_KG_PER_KWH/1000; }
+function savingsNow(){ return Math.max(0, BASE.savings + S.realized - S.wasteLoss); }
+function carbonRedNow(){ return BASE.carbonRed + S.avoidedKwh * CO2_KG_PER_KWH / 1000; }
+function m3(){ return S.machines[2]; }
+function wasteActive(){ return m3().wasteArmed && isNight() && !S.fixesApplied.f1 && !m3().fault && !S.outage; }
+function forecast(){
+  var applied = 0; FIXES.forEach(function(f){ if(S.fixesApplied[f.id]) applied += f.money; });
+  var adj = applied * 0.5;
+  if(!S.fixesApplied.f1 && !m3().wasteArmed) adj += 14000;
+  var rangeF = S.fcRange * (S.fcRange===1 ? 1 : 0.985);
+  var billEnergy = (BASE.fcBill - adj) * rangeF;
+  var carbon = billEnergy / BASE.fcBill * BASE.fcCarbon;
+  var bill = billEnergy * (S.tariff / 12.40);
+  return { bill: bill, carbon: carbon };
+}
+function machineKw(m){
+  if(S.outage) return m.id==="light" ? m.rated*0.35 : 0;
+  if(m.fault) return 0;
+  var night = isNight();
+  if(m.id==="m3" && wasteActive()) return 38;
+  var f = night ? m.night : m.day;
+  var kw = m.rated * f * (1 + m.adj/100);
+  if(m.id==="boiler" && S.fixesApplied.f2) kw *= 0.88;
+  if(m.id==="light" && S.fixesApplied.f3) kw *= 0.82;
+  if(m.id==="comp" && wasteActive()) kw *= 1.15;
+  if(S.surgeUntil > S.simMin) kw *= S.surgeLevel;
+  var wob = 1 + Math.sin(S.tick*1.7 + m.rated) * 0.03;
+  return Math.max(0, kw * wob);
+}
+function totalKw(){ var t=0; S.machines.forEach(function(m){ t += machineKw(m); }); return t; }
+function peakNow(){ return Math.max(S.peakKw, totalKw()); }
+function machineStatus(m){
+  if(S.outage) return m.id==="light" ? ["ON GENERATOR","gen"] : ["NO POWER","off"];
+  if(m.fault) return ["FAULT — STOPPED","fault"];
+  if(m.id==="m3" && wasteActive()) return ["IDLE DRAW — WASTE","waste"];
+  if(machineKw(m) < 0.5) return ["STANDBY","off"];
+  return ["RUNNING","run"];
+}
+
+function syncSharedStorage(){
+  try {
+    var s1 = +(BASE.scope1 + deltaKwh()*0.000242).toFixed(1);
+    var carb = carbonNow();
+    var s2 = +(carb - parseFloat(s1)).toFixed(1);
+    var payload = {
+      simMin: S.simMin,
+      tick: S.tick,
+      clock: clockStr(),
+      date: dateStr(),
+      shift: isNight() ? "night" : "day",
+      running: S.running,
+      speed: S.speed,
+      tariff: S.tariff,
+      target: S.target,
+      prodToday: S.prodToday,
+      totalKw: totalKw(),
+      peakKw: peakNow(),
+      energy: S.energy,
+      bill: billNow(),
+      carbon: carb,
+      carbonRed: carbonRedNow(),
+      scope1: s1,
+      scope2: s2,
+      savings: savingsNow(),
+      avoidedKwh: S.avoidedKwh,
+      wasteLoss: S.wasteLoss,
+      wasteActive: wasteActive(),
+      wastePct: S.wastePct,
+      outage: S.outage,
+      surgeLevel: S.surgeLevel,
+      surgeActive: S.surgeUntil > S.simMin,
+      fixesApplied: S.fixesApplied,
+      faults: S.machines.filter(function(m){ return m.fault; }).map(function(m){ return m.id; }),
+      alerts: S.alerts.map(function(a){ return { id: a.id, sev: a.sev, title: a.title, body: a.body, time: a.time }; }),
+      machines: S.machines.map(function(m){
+        return {
+          id: m.id,
+          name: m.name,
+          kw: machineKw(m),
+          today: m.today,
+          month: m.month,
+          health: m.fault ? 31 : m.health,
+          fault: !!m.fault
+        };
+      }),
+      timestamp: Date.now()
+    };
+    localStorage.setItem('gfb_simulation_state', JSON.stringify(payload));
+    if(typeof BroadcastChannel !== 'undefined'){
+      if(!window._gfbChannel) window._gfbChannel = new BroadcastChannel('gfb_simulation_sync');
+      window._gfbChannel.postMessage({ type: 'GFB_SIM_SYNC', payload: payload });
+    }
+    if(window.parent && window.parent !== window){
+      window.parent.postMessage({ type: 'GFB_SIM_SYNC', payload: payload }, '*');
+    }
+  } catch(e){}
+}
+
+function handleExternalAction(data){
+  if(!data) return;
+  if(data.type === 'GFB_REQ_STATE' || data.action === 'requestState'){
+    syncSharedStorage();
+    return;
+  }
+  if(data.action === 'setScenario' && data.scenario){
+    setScenario(data.scenario);
+  } else if(data.action === 'togglePlay'){
+    cancelStory(); S.running = !S.running; syncPlayBtn(); render();
+  } else if(data.action === 'step'){
+    cancelStory(); tick(data.stepMin || 60); push();
+  } else if(data.action === 'setSpeed' && data.speed){
+    cancelStory(); S.speed = data.speed; syncSpeedSeg(); render();
+  } else if(data.action === 'reset'){
+    var btn = $("btnReset"); if(btn) btn.click();
+  } else if(data.action === 'applyFix' && data.fixId){
+    applyFix(data.fixId, "external", false);
+  } else if(data.action === 'setFault' && data.machineId){
+    var mch = S.machines.filter(function(x){ return x.id === data.machineId; })[0];
+    if(mch) {
+      cancelStory();
+      var newState = (typeof data.fault === 'boolean') ? data.fault : !mch.fault;
+      setFault(data.machineId, newState);
+    }
+  } else if(data.action === 'setTariff' && typeof data.tariff === 'number'){
+    S.tariff = data.tariff;
+    var tr = $("tariffRange"); if(tr) tr.value = S.tariff;
+    var to = $("tariffOut"); if(to) to.textContent = "৳" + S.tariff.toFixed(2) + " /kWh";
+    push(); syncSharedStorage();
+  }
+}
+try {
+  if(typeof BroadcastChannel !== 'undefined'){
+    var rxChannel = new BroadcastChannel('gfb_simulation_sync');
+    rxChannel.addEventListener('message', function(ev){
+      if(ev.data && (ev.data.action || ev.data.type)) handleExternalAction(ev.data);
+    });
+  }
+  window.addEventListener('message', function(ev){
+    if(ev.data && (ev.data.action || ev.data.type)) handleExternalAction(ev.data);
+  });
+} catch(e){}
+
+function tick(stepMin){
+  S.tick++;
+  S.simMin += stepMin;
+  var nd = Math.floor(S.simMin/1440);
+  if(nd !== S.dayIdx){ S.dayIdx = nd;
+    S.machines.forEach(function(m){ m.today = 0; }); S.peakKw = 0;
+    logEvent("ev","New simulated day (" + dateStr() + ") — daily meter counters and peak reset"); }
+  if(S.outage && S.outageUntil > 0 && S.simMin >= S.outageUntil) endOutage(true);
+  var stepH = stepMin/60, tk = 0, avoided = 0;
+  S.machines.forEach(function(m){
+    var kw = machineKw(m); tk += kw;
+    var e = kw*stepH; m.today += e; m.month += e; S.sessionKwh += e;
+    if(m.id==="m3" && wasteActive()) m.wasteKwh = (m.wasteKwh||0) + e;
+    var cf = kw;
+    if(m.id==="boiler" && S.fixesApplied.f2) cf = kw / 0.88;
+    if(m.id==="light" && S.fixesApplied.f3) cf = kw / 0.82;
+    if(m.id==="m3" && S.fixesApplied.f1 && m.wasteArmed && isNight() && !m.fault && !S.outage) cf = 38;
+    if(cf > kw) avoided += (cf - kw) * stepH;
+  });
+  S.energy += tk*stepH;
+  if(tk > S.peakKw) S.peakKw = tk;
+  var target = S.fixesApplied.f1 ? 4 : (m3().wasteArmed ? (S.surgeUntil>S.simMin ? 27 : 22) : 9);
+  S.wastePct += (target - S.wastePct) * 0.08;
+  avoided += tk * stepH * 0.1048;
+  if(avoided > 0){ S.avoidedKwh += avoided; S.realized += avoided * S.tariff; }
+  if(wasteActive()) S.wasteLoss += 38 * stepH * S.tariff;
+  S.history.push(Math.round(tk)); if(S.history.length>60) S.history.shift();
+  checkEvents();
+  if(S.tick % 4 === 0) push();
+  render();
+  syncSharedStorage();
+}
+
+var flags = {};
+function raiseAlert(id, sev, title, body){
+  if(S.alerts.some(function(a){ return a.id===id; })) return;
+  S.alerts.unshift({ id:id, sev:sev, title:title, body:body, time: clockStr() });
+  if(S.alerts.length>5) S.alerts.pop();
+  logEvent(sev==="crit" ? "crit" : sev==="warn" ? "warn" : "ev",
+    (sev==="crit"?"ALARM — ":"WARNING: ") + title);
+  renderAlerts();
+}
+function clearAlert(id){ S.alerts = S.alerts.filter(function(a){ return a.id!==id; }); renderAlerts(); }
+function checkEvents(){
+  var night = isNight();
+  if(wasteActive() && !flags.waste){ flags.waste = true;
+    raiseAlert("waste","crit","Machine 3 is wasting energy — 38 kW idle draw",
+      "Night shift: the line is drawing a flat 38 kW with zero production. At ৳" + S.tariff.toFixed(2) + "/kWh this leak costs about " + bdt(38 * S.tariff) + " for every hour it runs. AI Recommendation #1 targets exactly this."); }
+  if(!wasteActive() && flags.waste){ flags.waste = false; clearAlert("waste");
+    if(S.fixesApplied.f1) logEvent("ok","Machine 3 idle block gone — waste resolved by AI fix #1"); }
+  if(night && !flags.night){ flags.night = true; logEvent("ev","Night shift started (22:00–06:00) — production lines idle, boiler & compressor on reduced load"); }
+  if(!night && flags.night){ flags.night = false; logEvent("ev","Day shift started (06:00) — all production lines ramping up"); }
+  if(S.surgeUntil > S.simMin && !flags.surge){ flags.surge = true;
+    S.demandCharge += 9000;
+    logEvent("warn","Demand charge +৳9,000 added to this month's bill (peak demand event)");
+    raiseAlert("surge","warn","Peak demand surge in progress","All machine loads ×" + S.surgeLevel + ". Total draw is climbing toward the 218 kW contract peak."); }
+  if(S.surgeUntil <= S.simMin && flags.surge){ flags.surge = false; clearAlert("surge"); logEvent("ev","Surge ended — loads back to normal pattern"); }
+  var tkNow = totalKw();
+  if(tkNow > 218 && !flags.peak){ flags.peak = true;
+    raiseAlert("peak","crit","Contract peak breached — " + Math.round(tkNow) + " kW",
+      "Total draw is above 218 kW contract peak. Every minute risks a higher demand charge."); }
+  if(tkNow <= 218 && flags.peak){ flags.peak = false; clearAlert("peak");
+    logEvent("ok","Draw back under 218 kW contract peak (" + Math.round(tkNow) + " kW)"); }
+}
+
+function logEvent(kind, msg){
+  var el = $("termLog"); if(!el) return;
+  var d = document.createElement("div");
+  d.innerHTML = '<span class="t-time">[' + clockStr() + ']</span> <span class="t-' + kind + '">' + esc(msg) + '</span>';
+  el.appendChild(d);
+  while(el.children.length > 46) el.removeChild(el.firstChild);
+  el.scrollTop = el.scrollHeight;
+}
+
+function buildPayload(ep){
+  var night = isNight(), tk = totalKw();
+  if(ep==="energy") return { endpoint:"/api/energy", factory:"Rupsha Garments Ltd.", sim_time: dateStr()+" "+clockStr(),
+    shift: night?"night":"day", total_kwh_month: Math.round(S.energy), bill_bdt_month: Math.round(billNow()),
+    carbon_ton_month: +carbonNow().toFixed(2), co2_factor_kg_per_kwh: CO2_KG_PER_KWH, tariff_bdt_per_kwh: S.tariff,
+    live_draw_kw: +tk.toFixed(1), peak_kw_today: Math.round(peakNow()), production_pcs_today: S.prodToday,
+    grid_status: S.outage ? "down — generator only" : "up", surge_level: S.surgeLevel,
+    machines_faulted: S.machines.filter(function(m){ return m.fault; }).length,
+    savings_bdt_month: Math.round(savingsNow()), savings_verified_bdt: Math.round(S.realized),
+    waste_loss_bdt: Math.round(S.wasteLoss), avoided_kwh: Math.round(S.avoidedKwh),
+    carbon_reduction_ton: +carbonRedNow().toFixed(2),
+    waste_pct_machine3: +S.wastePct.toFixed(1), tick: S.tick, source:"simulation-engine" };
+  if(ep==="machines") return { endpoint:"/api/machines", sim_time: clockStr(), machines: S.machines.map(function(m){
+      var st = machineStatus(m); return { id:m.id, name:m.name, area:m.area, status: st[0],
+        draw_kw: +machineKw(m).toFixed(1), kwh_today: Math.round(m.today), kwh_month: Math.round(m.month),
+        health: m.fault?31:m.health }; }) };
+  if(ep==="forecast") { var f = forecast(); return { endpoint:"/api/forecast", range_months: S.fcRange,
+      bill_forecast_bdt: Math.round(f.bill), carbon_forecast_ton: +f.carbon.toFixed(1), confidence:"±5%",
+      assumes_machine3_fix_applied: !!S.fixesApplied.f1,
+      recommendations: FIXES.map(function(x){ return { name:x.name, save_bdt_month:x.money, payback:x.payback, applied: !!S.fixesApplied[x.id] }; }) }; }
+  return { endpoint:"/api/alerts", active: S.alerts.map(function(a){ return { severity:a.sev, title:a.title, since:a.time }; }),
+    alarm_summary:{ critical: S.alerts.filter(function(a){return a.sev==="crit";}).length,
+      warning: S.alerts.filter(function(a){return a.sev==="warn";}).length } };
+}
+function jsonHtml(obj){
+  var s = esc(JSON.stringify(obj, null, 2));
+  s = s.replace(/"([^"]+)":/g, '<span class="jk">"$1"</span>:');
+  s = s.replace(/: "([^"]*)"/g, ': <span class="js">"$1"</span>');
+  s = s.replace(/: (-?\d[\d.]*)/g, ': <span class="jn">$1</span>');
+  s = s.replace(/: (true|false|null)/g, ': <span class="jb">$1</span>');
+  return s;
+}
+function snapshot(){
+  return { energy: S.energy, bill: billNow(), carbon: carbonNow(), savings: savingsNow(),
+    carbonRed: carbonRedNow(), delta: deltaKwh(), wastePct: S.wastePct, tariff: S.tariff,
+    target: S.target, appliedCount: S.appliedCount,
+    realized: S.realized, wasteLoss: S.wasteLoss, wasteOn: wasteActive(), wasteArmed: m3().wasteArmed, avoidedKwh: S.avoidedKwh,
+    outage: S.outage, outageLeft: S.outage ? Math.max(0, Math.ceil(S.outageUntil - S.simMin)) : 0,
+    faultIds: S.machines.filter(function(m){ return m.fault; }).map(function(m){ return m.id; }),
+    faultNames: S.machines.filter(function(m){ return m.fault; }).map(function(m){ return m.name.split(" · ")[0]; }),
+    f1: !!S.fixesApplied.f1,
+    months: S.machines.map(function(m){ return m.month; }), fc: forecast() };
+}
+function push(){
+  S.pushes++; S.lastSync = Date.now();
+  S.view = snapshot();
+  S.lastPayload = buildPayload(S.apiTab);
+  $("apiJson").innerHTML = jsonHtml(S.lastPayload);
+  var row = document.createElement("div"); row.className = "push-row";
+  var ep = ["/api/energy","/api/machines","/api/forecast","/api/alerts"][S.pushes % 4];
+  row.innerHTML = "<time>" + clockStr() + "</time><span class='ep'>POST " + ep + "</span><span class='ok'>200 OK</span><span class='sz'>" +
+    (2.1 + (S.pushes % 7) * 0.23).toFixed(1) + " KB · " + (38 + (S.pushes % 5) * 11) + " ms</span>";
+  var log = $("pushLog"); if(log && log.querySelector(".empty-note")) log.innerHTML = "";
+  if(log) { log.prepend(row); while(log.children.length > 7) log.removeChild(log.lastChild); }
+  var pill = $("syncPill"); if(pill){ pill.classList.remove("flash"); void pill.offsetWidth; pill.classList.add("flash"); }
+  if($("flowApi")) $("flowApi").textContent = "POST " + ep + " → 200 OK · just now";
+  if($("flowSiteText")) $("flowSiteText").textContent = "last synced just now · push #" + S.pushes;
+  if ($("pvLive")) { $("pvLive").textContent = "LAST PUSH " + clockStr() + " SIM · PUSH #" + S.pushes; }
+  renderPreview();
+  syncSharedStorage();
+}
+
+var mEls = {};
+function buildMeters(){
+  var host = $("meterRows"); if(!host) return; host.innerHTML = ""; mEls = {};
+  S.machines.forEach(function(m, i){
+    var row = document.createElement("div"); row.className = "meter-row";
+    var faultBtns = '<button class="mini-btn" data-fault="' + m.id + '"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg> Breakdown</button>' +
+      '<button class="mini-btn fix hidden" data-repair="' + m.id + '"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Repair</button>';
+    var extra = "";
+    if(m.id==="m3"){
+      extra = '<span class="mini">Night idle waste (38 kW)' +
+        '<span class="switch"><input type="checkbox" id="wasteToggle" ' + (m.wasteArmed?"checked":"") + ' aria-label="Arm Machine 3 night idle waste"><i></i></span></span>' +
+        faultBtns;
+    } else if(m.id==="boiler" || m.id==="comp"){
+      extra = faultBtns;
+    }
+    row.innerHTML =
+      '<span class="m-dot"></span>' +
+      '<div class="m-name"><b>' + esc(m.name) + '</b><span>' + esc(m.area) + ' · rated ' + m.rated + ' kW</span><br/><span class="m-status"></span></div>' +
+      '<div class="m-loadcell"><div class="loadbar"><i></i></div><div class="load-pct"></div></div>' +
+      '<div class="m-kw">0<small>kW now</small></div>' +
+      '<div class="m-kwh">0<small>kWh today</small></div>' +
+      '<div class="health m-health-cell"><span class="h-num"></span><span class="h-bar"><i></i></span></div>' +
+      '<div class="m-actions">' +
+        '<span class="mini">Load adjust <input type="range" min="-50" max="50" step="5" value="' + m.adj + '" data-adj="' + i + '" aria-label="Load adjust for ' + esc(m.name) + '"></span>' +
+        extra +
+      '</div>';
+    host.appendChild(row);
+    mEls[m.id] = { dot: row.querySelector(".m-dot"), status: row.querySelector(".m-status"),
+      bar: row.querySelector(".loadbar i"), pct: row.querySelector(".load-pct"),
+      kw: row.querySelector(".m-kw"), kwh: row.querySelector(".m-kwh"),
+      hnum: row.querySelector(".h-num"), hbar: row.querySelector(".h-bar i"),
+      faultBtn: row.querySelector("[data-fault]"), repairBtn: row.querySelector("[data-repair]") };
+  });
+  host.querySelectorAll("[data-adj]").forEach(function(sl){
+    sl.addEventListener("input", function(){
+      cancelStory(); S.machines[+sl.getAttribute("data-adj")].adj = +sl.value; render(); }); });
+  var wt = $("wasteToggle");
+  if(wt) wt.addEventListener("change", function(){ cancelStory();
+    m3().wasteArmed = wt.checked;
+    logEvent(wt.checked?"warn":"ok", wt.checked ? "Machine 3 night idle waste ARMED — 38 kW all night" : "Machine 3 night idle waste disarmed");
+    if(!wt.checked && !S.fixesApplied.f1) S.wastePct = 9; render(); });
+  host.querySelectorAll("[data-fault]").forEach(function(b){
+    b.addEventListener("click", function(){ cancelStory(); setFault(b.getAttribute("data-fault"), true); }); });
+  host.querySelectorAll("[data-repair]").forEach(function(b){
+    b.addEventListener("click", function(){ cancelStory(); setFault(b.getAttribute("data-repair"), false); }); });
+  updateMeters();
+}
+
+function updateMeters(){
+  S.machines.forEach(function(m){
+    var el = mEls[m.id]; if(!el) return;
+    var kw = machineKw(m), st = machineStatus(m);
+    var loadPct = m.rated ? clamp(kw / (m.rated*1.05) * 100, 0, 100) : 0;
+    el.dot.className = "m-dot " + (st[1]==="waste"||st[1]==="fault" ? "bad" : st[1]==="off" ? "off" : st[1]==="gen" ? "warn" : "");
+    el.status.className = "m-status st-" + st[1]; el.status.textContent = st[0];
+    el.bar.className = loadPct>86 ? "hot" : ""; el.bar.style.width = loadPct.toFixed(0) + "%";
+    el.pct.textContent = "load " + loadPct.toFixed(0) + "% · adj " + (m.adj>=0?"+":"") + m.adj + "%";
+    el.kw.innerHTML = kw.toFixed(1) + "<small>kW now</small>";
+    el.kwh.innerHTML = inr(m.today) + "<small>kWh today</small>";
+    var h = m.fault ? 31 : m.health;
+    var hCol = m.fault ? "var(--red)" : m.health>=80 ? "var(--green)" : m.health>=65 ? "var(--amber)" : "var(--red)";
+    el.hnum.style.color = hCol; el.hnum.textContent = h;
+    el.hbar.style.width = h + "%"; el.hbar.style.background = hCol;
+    if(el.faultBtn) el.faultBtn.classList.toggle("hidden", !!m.fault);
+    if(el.repairBtn) el.repairBtn.classList.toggle("hidden", !m.fault);
+    if(m.id==="m3"){
+      var wt = $("wasteToggle"); if(wt && wt.checked !== m.wasteArmed) wt.checked = m.wasteArmed;
+    }
+  });
+}
+
+function setFault(id, on){
+  var m = S.machines.filter(function(x){ return x.id===id; })[0]; if(!m) return;
+  m.fault = on;
+  var short = m.name.split(" · ")[0];
+  if(on){ raiseAlert("fault-"+id, "crit", short + " breakdown — stopped",
+      "Fault at " + clockStr() + ": meter reads 0 kW, health dropped to 31."); }
+  else { clearAlert("fault-"+id); logEvent("ok","Repaired: " + short + " — health back to " + m.health); }
+  render();
+}
+
+function renderAlerts(){
+  var host = $("alertList"); host.innerHTML = "";
+  $("alertTag").textContent = S.alerts.length + " ACTIVE";
+  $("alertTag").className = "tag " + (S.alerts.some(function(a){return a.sev==="crit";}) ? "warn" : "ok");
+  if(!S.alerts.length){ host.innerHTML = '<p class="empty-note">No active alarms. The factory is running clean.</p>'; return; }
+  S.alerts.forEach(function(a){
+    var d = document.createElement("div"); d.className = "alert " + a.sev;
+    d.innerHTML = '<span class="a-ico">' + (a.sev==="crit"?'<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" x2="19.07" y1="4.93" y2="19.07"/></svg>':a.sev==="warn"?'<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>':'<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>') + '</span><div><b>' +
+      esc(a.title) + '</b><p>' + esc(a.body) + '</p></div><time>' + a.time + '</time>' +
+      '<button class="a-x" aria-label="Dismiss alert"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg></button>';
+    d.querySelector(".a-x").addEventListener("click", function(){ clearAlert(a.id); });
+    host.appendChild(d);
+  });
+}
+
+function renderChart(){
+  var svg = $("loadChart"), W = 640, H = 190, padL = 8, padT = 14, padB = 20;
+  var data = S.history.length ? S.history : [0];
+  var max = Math.max(240, Math.max.apply(null, data) * 1.15);
+  function X(i){ return padL + i * (W - padL*2) / 59; }
+  function Y(v){ return padT + (1 - v/max) * (H - padT - padB); }
+  var pts = data.map(function(v,i){ return X(i).toFixed(1) + "," + Y(v).toFixed(1); }).join(" ");
+  var area = pts + " " + X(data.length-1).toFixed(1) + "," + (H-padB) + " " + padL + "," + (H-padB);
+  var grid = "";
+  [0.25, 0.5, 0.75, 1].forEach(function(f){ var y = padT + (1-f)*(H-padT-padB);
+    grid += '<line x1="' + padL + '" y1="' + y + '" x2="' + (W-padL) + '" y2="' + y + '" stroke="var(--line)" stroke-width="1" opacity=".55"/>'; });
+  var peakY = Y(218);
+  svg.innerHTML = grid +
+    '<line x1="' + padL + '" y1="' + peakY + '" x2="' + (W-padL) + '" y2="' + peakY + '" stroke="var(--amber)" stroke-width="1.4" stroke-dasharray="6 5"/>' +
+    '<text x="' + (W-padL) + '" y="' + (peakY-5) + '" text-anchor="end" font-size="10" fill="var(--amber)" font-family="IBM Plex Mono">218 kW peak</text>' +
+    '<polygon points="' + area + '" fill="rgba(11,184,148,.14)"/>' +
+    '<polyline points="' + pts + '" fill="none" stroke="var(--teal-b)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>' +
+    (data.length ? '<circle cx="' + X(data.length-1) + '" cy="' + Y(data[data.length-1]) + '" r="3.6" fill="var(--teal-b)"/>' : "") +
+    '<text x="' + padL + '" y="' + (H-5) + '" font-size="10" fill="var(--faint)" font-family="IBM Plex Mono">-' + data.length + ' ticks</text>' +
+    '<text x="' + (W-padL) + '" y="' + (H-5) + '" text-anchor="end" font-size="10" fill="var(--faint)" font-family="IBM Plex Mono">now</text>';
+  var tk = totalKw();
+  $("cmNow").textContent = Math.round(tk) + " kW";
+  $("cmMin").textContent = (data.length?Math.min.apply(null,data):0) + " kW";
+  $("cmMax").textContent = (data.length?Math.max.apply(null,data):0) + " kW";
+  $("cmEnergy").textContent = inr(S.sessionKwh) + " kWh";
+}
+
+var lastShown = {};
+function bump(id, val){ if(lastShown[id] !== undefined && lastShown[id] !== val){ var el = $(id);
+  el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); } lastShown[id] = val; }
+
+function renderPreview(){
+  var V = S.view; if(!V) return;
+  var e = Math.round(V.energy), b = Math.round(V.bill), c = V.carbon, sv = Math.round(V.savings);
+  if($("kEnergy")){ $("kEnergy").innerHTML = inr(e) + " <small>kWh</small>"; bump("kEnergy", e); }
+  if($("kBill")){ $("kBill").textContent = bdt(b); bump("kBill", b); }
+  if($("kCarbon")){ $("kCarbon").innerHTML = c.toFixed(1) + " <small>ton CO₂e</small>"; bump("kCarbon", Math.round(c*10)); }
+  if($("kSavings")){ $("kSavings").textContent = bdt(sv); bump("kSavings", sv); }
+  if($("kEnergyLive")) $("kEnergyLive").textContent = "+" + inr(V.delta) + " kWh simulated since baseline";
+  if($("kBillLive")) $("kBillLive").textContent = "tariff ৳" + V.tariff.toFixed(2) + "/kWh · live from /api/energy";
+  if($("kCarbonRed")) $("kCarbonRed").textContent = V.carbonRed.toFixed(1);
+  if($("kSavLive")) $("kSavLive").textContent = V.wasteOn
+    ? "Warning: M3 night leak running — savings falling ৳" + inr(38 * V.tariff) + "/hr"
+    : V.appliedCount + " of 3 AI fixes applied" +
+      (V.realized > 0 ? " · +" + bdt(Math.round(V.realized)) + " verified" : "");
+
+  var pb = $("pvBanner");
+  if(pb){
+    if(V.outage){ pb.className = "callout pv-banner crit";
+      pb.textContent = "GRID POWER CUT — factory running on generator. Production lines stopped; Lighting & HVAC active."; }
+    else if(V.faultIds.length){ pb.className = "callout pv-banner";
+      pb.textContent = "BREAKDOWN — " + V.faultNames.join(", ") + " stopped (health 31). Production lost until repaired."; }
+    else pb.className = "callout pv-banner crit hidden";
+  }
+
+  var maxM = Math.max.apply(null, V.months);
+  var host = $("pvBars");
+  if(host){
+    host.innerHTML = "";
+    S.machines.forEach(function(m, i){
+      var mv = V.months[i];
+      var isFault = V.faultIds.indexOf(m.id) >= 0;
+      var r = document.createElement("div"); r.className = "bar-row";
+      r.innerHTML = '<span class="b-name' + (isFault || (m.id==="m3" && !V.f1) ? " hot":"") + '">' + esc(m.name.split(" · ")[0] + (m.id==="m3"?" (Sewing)":"") + (isFault ? " [FAULT]" : "")) + '</span>' +
+        '<span class="bar-track"><i class="' + (m.id==="m3" && V.wasteOn ? "hot":"") + '" style="width:' + (mv/maxM*100).toFixed(1) + '%"></i></span>' +
+        '<span class="bar-val">' + inr(mv) + ' kWh</span>';
+      host.appendChild(r);
+    });
+  }
+  var co = $("m3Callout");
+  if(co){
+    if(V.f1){ co.className = "callout ok";
+      co.textContent = "Machine 3 (Sewing) — fixed · Night idle draw eliminated · Waste now " + V.wastePct.toFixed(0) + "% · Saving ৳28,000/month"; }
+    else { co.className = "callout";
+      co.textContent = "Machine 3 (Sewing) — " + inr(V.months[2]) + " kWh · Production: 12,450 pcs · Waste: " + V.wastePct.toFixed(0) + "% (Night Shift)"; }
+  }
+
+  var f = V.fc;
+  if($("fcBill")) $("fcBill").textContent = bdt(f.bill);
+  if($("fcCarbon")) $("fcCarbon").textContent = f.carbon.toFixed(1) + " ton";
+  if($("fcNote")){
+    $("fcNote").textContent = V.f1
+      ? "Forecast improved — Machine 3 fix applied, night waste removed from projection."
+      : V.wasteArmed
+        ? "Forecast assumes Machine 3 night waste is still unfixed."
+        : "Forecast assumes Machine 3 night waste stays disarmed.";
+  }
+  var pct = clamp(sv / V.target * 100, 0, 100);
+  if($("ringPct")) $("ringPct").textContent = pct.toFixed(0) + "%";
+  if($("ringFg")) $("ringFg").style.strokeDashoffset = (276.5 * (1 - pct/100)).toFixed(1);
+  if($("savTotal")) $("savTotal").textContent = bdt(sv);
+  if($("savPlan")) $("savPlan").textContent = "(Plan: " + bdt(V.target) + ")";
+  if($("savCarbon")) $("savCarbon").textContent = V.carbonRed.toFixed(1) + " ton CO₂e";
+  if($("cqTotal")) $("cqTotal").textContent = c.toFixed(1) + " ton CO₂e";
+  var s1d = (BASE.scope1 + V.delta*0.000242).toFixed(1);
+  if($("cqS1")) $("cqS1").textContent = s1d + " t";
+  if($("cqS2")) $("cqS2").textContent = (c - parseFloat(s1d)).toFixed(1) + " t";
+  if($("cqScore")) $("cqScore").textContent = (72 + V.appliedCount*2) + "/100 · Good";
+  if($("aiAnswer") && !S.aiTouched) $("aiAnswer").textContent = "এই মাসে বিদ্যুৎ খরচ বেড়েছে মূলত মেশিন ৩ এর রাতের দিকে অতিরিক্ত ব্যবহারের কারণে। মোট খরচ: ৳ " + bn(inr(V.bill)) + " — গত মাসের তুলনায় ১০% কম।";
+}
+
+function renderFixes(){
+  var host = $("fixList");
+  if(!host) return;
+  host.innerHTML = "";
+  FIXES.forEach(function(f, i){
+    var done = !!S.fixesApplied[f.id];
+    var d = document.createElement("div"); d.className = "fix" + (done ? " done" : "");
+    d.innerHTML = '<span class="f-num">' + (done ? '<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : (i+1)) + '</span><div style="flex:1;min-width:0">' +
+      '<div style="display:flex;align-items:flex-start;gap:8px"><b>' + esc(f.name) + '</b>' +
+      '<span class="impact ' + f.impact + '">' + (f.impact==="high" ? "High Impact" : "Medium Impact") + '</span></div>' +
+      '<p>' + esc(f.desc) + '</p>' +
+      '<div class="f-nums"><span><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> ' + f.saveLabel + '</span><span><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/></svg> ' + bdt(f.money) + '/month</span><span>Payback: ' + f.payback + '</span></div>' +
+      '<button class="apply-btn' + (done ? " done" : "") + '" data-fix="' + f.id + '"' + (done ? " disabled" : "") + '>' +
+      (done ? "Applied — verified by meters" : "Apply fix") + '</button></div>';
+    host.appendChild(d);
+  });
+  host.querySelectorAll("[data-fix]").forEach(function(btn){
+    btn.addEventListener("click", function(){ applyFix(btn.getAttribute("data-fix"), "simulation", false); });
+  });
+}
+
+function applyFix(id, via, fromStory){
+  if(S.fixesApplied[id]) return;
+  if(!fromStory) cancelStory();
+  S.fixesApplied[id] = true; S.appliedCount++;
+  var f = FIXES.filter(function(x){ return x.id===id; })[0];
+  S.realized += f.money * 0.1;
+  if(id==="f1"){ clearAlert("waste"); flags.waste = false; S.wastePct = 6; }
+  logEvent("ok", "AI fix applied: “" + f.name + "” — saving " + bdt(f.money) + "/month");
+  toast("Fix applied → simulation updated: " + f.name + " saves " + bdt(f.money) + "/month");
+  renderFixes(); push(); render();
+}
+
+function render(){
+  var night = isNight();
+  $("clockBig").textContent = clockStr() + "  ·  " + (night ? "NIGHT" : "DAY");
+  $("clockDate").textContent = dateStr();
+  $("clockChip").textContent = "SIM " + clockStr();
+  var badge = $("shiftBadge");
+  badge.textContent = night ? "NIGHT SHIFT" : "DAY SHIFT";
+  badge.className = "shift-badge " + (night ? "night" : "day");
+  $("shiftHours").textContent = night ? "22:00 – 06:00 · reduced load" : "06:00 – 22:00 · full production";
+  $("tickTag").textContent = "TICK #" + S.tick;
+  $("stTicks").textContent = S.tick;
+  $("stPushes").textContent = S.pushes;
+  $("pushCount").textContent = S.pushes;
+  var up = Math.floor(S.simMin - (18*1440 + 540));
+  $("stUptime").textContent = up >= 60 ? Math.floor(up/60) + "h " + pad(up%60) + "m" : up + "m";
+  $("flowMeters").textContent = Math.round(totalKw()) + " kW total draw · " + (S.outage ? "GRID DOWN" : "8/8 meters online");
+  $("flowEngine").textContent = "tick #" + S.tick + " · " + (S.running ? "running" : "paused") + " at " + S.speed + "×";
+  $("totalKw").textContent = Math.round(totalKw());
+  $("peakKw").textContent = Math.round(peakNow()) + " kW";
+  $("meterTag").textContent = S.outage ? "GRID DOWN · GENERATOR ON" : "8 / 8 ONLINE";
+  $("meterTag").className = "tag " + (S.outage ? "warn" : "ok");
+
+  document.querySelectorAll("[data-scen]").forEach(function(b){ var n = b.getAttribute("data-scen");
+    b.classList.toggle("active",
+      (n==="waste" && wasteActive()) ||
+      (n==="surge" && S.surgeUntil > S.simMin) ||
+      (n==="breakdown" && S.machines.some(function(m){ return m.fault; })) ||
+      (n==="outage" && S.outage)); });
+  updateMeters(); renderChart();
+}
+
+function cancelStory(){ if(S.storyTimers.length){ S.storyTimers.forEach(clearTimeout); S.storyTimers = []; logEvent("ev","Story interrupted — manual control"); } }
+function jumpToNight(){
+  var tod = S.simMin % 1440;
+  if(tod >= 6*60 && tod < 22*60) S.simMin += (23*60 + 10) - tod;
+  flags.night = false;
+}
+function startOutage(){
+  S.outage = true; S.outageUntil = S.simMin + S.outageDur;
+  raiseAlert("outage","crit","Grid power cut — running on generator",
+    "Mains supply dropped. Diesel generator carries Lighting & HVAC only.");
+  logEvent("crit","Grid power cut — generator carrying lighting only");
+}
+function endOutage(auto){
+  S.outage = false; S.outageUntil = -1; clearAlert("outage");
+  logEvent("ok","Grid power restored — all meters back online");
+  render();
+}
+function setScenario(name){
+  cancelStory();
+  if(name==="waste"){
+    jumpToNight();
+    m3().wasteArmed = true; S.outage = false; S.outageUntil = -1; clearAlert("outage");
+    logEvent("warn","Scenario: night shift — Machine 3 waste armed, idling at 38 kW");
+    toast("Night shift: Machine 3 idling at 38 kW — watch alarm and preview");
+  }
+  if(name==="surge"){ S.surgeUntil = S.simMin + 30; flags.surge = false;
+    logEvent("warn","Scenario: peak demand surge — all loads ×" + S.surgeLevel); toast("Surge on ×" + S.surgeLevel); }
+  if(name==="breakdown"){
+    var bm = S.machines.filter(function(x){ return x.id==="boiler"; })[0];
+    if(!bm.fault){ setFault("boiler", true); toast("Boiler breakdown: steam lost"); }
+    else toast("Boiler already down"); }
+  if(name==="outage"){
+    if(S.outage){ endOutage(false); toast("Grid power restored early"); }
+    else { startOutage(); toast("Power cut: factory on generator"); } }
+  if(name==="normal"){ S.outage = false; S.outageUntil = -1; S.surgeUntil = -1;
+    S.machines.forEach(function(m){ if(m.fault){ m.fault = false; clearAlert("fault-" + m.id); } });
+    clearAlert("outage"); clearAlert("peak"); flags.peak = false;
+    logEvent("ok","Scenario: normal operations — all events cleared"); toast("Normal operations restored"); }
+  render(); push();
+}
+function runStory(){
+  cancelStory(); ensureRunning();
+  logEvent("ev","▶ Judge story started — night waste → alarm → AI fix → verified savings");
+  toast("Judge story running: watch Machine 3, alarm, then savings");
+  var t = [];
+  t.push(setTimeout(function(){ setScenarioKeep("waste"); }, 600));
+  t.push(setTimeout(function(){ logEvent("warn","Story beat: waste alarm live on website feed — AI Recommendation #1 generated"); }, 7000));
+  t.push(setTimeout(function(){ applyFix("f1", "judge story", true); }, 13000));
+  t.push(setTimeout(function(){ S.speed = 60; syncSpeedSeg();
+    logEvent("ev","⏩ Story beat: fast-forwarding meters for verified savings"); }, 19000));
+  t.push(setTimeout(function(){ S.speed = 12; syncSpeedSeg();
+    logEvent("ok","Story complete — savings & carbon reduction verified"); 
+    toast("Story complete: fix verified — savings rose and forecast improved"); }, 26000));
+  S.storyTimers = t;
+}
+function setScenarioKeep(name){
+  if(name==="waste"){ jumpToNight(); m3().wasteArmed = true; S.outage = false;
+    logEvent("warn","Story beat: night shift — Machine 3 idling at 38 kW"); render(); push(); }
+}
+function ensureRunning(){ if(!S.running){ S.running = true; syncPlayBtn(); } }
+function syncPlayBtn(){ $("btnPlay").innerHTML = S.running ? "Pause engine" : "Resume engine";
+  $("enginePillTxt").textContent = S.running ? "ENGINE RUNNING" : "ENGINE PAUSED";
+  $("enginePill").className = "chip eng-pill " + (S.running ? "running" : "paused");
+  $("engineDot").className = "dot " + (S.running ? "live" : "off"); }
+function syncSpeedSeg(){ document.querySelectorAll("#speedSeg button").forEach(function(b){
+  b.classList.toggle("on", +b.getAttribute("data-speed") === S.speed); }); }
+
+function wire(){
+  $("btnPlay").addEventListener("click", function(){ cancelStory(); S.running = !S.running; syncPlayBtn();
+    logEvent("ev", S.running ? "Engine resumed" : "Engine paused"); render(); });
+  $("btnStep").addEventListener("click", function(){ cancelStory(); tick(60); push(); logEvent("ev","⏩ Stepped +1 simulated hour"); });
+  $("btnReset").addEventListener("click", function(){
+    var keepTab = S.apiTab; S = freshState(); S.apiTab = keepTab; flags = {};
+    BASE.energy = 52300; BASE.bill = 648750; BASE.carbon = 34.2;
+    $("billJson").value = '{ "month": "Oct 2026", "kwh": 52300, "bill_bdt": 648750, "source": "DPDC e-bill" }';
+    $("tariffRange").value = 12.40; $("tariffOut").textContent = "৳12.40 /kWh";
+    $("targetRange").value = 95000; $("targetOut").textContent = "৳ 95,000";
+    $("prodRange").value = 12000; $("prodOut").textContent = "12,000 pcs";
+    $("importMsg").textContent = "";
+    $("termLog").innerHTML = ""; $("pushLog").innerHTML = "";
+    document.querySelectorAll("#shiftSeg button").forEach(function(x){ x.classList.toggle("on", x.getAttribute("data-shift")==="auto"); });
+    document.querySelectorAll("#surgeSeg button").forEach(function(x){ x.classList.toggle("on", x.getAttribute("data-level")==="1.25"); });
+    document.querySelectorAll("#outageSeg button").forEach(function(x){ x.classList.toggle("on", x.getAttribute("data-dur")==="15"); });
+    document.querySelectorAll("[data-scen]").forEach(function(x){ x.classList.remove("active"); });
+    document.querySelectorAll("[data-fc]").forEach(function(x){ x.classList.toggle("on", x.getAttribute("data-fc")==="1"); });
+    bootLog(); syncPlayBtn(); syncSpeedSeg(); renderFixes(); renderAlerts(); buildMeters(); render(); push();
+    toast("Simulation reset to baseline"); });
+  $("speedSeg").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return;
+    cancelStory(); S.speed = +b.getAttribute("data-speed"); syncSpeedSeg(); render(); });
+  $("shiftSeg").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return;
+    cancelStory(); S.shiftOverride = b.getAttribute("data-shift");
+    document.querySelectorAll("#shiftSeg button").forEach(function(x){ x.classList.toggle("on", x===b); });
+    logEvent("ev","Shift pattern: " + S.shiftOverride); render(); });
+  document.querySelectorAll("[data-scen]").forEach(function(b){
+    b.addEventListener("click", function(){ setScenario(b.getAttribute("data-scen")); }); });
+  $("surgeSeg").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return;
+    cancelStory(); S.surgeLevel = +b.getAttribute("data-level");
+    document.querySelectorAll("#surgeSeg button").forEach(function(x){ x.classList.toggle("on", x===b); });
+    logEvent("ev","Peak demand level set to ×" + S.surgeLevel); render(); });
+  $("outageSeg").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return;
+    cancelStory(); S.outageDur = +b.getAttribute("data-dur");
+    document.querySelectorAll("#outageSeg button").forEach(function(x){ x.classList.toggle("on", x===b); });
+    if(S.outage) S.outageUntil = S.simMin + S.outageDur;
+    logEvent("ev","Power cut length: " + S.outageDur + " min"); render(); push(); });
+  $("btnStory").addEventListener("click", runStory);
+  $("tariffRange").addEventListener("input", function(){ S.tariff = +this.value;
+    $("tariffOut").textContent = "৳" + S.tariff.toFixed(2) + " /kWh"; });
+  $("tariffRange").addEventListener("change", function(){ push(); syncSharedStorage(); });
+  $("targetRange").addEventListener("input", function(){ S.target = +this.value;
+    $("targetOut").textContent = bdt(S.target); });
+  $("targetRange").addEventListener("change", function(){ push(); syncSharedStorage(); });
+  $("prodRange").addEventListener("input", function(){ S.prodToday = +this.value;
+    $("prodOut").textContent = inr(S.prodToday) + " pcs"; });
+  $("prodRange").addEventListener("change", function(){ push(); syncSharedStorage(); });
+  $("btnImport").addEventListener("click", function(){
+    try { var j = JSON.parse($("billJson").value);
+      if(!j.kwh || !j.bill_bdt) throw new Error("needs kwh + bill_bdt");
+      BASE.energy = +j.kwh; BASE.bill = +j.bill_bdt; BASE.carbon = +((+j.kwh) * CO2_KG_PER_KWH / 1000).toFixed(1);
+      S.energy = BASE.energy; S.tariff = BASE.bill / BASE.energy;
+      S.fixedCharge = Math.max(0, Math.round(BASE.bill - BASE.energy * S.tariff));
+      S.demandCharge = 0;
+      var sumM = S.machines.reduce(function(a,m){ return a + m.month; }, 0) || 1;
+      var mf = BASE.energy / sumM;
+      S.machines.forEach(function(m){ m.month *= mf; });
+      $("tariffRange").value = S.tariff; $("tariffOut").textContent = "৳" + S.tariff.toFixed(2) + " /kWh";
+      $("importMsg").textContent = "Applied — simulation re-based to " + inr(BASE.energy) + " kWh / " + bdt(BASE.bill);
+      logEvent("ok","Monthly bill imported (" + (j.source || "manual") + ") — baseline re-based");
+      render(); push(); syncSharedStorage();
+    } catch(err){ $("importMsg").textContent = "Invalid JSON — " + err.message; }
+  });
+  $("apiTabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return;
+    S.apiTab = b.getAttribute("data-ep");
+    document.querySelectorAll("#apiTabs button").forEach(function(x){ x.classList.toggle("on", x===b); });
+    $("apiJson").innerHTML = jsonHtml(buildPayload(S.apiTab)); });
+  document.querySelectorAll("[data-fc]").forEach(function(b){
+    b.addEventListener("click", function(){ S.fcRange = +b.getAttribute("data-fc");
+      document.querySelectorAll("[data-fc]").forEach(function(x){ x.classList.toggle("on", x===b); });
+      push(); }); });
+  document.querySelectorAll("[data-q]").forEach(function(b){
+    b.addEventListener("click", function(){
+      S.aiTouched = true;
+      var q = b.getAttribute("data-q"), V = S.view || snapshot(), ans = "";
+      if(q==="why"){ var rows = S.machines.map(function(m,i){ return { n: m.name.split(" · ")[0], v: V.months[i] }; })
+          .sort(function(a,b){ return b.v - a.v; });
+        ans = "সবচেয়ে বেশি বিদ্যুৎ যাচ্ছে " + bn(rows[0].n) + " — এই মাসে " + bn(inr(rows[0].v)) + " kWh। দ্বিতীয় অবস্থানে আছে " + bn(rows[1].n) + " (" + bn(inr(rows[1].v)) + " kWh)।" +
+          (!V.f1 && V.wasteArmed ? " রাতের শিফটে মেশিন ৩ বন্ধ থাকার কথা থাকলেও ৩৮ kW টেনে নিচ্ছে, অপচয় " + bn(V.wastePct.toFixed(0)) + "%।" : ""); }
+      if(q==="next") ans = "আগামী মাসের আনুমানিক বিল " + bn(bdt(V.fc.bill)) + " এবং কার্বন " + bn(V.fc.carbon.toFixed(1)) + " টন হতে পারে (±৫%)।";
+      if(q==="carbon"){ var s1x = (BASE.scope1 + V.delta*0.000242).toFixed(1);
+        ans = "এই মাসে মোট কার্বন নির্গমন " + bn(V.carbon.toFixed(1)) + " টন CO₂e। Scope 1: " + bn(s1x) + " টন, Scope 2: " + bn((V.carbon - parseFloat(s1x)).toFixed(1)) + " টন।"; }
+      if($("aiAnswer")) $("aiAnswer").textContent = ans; }); });
+  var br = $("btnReport");
+  if(br){
+    br.addEventListener("click", function(){
+      var V = S.view || snapshot(), f = V.fc;
+      var html = "<!doctype html><html lang='en'><head><meta charset='utf-8'><title>CarbonIQ Report — Rupsha Garments Ltd.</title>" +
+        "<style>body{font-family:Georgia,serif;max-width:720px;margin:40px auto;padding:0 20px;color:#0b2233}h1{font-size:26px}table{width:100%;border-collapse:collapse;margin:16px 0}td,th{border:1px solid #ccc;padding:8px 12px;text-align:left}.n{text-align:right;font-family:monospace}</style></head><body>" +
+        "<h1>CarbonIQ Report — Rupsha Garments Ltd.</h1><p>Generated by Green Factory Brain AI · Simulation data · " + dateStr() + ", " + clockStr() + " (simulated)</p>" +
+        "<table><tr><th>Metric</th><th class='n'>Value</th></tr>" +
+        "<tr><td>Total energy (Oct 2026)</td><td class='n'>" + inr(V.energy) + " kWh</td></tr>" +
+        "<tr><td>Electricity bill</td><td class='n'>" + bdt(V.bill) + "</td></tr>" +
+        "<tr><td>Total emissions</td><td class='n'>" + V.carbon.toFixed(1) + " ton CO2e</td></tr>" +
+        "<tr><td>Scope 1</td><td class='n'>" + (BASE.scope1 + V.delta*0.000242).toFixed(1) + " t</td></tr>" +
+        "<tr><td>Scope 2</td><td class='n'>" + (V.carbon - parseFloat((BASE.scope1 + V.delta*0.000242).toFixed(1))).toFixed(1) + " t</td></tr>" +
+        "<tr><td>Emission factor</td><td class='n'>0.654 kg CO2e/kWh</td></tr>" +
+        "<tr><td>Carbon reduction achieved</td><td class='n'>" + V.carbonRed.toFixed(1) + " ton</td></tr>" +
+        "<tr><td>Sustainability score</td><td class='n'>" + (72 + V.appliedCount*2) + "/100 · Higg FEM Level 3</td></tr>" +
+        "<tr><td>Next-month forecast</td><td class='n'>" + bdt(f.bill) + " · " + f.carbon.toFixed(1) + " ton</td></tr></table>" +
+        "<p>Simulation report for demonstration — figures generated by Green Factory Brain simulation engine.</p></body></html>";
+      var blob = new Blob([html], { type:"text/html" });
+      var a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+      a.download = "carboniq-report-rupsha-oct-2026.html"; document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+      toast("CarbonIQ report downloaded — built from live simulation data");
+    });
+  }
+  setInterval(function(){
+    var s = Math.round((Date.now() - S.lastSync)/1000);
+    if($("syncTxt")) $("syncTxt").textContent = "SYNCED · " + s + "s AGO";
+  }, 1000);
+  setInterval(function(){ if(S.running) tick(S.speed/2); }, 500);
+}
+function bootLog(){
+  logEvent("ev","Green Factory Brain · simulation engine v3.0 — online");
+  logEvent("api","Connected: 8 virtual sub-meters · Rupsha Garments Ltd. · Dhaka");
+  logEvent("ev","Baseline: 52,300 kWh · ৳6,48,750 · 34.2 ton CO₂e · savings ৳68,000");
+  logEvent("api","API live: /api/energy · /api/machines · /api/forecast · /api/alerts");
+}
+document.addEventListener("DOMContentLoaded", function(){
+  wire(); bootLog(); renderFixes(); renderAlerts(); buildMeters(); render(); push();
+  raiseAlert("meters","info","Sub-meters connected — 8 of 8 online",
+    "All virtual meters are reporting to the central simulation engine.");
+  syncSharedStorage();
+  if(window.parent && window.parent !== window){
+    window.parent.postMessage({ type: 'GFB_SIM_READY', payload: S.view }, '*');
+  }
+});
+</script>
+
+  <!-- FLOATING 3D ANIMATED ORB COPILOT & NAVIGATION DOCK -->
+  <style>
+    .gfb-sim-dock {
+      position: fixed; bottom: 18px; right: 18px; z-index: 90;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .in-iframe .gfb-sim-dock,
+    body.in-iframe .gfb-sim-dock {
+      display: none !important;
+    }
+    .gfb-sim-pill {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 7px 14px 7px 9px; border-radius: 999px;
+      background: #eafaf0; color: #0f3923;
+      border: 1.5px solid #86efac;
+      box-shadow: 0 12px 28px rgba(22, 163, 74, 0.32);
+      font-family: "Manrope", system-ui, sans-serif;
+      font-size: 12px; font-weight: 800; text-decoration: none;
+      transition: transform 0.2s ease;
+    }
+    .gfb-sim-pill:hover { transform: translateY(-2px); }
+    .gfb-mini-orb {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 25%, #86efac 0%, #22c55e 42%, #15803d 82%, #052e16 100%);
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.45), inset -2px -2px 6px rgba(5, 46, 22, 0.5), inset 2px 2px 5px rgba(255, 255, 255, 0.65);
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      animation: gfbSimOrbFloat 3.6s ease-in-out infinite; flex-shrink: 0;
+    }
+    .gfb-mini-eye {
+      width: 3.2px; height: 7.5px; background: #ffffff; border-radius: 999px;
+      animation: gfbSimOrbBlink 4.2s infinite;
+    }
+    @keyframes gfbSimOrbFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-4px); } }
+    @keyframes gfbSimOrbBlink { 0%, 44%, 48%, 92%, 96%, 100% { transform: scaleY(1); } 46%, 94% { transform: scaleY(0.1); } }
+  </style>
+  <div id="gfb-sim-floating-orb-dock" class="gfb-sim-dock">
+    <a href="index.html#/dashboard" target="_top" class="gfb-sim-pill">
+      <span class="gfb-mini-orb"><span class="gfb-mini-eye"></span><span class="gfb-mini-eye"></span></span>
+      <span>AI Copilot &amp; Main Dashboard</span>
+      <span style="padding:2px 7px;border-radius:99px;background:#dcfce7;color:#15803d;border:1px solid #bbf7d0;font-size:9px;">LIVE AGENT</span>
+    </a>
+    <a href="digital-twin.html" target="_top" class="gfb-sim-pill" style="padding-left:13px;background:#0a2534;color:#2fe0bd;border-color:#1f5064;">
+      <svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-9 5-9-5V8l9-5 9 5v8Z"/><path d="m3.27 6.96 8.73 4.89 8.73-4.89"/><path d="M12 22V12"/></svg> 3D EPMS Twin
+    </a>
+  </div>
+</body>
+</html>

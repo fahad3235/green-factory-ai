@@ -1,0 +1,26 @@
+# Production Static SPA Redirects for Green Factory Brain AI
+# Ensures all static pages and client-side SPA routes resolve with 200 OK
+
+# Dedicated standalone pages
+/digital-twin.html     /digital-twin.html     200
+/digital-twin          /digital-twin.html     200
+/simulation.html       /simulation.html       200
+/simulation            /simulation.html       200
+
+# Client-side hash routes & SPA fallbacks
+/dashboard             /index.html            200
+/login                 /index.html            200
+/settings              /index.html            200
+/agent-console         /index.html            200
+/energy-analytics      /index.html            200
+/factory-operations    /index.html            200
+/bill-carbon-forecast  /index.html            200
+/ai-recommendations    /index.html            200
+/savings-tracker       /index.html            200
+/carboniq-report       /index.html            200
+/sustainability-reports /index.html           200
+/machine-monitoring    /index.html            200
+/inventory-production  /index.html            200
+
+# Catch-all SPA rewrite
+/*                     /index.html            200

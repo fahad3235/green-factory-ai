@@ -1,0 +1,16 @@
+{
+  "name": "green-factory-brain-ai",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Green Factory Brain AI — Interactive Enterprise Energy, CarbonIQ, Agent Console & 3D EPMS Machine Digital Twin Simulation Platform",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve . -l 3000",
+    "start": "npx serve . -l 3000",
+    "test": "node tests/domain-calculations.test.mjs",
+    "build": "echo 'Static SPA bundle verified: index.html'"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

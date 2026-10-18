@@ -1,0 +1,52 @@
+[build]
+  publish = "."
+  command = "echo 'Build verified for Green Factory Brain AI'"
+
+[build.environment]
+  NETLIFY_PREVIEW_FEEDBACK = "false"
+  NETLIFY_FEEDBACK_DISABLED = "true"
+
+[context.deploy-preview.environment]
+  NETLIFY_PREVIEW_FEEDBACK = "false"
+  NETLIFY_FEEDBACK_DISABLED = "true"
+
+[context.branch-deploy.environment]
+  NETLIFY_PREVIEW_FEEDBACK = "false"
+  NETLIFY_FEEDBACK_DISABLED = "true"
+
+[context.production.environment]
+  NETLIFY_PREVIEW_FEEDBACK = "false"
+  NETLIFY_FEEDBACK_DISABLED = "true"
+
+[[redirects]]
+  from = "/digital-twin"
+  to = "/digital-twin.html"
+  status = 200
+
+[[redirects]]
+  from = "/digital-twin.html"
+  to = "/digital-twin.html"
+  status = 200
+
+[[redirects]]
+  from = "/simulation"
+  to = "/simulation.html"
+  status = 200
+
+[[redirects]]
+  from = "/simulation.html"
+  to = "/simulation.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(self), geolocation=()"

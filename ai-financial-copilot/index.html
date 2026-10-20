@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Finance — AI Financial Copilot & Live Agent</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { background: linear-gradient(180deg, #f6f9fc 0%, #eef5f2 100%); min-height: 100vh; }
+    .orb-wrapper { position: relative; display: flex; align-items: center; justify-content: center; }
+    .orb-glow {
+      position: absolute; width: 118px; height: 118px; border-radius: 9999px;
+      background: radial-gradient(circle, rgba(22, 163, 74, 0.35) 0%, rgba(22, 163, 74, 0) 70%);
+      animation: pulseGlow 3.2s ease-in-out infinite; pointer-events: none;
+    }
+    .orb-sphere {
+      width: 86px; height: 86px; border-radius: 9999px;
+      background: radial-gradient(circle at 32% 28%, #6ee787 0%, #22c55e 38%, #15803d 78%, #0d5428 100%);
+      box-shadow: inset -6px -8px 16px rgba(6, 46, 22, 0.55), inset 6px 6px 14px rgba(187, 247, 208, 0.65), 0 12px 26px -4px rgba(22, 163, 74, 0.42);
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      animation: floatOrb 3.6s ease-in-out infinite; position: relative; z-index: 2; cursor: pointer;
+    }
+    .orb-eye {
+      width: 9px; height: 20px; background: #ffffff; border-radius: 999px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.95);
+      animation: blinkEyes 4.5s infinite, lookAround 7s ease-in-out infinite;
+    }
+    .mini-orb {
+      width: 38px; height: 38px; min-width: 38px; border-radius: 9999px;
+      background: radial-gradient(circle at 32% 28%, #6ee787 0%, #22c55e 40%, #15803d 82%, #0d5428 100%);
+      box-shadow: inset -3px -4px 8px rgba(6, 46, 22, 0.55), inset 3px 3px 7px rgba(187, 247, 208, 0.65), 0 6px 14px -2px rgba(22, 163, 74, 0.45);
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      animation: floatMini 3.2s ease-in-out infinite;
+    }
+    .mini-eye { width: 4px; height: 9px; background: #ffffff; border-radius: 999px; animation: blinkEyes 4.5s infinite; }
+    .status-dot { width: 7px; height: 7px; border-radius: 9999px; background-color: #15803d; animation: dotWave 1.6s infinite ease-in-out; }
+    .status-dot:nth-child(2) { animation-delay: 0.25s; }
+    .status-dot:nth-child(3) { animation-delay: 0.5s; }
+    @keyframes floatOrb { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
+    @keyframes floatMini { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-3px); } }
+    @keyframes pulseGlow { 0%, 100% { transform: scale(0.95); opacity: 0.75; } 50% { transform: scale(1.12); opacity: 1; } }
+    @keyframes blinkEyes { 0%, 44%, 48%, 92%, 96%, 100% { transform: scaleY(1); } 46%, 94% { transform: scaleY(0.1); } }
+    @keyframes lookAround { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(3px, -1px); } 55% { transform: translate(-3px, 1px); } 80% { transform: translate(1px, 2px); } }
+    @keyframes dotWave { 0%, 100% { opacity: 0.35; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.15); } }
+    .prompt-marquee { white-space: nowrap; overflow-x: auto; scrollbar-width: none; }
+    .prompt-marquee::-webkit-scrollbar { display: none; }
+    .msg-enter { animation: msgSlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes msgSlideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .thinking .orb-sphere { animation: floatOrb 0.9s ease-in-out infinite; box-shadow: 0 0 34px 6px rgba(34, 197, 94, 0.65); }
+  </style>
+</head>
+<body class="py-6 px-4 flex flex-col items-center justify-start">
+  <div class="w-full max-w-[460px] flex items-center justify-between mb-4">
+    <span class="text-xs font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-100/80 px-2.5 py-1 rounded-full">AI Financial Copilot · Live</span>
+    <button onclick="downloadProjectZip()" class="text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 transition">⬇ Download .ZIP</button>
+  </div>
+
+  <div class="w-full max-w-[460px]">
+    <div class="mb-4 px-1">
+      <h1 class="text-[32px] leading-tight font-extrabold text-[#162447] tracking-tight">Good Morning, Ishan</h1>
+      <p class="text-[16.5px] text-[#64748b] font-medium mt-1">Your international student finances, in one place.</p>
+    </div>
+
+    <div class="rounded-[26px] border-[1.5px] border-[#b9e6c9] bg-[#f4fbf7] shadow-[0_14px_40px_-12px_rgba(22,163,74,0.16)] overflow-hidden">
+      <div class="px-5 py-3.5 bg-[#eafaf0] border-b border-[#cdecd8] flex items-center justify-between">
+        <span class="text-[17px] font-bold text-[#134e2c] tracking-tight">AI Financial Copilot Chat</span>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2 mr-1"><span class="status-dot"></span><span class="status-dot"></span><span class="status-dot"></span></div>
+          <button onclick="location.reload()" class="text-[#15803d] hover:bg-[#d8f3e2] w-7 h-7 rounded-full flex items-center justify-center transition text-lg font-semibold">↻</button>
+          <button onclick="document.getElementById('chatBody').classList.toggle('hidden')" class="text-[#15803d] hover:bg-[#d8f3e2] w-7 h-7 rounded-full flex items-center justify-center transition text-xl leading-none">×</button>
+        </div>
+      </div>
+
+      <div class="px-4 py-2.5 bg-[#effaf3] border-b border-[#d5f0df] flex items-center justify-between gap-2">
+        <div class="flex items-center gap-1.5 text-[13px] font-medium text-[#1b5e37] truncate">
+          <span>📡</span><span class="truncate">Tracking Vault, Crypto, Tuition &amp; 18+ Corridors live</span>
+        </div>
+        <span class="shrink-0 text-[11px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d] border border-[#bbf7d0]">LIVE AGENT</span>
+      </div>
+
+      <div id="chatBody" class="bg-white px-4 pt-6 pb-3 flex flex-col">
+        <div id="orbHeader" class="flex flex-col items-center text-center mb-5">
+          <div class="orb-wrapper mb-3"><div class="orb-glow"></div><div class="orb-sphere"><div class="orb-eye"></div><div class="orb-eye"></div></div></div>
+          <h2 class="text-[20px] font-extrabold text-[#0f3923] tracking-tight">AI Copilot</h2>
+          <p class="text-[13.5px] font-semibold text-[#16a34a] mt-0.5">Copilot+ Agent · Nemotron 3 Ultra 550B</p>
+        </div>
+
+        <div id="messagesContainer" class="space-y-3.5 max-h-[340px] overflow-y-auto pr-1">
+          <div class="flex items-start gap-3 msg-enter">
+            <div class="mini-orb mt-1"><div class="mini-eye"></div><div class="mini-eye"></div></div>
+            <div class="flex-1 rounded-[20px] border border-[#ccebd7] bg-[#f1faf4] px-4 py-3.5 shadow-sm">
+              <p class="text-[15.5px] font-bold text-[#111827] mb-1">Your JPY balance is up 4% this week</p>
+              <p class="text-[14.5px] leading-[1.48] text-[#4b5563]">Live portfolio synced ($48,493.24 USD). Ask me to plan your 4-month tuition + family remittance, compare rates, or execute a live Vault action.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3.5 ml-[50px]">
+          <button onclick="sendQuick('Generate my 4-Month Tuition + Remittance Plan')" class="inline-flex items-center px-3.5 py-1.5 rounded-full border border-[#ccebd7] bg-[#f1faf4] hover:bg-[#e3f6ea] text-[13.5px] font-semibold text-[#14532d] transition">Quick-suggest · 4-Mo Plan</button>
+        </div>
+      </div>
+
+      <div class="px-3 py-2 bg-[#f4fbf7] border-t border-[#d8f0e0]">
+        <button onclick="sendQuick('Amar 4 months por tuition dite hobe, sathe family ke month-e $400 pathate hobe—plan kore dao')" class="w-full text-left px-3.5 py-2 rounded-full bg-white border border-[#cdecd8] hover:border-[#86efac] shadow-xs flex items-center gap-2 prompt-marquee transition">
+          <span class="text-base shrink-0">🎯</span>
+          <span class="text-[14px] font-semibold text-[#14532d]">Amar 4 months por tuition dite hobe, sathe family ke month-e $400 pathate hobe—plan kore dao</span>
+        </button>
+      </div>
+
+      <div class="p-3 bg-[#f4fbf7] border-t border-[#d8f0e0]">
+        <form onsubmit="handleSend(event)" class="flex items-center bg-white rounded-full border-[2px] border-[#16a34a] pl-5 pr-2 py-1.5 shadow-sm">
+          <input id="chatInput" type="text" placeholder="Type a message..." class="w-full bg-transparent text-[16px] text-slate-800 placeholder-[#6b7280] focus:outline-none" />
+          <button type="submit" class="w-10 h-10 shrink-0 rounded-full bg-[#15803d] hover:bg-[#166534] text-white flex items-center justify-center transition">↑</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const box = document.getElementById('messagesContainer');
+    const orb = document.getElementById('orbHeader');
+    const input = document.getElementById('chatInput');
+
+    function sendQuick(text) {
+      input.value = text;
+      handleSend(new Event('submit'));
+    }
+
+    function handleSend(e) {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      box.innerHTML += `<div class="flex justify-end msg-enter"><div class="max-w-[82%] rounded-[20px] bg-[#15803d] text-white px-4 py-2.5 text-[14.5px] font-medium">${text}</div></div>`;
+      orb.classList.add('thinking');
+      setTimeout(() => {
+        orb.classList.remove('thinking');
+        box.innerHTML += `<div class="flex items-start gap-3 msg-enter"><div class="mini-orb mt-1"><div class="mini-eye"></div><div class="mini-eye"></div></div><div class="flex-1 rounded-[20px] border border-[#ccebd7] bg-[#f1faf4] px-4 py-3.5 shadow-sm"><p class="text-[15.5px] font-bold text-[#111827] mb-1">4-Month Tuition & Remittance Plan Ready ✅</p><p class="text-[14px] leading-[1.5] text-[#374151]">Allocated <strong>$14,200</strong> to 4.85% APY Tuition Vault (+$229 yield) + scheduled <strong>$400/mo</strong> USD→BDT instant corridor with +2% remittance bonus.</p></div></div>`;
+        box.scrollTop = box.scrollHeight;
+      }, 750);
+    }
+
+    async function downloadProjectZip() {
+      const zip = new JSZip();
+      zip.file("index.html", "<!DOCTYPE html>\n" + document.documentElement.outerHTML);
+      const blob = await zip.generateAsync({ type: "blob" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "ai-financial-copilot.zip";
+      a.click();
+    }
+  </script>
+</body>
+</html>

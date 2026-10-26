@@ -143,18 +143,15 @@ git clone https://github.com/fahad3235/green-factory-ai.git
 cd green-factory-ai
 ```
 
-### Step 2: Configure Environment Variables
-Copy the provided environment template:
+### Step 2: Zero-Configuration Quick Start
+Green Factory Brain AI requires **no `.env` file** or database configuration to run. The application is completely self-contained with zero external dependencies:
 ```bash
-# On Linux / macOS / Git Bash:
-cp preview/.env.example preview/.env
-
-# On Windows PowerShell:
-Copy-Item preview\.env.example preview\.env
+npm start
 ```
+The application will be live immediately at `http://127.0.0.1:4321/`.
 
 ### Step 3: Verify Directory Structure
-Ensure the repository contains the following structure:
+Ensure the repository contains the following clean structure:
 ```text
 green-factory-ai/
 ├── .github/workflows/ci.yml            # Automated GitHub Actions CI workflow
@@ -167,7 +164,6 @@ green-factory-ai/
 ├── simulation.html                     # Standalone Simulation engine control console
 ├── preview/
 │   ├── index.html                      # Core single-page application bundle (All 15 views)
-│   ├── .env.example                    # Clean environment configuration template
 │   ├── .gitignore                      # Deployment-level git ignore rules
 │   ├── package.json                    # Project metadata & npm test scripts
 │   ├── netlify.toml                    # Netlify production routing & headers
@@ -187,18 +183,18 @@ green-factory-ai/
 
 ---
 
-## 6. Environment Variables
+## 6. Environment & Configuration Settings
 
-The project includes a clean environment template at [`.env.example`](file:///c:/AI%20HACATHON%20CLOUD%20CAMP%20PROJECT/preview/.env.example). All configuration variables use safe placeholders with zero exposed secrets:
+Green Factory Brain AI operates in **Zero-Configuration Mode** by default. All industrial telemetry models, baseline datasets, and energy calculations run out of the box with zero external configuration files or setup needed:
 
-| Variable Name | Default Value | Purpose & Description |
+| Setting / Constant | Default Value | Purpose & Description |
 | :--- | :--- | :--- |
+| `PORT` | `4321` | HTTP listening port for `server.js` (automatically adapts to cloud host `$PORT` if set). |
+| `HOST` | `0.0.0.0` | Universal interface binding for local machine and container access. |
 | `GFB_OPERATING_MODE` | `simulation` | Sets application runtime mode: `"simulation"` (default demo mode) or `"connected_readonly"`. |
 | `GFB_SIMULATION_SEED` | `20261018` | Deterministic pseudo-random seed ensuring reproducible telemetry across all judge evaluations. |
-| `LLM_PROVIDER` | `none` | Optional server-side LLM provider (`"openai"`, `"anthropic"`, `"gemini"`, or `"none"` for client-side rule-based copilot). |
-| `LLM_SERVER_ENDPOINT` | *empty* | Secure reverse-proxy endpoint for server-side AI model integration. |
-| `LLM_API_KEY_SECRET_REF` | *empty* | Secret vault reference key. Kept strictly server-side. |
-| `EPMS_READONLY_GATEWAY_URL` | *empty* | Optional industrial IoT edge gateway URL for Modbus/TCP or OPC-UA read-only telemetry. |
+| `LLM_PROVIDER` | `none` | Default AI copilot engine: `"none"` (uses zero-latency built-in bilingual grounded engine). |
+| `EPMS_READONLY_GATEWAY_URL` | *empty* | Optional edge gateway URL for Modbus/TCP or OPC-UA read-only telemetry. |
 | `ALLOW_PHYSICAL_EQUIPMENT_WRITE` | `false` | Critical industrial safety switch. Must remain `false` to block unauthorized physical actuator control. |
 
 ---

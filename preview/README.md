@@ -138,7 +138,7 @@ Follow these step-by-step instructions to clone, configure, and launch the proje
 
 ### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/<your-username>/green-factory-ai.git
+git clone https://github.com/fahad3235/green-factory-ai.git
 cd green-factory-ai
 ```
 

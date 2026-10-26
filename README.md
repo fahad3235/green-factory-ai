@@ -109,6 +109,7 @@ The single-page architecture provides zero-reload, deep-linkable URL hash routin
 | Layer | Technologies Used | Description & Purpose |
 | :--- | :--- | :--- |
 | **Core Frontend** | Modern Vanilla JavaScript (ES2022+), HTML5, CSS3 | Framework-free, zero-build single page application for maximum runtime performance and universal compatibility. |
+| **TypeScript Domain Core** | TypeScript (strict, erasable syntax), `tsc --noEmit` | Typed port of the domain engine (`preview/src/domain/calculations.ts`), kept output-identical to the JavaScript runtime module and verified by `scripts/test_typescript_parity.mjs`. |
 | **Styling & Design System** | Tailwind CSS (CDN v3), Custom HSL Glassmorphism, Micro-Animations | Sleek industrial dark mode, responsive mobile dock, and accessible color tokens. |
 | **3D Graphics & Digital Twin** | Three.js (r128), WebGL, Canvas API | Real-time 3D factory floor rendering, procedural machine geometry, animated electrical heatmaps, and spatial cameras. |
 | **Data Visualization** | Highcharts.js, Chart.js, HTML5 Canvas, Vector SVGs | Dual-axis production curves, harmonic spectrums, power factor radial gauges, and load profile charts. |
@@ -323,4 +324,5 @@ In adherence to **Section 5 of the AI DEV FEST 2026 Official Rulebook**, this re
 
 **Developed for the AI DEV FEST 2026 AI Hackathon**  
 *Green Factory Brain AI — Smarter Energy. Lower Costs. Measurable Climate Impact.*
+
 

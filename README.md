@@ -6,7 +6,7 @@
 [![Status](https://img.shields.io/badge/Status-Production%20Verified%20(10%2F10%20E2E)-emerald.svg?style=flat-square)](https://github.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![CI](https://github.com/fahad3235/green-factory-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/fahad3235/green-factory-ai/actions/workflows/ci.yml)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-TryCloudflare%20%2F%20Netlify-cyan.svg?style=flat-square)](https://shop-strategy-engage-conducting.trycloudflare.com)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-emerald.svg?style=flat-square)](https://fahad3235.github.io/green-factory-ai/)
 
 ---
 
@@ -323,3 +323,4 @@ In adherence to **Section 5 of the AI DEV FEST 2026 Official Rulebook**, this re
 
 **Developed for the AI DEV FEST 2026 AI Hackathon**  
 *Green Factory Brain AI — Smarter Energy. Lower Costs. Measurable Climate Impact.*
+

@@ -2,8 +2,38 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+// Native zero-dependency .env parser & loader
+function loadEnv() {
+  const envFiles = [
+    path.join(__dirname, '.env'),
+    path.join(__dirname, 'preview', '.env')
+  ];
+  for (const envPath of envFiles) {
+    if (fs.existsSync(envPath)) {
+      try {
+        const content = fs.readFileSync(envPath, 'utf8');
+        for (const line of content.split(/\r?\n/)) {
+          const trimmed = line.trim();
+          if (!trimmed || trimmed.startsWith('#')) continue;
+          const eqIdx = trimmed.indexOf('=');
+          if (eqIdx !== -1) {
+            const key = trimmed.slice(0, eqIdx).trim();
+            const val = trimmed.slice(eqIdx + 1).trim();
+            if (process.env[key] === undefined) {
+              process.env[key] = val;
+            }
+          }
+        }
+      } catch (e) {
+        // Ignore unreadable env files gracefully
+      }
+    }
+  }
+}
+loadEnv();
 
-const PORT = 4321;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 4321;
+const HOST = process.env.HOST || '0.0.0.0';
 const ZIP_FILE_PATH = path.join(__dirname, 'green_factory_brain_ai_full_project.zip');
 const PREVIEW_DIR = path.join(__dirname, 'preview');
 
@@ -265,6 +295,6 @@ const server = http.createServer((req, res) => {
   res.end('404 Not Found');
 });
 
-server.listen(PORT, () => {
-  console.log(`Green Factory Brain AI server listening on http://localhost:${PORT} and http://127.0.0.1:${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`Green Factory Brain AI server listening on http://${HOST}:${PORT} (and http://localhost:${PORT})`);
 });

@@ -5,10 +5,12 @@ const path = require('path');
 const logPath = path.resolve('cloudflared_active.log');
 const outStream = fs.createWriteStream(logPath, { flags: 'a' });
 
-const cfBin = 'C:\\Program Files (x86)\\cloudflared\\cloudflared.exe';
+const defaultWinBin = 'C:\\Program Files (x86)\\cloudflared\\cloudflared.exe';
+const cfBin = process.env.CLOUDFLARED_BIN || (process.platform === 'win32' && fs.existsSync(defaultWinBin) ? defaultWinBin : 'cloudflared');
+const port = process.env.PORT || 4321;
 
-console.log('Spawning cloudflared tunnel...');
-const child = spawn(cfBin, ['tunnel', '--url', 'http://127.0.0.1:4321'], {
+console.log(`Spawning cloudflared tunnel for port ${port}...`);
+const child = spawn(cfBin, ['tunnel', '--url', `http://127.0.0.1:${port}`], {
   detached: true,
   stdio: ['ignore', 'pipe', 'pipe']
 });

@@ -1,0 +1,40 @@
+name: CI Verification Suite
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Run Verification Suites (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Run Domain Calculation Unit Tests
+      run: node preview/tests/domain-calculations.test.mjs
+
+    - name: Run 10/10 Full E2E Verification Suite
+      run: node preview/tests/e2e-routes-and-flows.test.mjs
+
+    - name: Run Carbon Credit Simulation Scenarios Test
+      run: node scripts/test_simulation_carbon_scenarios.js
+
+    - name: Run 30-Tick Monotonic Carbon Progression Test
+      run: node scripts/test_30_ticks_strict_increase.js
+
+    - name: Validate Emoji Count and JavaScript Syntax
+      run: node scripts/test_carbon_credit_integration.js

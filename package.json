@@ -1,0 +1,34 @@
+{
+  "name": "green-factory-ai",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Green Factory Brain AI — Autonomous Industrial Energy Intelligence, CarbonIQ MRV Accounting & 3D EPMS Digital Twin Platform",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "test": "node preview/tests/e2e-routes-and-flows.test.mjs",
+    "test:domain": "node preview/tests/domain-calculations.test.mjs",
+    "test:carbon": "node scripts/test_simulation_carbon_scenarios.js",
+    "test:ticks": "node scripts/test_30_ticks_strict_increase.js",
+    "test:routes": "node scripts/verify_all_15_routes.js",
+    "test:all": "npm run test:domain && npm run test && npm run test:carbon && npm run test:ticks && npm run test:routes",
+    "build:zip": "node scripts/rebuild_zip.js"
+  },
+  "keywords": [
+    "industrial-ai",
+    "epms",
+    "energy-efficiency",
+    "digital-twin",
+    "threejs",
+    "carbon-credits",
+    "mrv",
+    "verra-vcs",
+    "sustainability",
+    "ai-hackathon"
+  ],
+  "author": "fahad3235",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -5,6 +5,7 @@
 [![AI DEV FEST 2026](https://img.shields.io/badge/AI%20DEV%20FEST-2026%20Hackathon-059669.svg?style=flat-square)](https://github.com)
 [![Status](https://img.shields.io/badge/Status-Production%20Verified%20(10%2F10%20E2E)-emerald.svg?style=flat-square)](https://github.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+[![CI](https://github.com/fahad3235/green-factory-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/fahad3235/green-factory-ai/actions/workflows/ci.yml)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-TryCloudflare%20%2F%20Netlify-cyan.svg?style=flat-square)](https://shop-strategy-engage-conducting.trycloudflare.com)
 
 ---
@@ -156,7 +157,9 @@ Copy-Item preview\.env.example preview\.env
 Ensure the repository contains the following structure:
 ```text
 green-factory-ai/
-├── .gitignore                          # Standard production git ignore rules
+├── .github/workflows/ci.yml            # Automated GitHub Actions CI workflow
+├── .gitignore                          # Clean production git ignore rules
+├── package.json                        # Root project metadata & npm script runners
 ├── README.md                           # Official hackathon documentation (Section 6 compliant)
 ├── server.js                           # Lightweight Node.js local preview & API server
 ├── index.html                          # Root SPA entrypoint
@@ -174,7 +177,10 @@ green-factory-ai/
 │       ├── domain-calculations.test.mjs    # Core energy & carbon math validation
 │       └── e2e-routes-and-flows.test.mjs   # 10/10 E2E route & feature verification
 └── scripts/
+    ├── rebuild_zip.js                  # Production ZIP package builder
+    ├── start_tunnel.js                 # Cloudflare tunnel launcher
     ├── test_30_ticks_strict_increase.js    # Monotonic carbon credit yield verification
+    ├── test_carbon_credit_integration.js   # Emoji scan & JavaScript syntax checker
     ├── test_simulation_carbon_scenarios.js # Multi-scenario simulation suite
     └── verify_all_15_routes.js             # HTTP 200 endpoint verification across all routes
 ```
@@ -202,9 +208,10 @@ The project includes a clean environment template at [`.env.example`](file:///c:
 ### 7.1 Running Locally
 You can run the application with any of the following commands:
 
-**Method 1: Built-in Node.js Server (Recommended)**
+**Method 1: Standard NPM Command (Recommended)**
 ```bash
-node server.js
+npm start
+# Or directly: node server.js
 ```
 The application will be live immediately at:
 ```
@@ -245,6 +252,12 @@ Judges can access and evaluate the live platform at either of the following depl
 Green Factory Brain AI includes an automated, multi-tiered test suite that verifies mathematical accuracy, route stability, emoji-free SVG compliance, and monotonic carbon credit growth.
 
 ### Run All Test Suites:
+
+**Quick Single-Command Execution:**
+```bash
+npm test          # Runs 10/10 Full E2E Route & Flow Suite
+npm run test:all  # Runs all 5 automated domain, E2E, carbon, tick & route suites
+```
 
 **1. Full Route & Flow Integrity Suite (10/10 Suites)**
 ```bash

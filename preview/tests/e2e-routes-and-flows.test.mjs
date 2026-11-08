@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import vm from 'node:vm';
 
 console.log('Running Green Factory Brain AI — Route, Flow & UI Integrity Verification Suite...');
 
@@ -132,5 +133,149 @@ const foundEmojis = html.match(emojiRegex);
 assert.equal(foundEmojis, null, 'HTML must contain ZERO emojis (all icons must be refined SVGs)');
 console.log('✓ PASS: Carbon Credit System & Real-Time Simulation Synchronization verified');
 
-console.log('ALL 10 E2E ROUTE & FLOW VERIFICATION SUITES PASSED (10/10).');
+// 11. Verify Full Suite of Hackathon Enhancements (Live Mic STT, Pitch Deck Mode, Solar/BESS Microgrid, Spectrogram, BERC Audit)
+// Feature 1: Live Mic Speech-to-Text for AI Copilot
+assert.ok(html.includes('id="copilot-mic-btn"'), 'Microphone button #copilot-mic-btn must exist in Copilot drawer');
+assert.ok(html.includes('id="copilot-mic-wave"'), 'Animated wave indicator #copilot-mic-wave must exist');
+assert.ok(html.includes('SpeechRecognition') || html.includes('webkitSpeechRecognition'), 'Web Speech API interface supported');
+assert.ok(html.includes('function sendCopilotMessage('), 'sendCopilotMessage function must accept parameter');
+
+// Feature 2: 1-Click Interactive Hackathon Pitch Deck Mode
+assert.ok(html.includes('id="pitch-deck-modal"'), 'Modal #pitch-deck-modal must exist');
+assert.ok(html.includes('id="btn-pitch-deck-mode"'), 'Header button #btn-pitch-deck-mode must exist');
+assert.ok(html.includes('openPitchDeckModal'), 'openPitchDeckModal function must exist');
+assert.ok(html.includes('closePitchDeckModal'), 'closePitchDeckModal function must exist');
+assert.ok(html.includes('nextPitchSlide') && html.includes('prevPitchSlide'), 'Slide navigation functions must exist');
+assert.ok(html.includes('Deterministic ISA-101 Physics'), 'Slide 2 Solution content verified');
+assert.ok(html.includes('Verra VCS'), 'Slide 3 Impact content verified');
+assert.ok(html.includes('NVIDIA Nemotron 3 Ultra 550B'), 'Slide 4 Architecture content verified');
+
+// Modal Structural Isolation Check: pitch-deck-modal must NOT be nested inside app-modal-backdrop
+const backdropIdx = html.indexOf('id="app-modal-backdrop"');
+const pitchIdx = html.indexOf('id="pitch-deck-modal"');
+const normHtml = html.replace(/\r\n/g, '\n');
+const backdropCloseIdx = normHtml.indexOf('</div>\n\n  <!-- 1-CLICK INTERACTIVE HACKATHON PITCH DECK MODAL -->');
+assert.ok(backdropIdx !== -1 && pitchIdx !== -1, 'Both modals must exist');
+assert.ok(backdropCloseIdx !== -1 && backdropCloseIdx < pitchIdx, 'app-modal-backdrop must be closed before pitch-deck-modal begins');
+assert.ok(html.includes('onclick="if(event.target===this)closePitchDeckModal()"'), 'Pitch deck backdrop click dismiss must be present');
+
+// Feature 3: Rooftop Solar PV & BESS Microgrid Simulator
+assert.ok(html.includes('id="microgrid-sim-panel"'), 'Microgrid simulator panel must exist');
+assert.ok(html.includes('calcMicrogridMetrics'), 'calcMicrogridMetrics calculation function must exist');
+assert.ok(html.includes('id="mg-slider-solar"'), 'Solar capacity slider must exist');
+assert.ok(html.includes('id="mg-slider-bess"'), 'BESS storage slider must exist');
+assert.ok(html.includes('id="mg-slider-diesel"'), 'Diesel displacement slider must exist');
+assert.ok(html.includes('applyMicrogridToSimulation'), 'applyMicrogridToSimulation function must exist');
+
+// Feature 4: Machine Predictive Anomaly Vibration & Thermal Spectrogram
+assert.ok(html.includes('id="machine-fft-canvas"'), 'Canvas #machine-fft-canvas must exist in inspectMachineDetail');
+assert.ok(html.includes('ISO 10816-3'), 'ISO 10816-3 vibration severity classification present');
+assert.ok(html.includes('initMachineFftCanvas'), 'initMachineFftCanvas rendering function present');
+assert.ok(html.includes('Thermal Motor Dissipation') || html.includes('Stator Winding'), 'Thermal motor dissipation metrics present');
+
+// Feature 5: BERC (Bangladesh Energy Regulatory Commission) Energy Audit Compliance Sheet
+assert.ok(html.includes('openBercAuditComplianceModal'), 'openBercAuditComplianceModal function must exist');
+assert.ok(html.includes('BERC/IND-GZP/2026/08492-R'), 'Official Gazipur registration number present');
+assert.ok(html.includes('0.82 kWh/pc'), 'Specific Energy Consumption SEC (0.82 kWh/pc) present');
+assert.ok(html.includes('FORM S-12') || html.includes('Form S-12 Compliance Sheet'), 'Form S-12 audit title present');
+
+// Functional Execution Verification (Live VM Sandbox)
+{
+  const scriptRegex = /<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/gi;
+  let match;
+  let mainCode = '';
+  while ((match = scriptRegex.exec(html)) !== null) {
+    if (match[1].includes('const AppState = {')) {
+      mainCode = match[1];
+      break;
+    }
+  }
+  assert.ok(mainCode.length > 0, 'Main script block must be found');
+
+  const context = {
+    console,
+    setTimeout,
+    clearTimeout,
+    setInterval,
+    clearInterval,
+    Date,
+    Math,
+    Number,
+    String,
+    Array,
+    Object,
+    JSON,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    matchMedia: () => ({ matches: false, addEventListener: () => {} }),
+    window: null,
+    document: {
+      documentElement: { classList: { contains: () => true, add: () => {}, remove: () => {} } },
+      getElementById: (id) => ({
+        value: '',
+        textContent: '',
+        innerHTML: '',
+        classList: { add: () => {}, remove: () => {}, contains: () => false },
+        focus: () => {},
+        appendChild: () => {},
+        closest: () => null
+      }),
+      querySelectorAll: () => [],
+      createElement: () => ({ className: '', innerHTML: '', style: {}, classList: { add: () => {}, remove: () => {} }, appendChild: () => {} }),
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      body: { classList: { add: () => {}, remove: () => {} } }
+    },
+    navigator: { userAgent: 'test' },
+    location: { hash: '#/dashboard' },
+    localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} }
+  };
+  context.window = context;
+  vm.createContext(context);
+  vm.runInContext(mainCode, context);
+
+  // Test Microgrid calculations directly
+  const calcMg = vm.runInContext('calcMicrogridMetrics', context);
+  const defRes = calcMg(320, 150, 45);
+  assert.ok(!isNaN(defRes.annualSolarMwh) && defRes.annualSolarMwh === 448.0, 'Annual solar generation must be 448 MWh');
+  assert.ok(!isNaN(defRes.gridBdtSavings) && defRes.gridBdtSavings > 0, 'Grid BDT savings must be positive');
+  assert.ok(!isNaN(defRes.dieselBackupSavingsBdt) && defRes.dieselBackupSavingsBdt > 0, 'Diesel savings must be positive');
+  assert.ok(!isNaN(defRes.vcsCarbonCreditsTons) && defRes.vcsCarbonCreditsTons > 0, 'VCS carbon credits must be positive');
+
+  // Verify missing dieselPct does not yield NaN
+  const missingPctRes = calcMg(320, 150);
+  assert.ok(!isNaN(missingPctRes.dieselBackupSavingsBdt), 'Missing dieselPct must default safely without NaN');
+  assert.ok(!isNaN(missingPctRes.totalAnnualSavingsBdt), 'totalAnnualSavingsBdt must not be NaN');
+
+  // Verify zero values clamp properly
+  const zeroRes = calcMg(0, 0, 0);
+  assert.ok(zeroRes.solarKwp === 100, '0 solarKwp must clamp to 100');
+  assert.ok(zeroRes.bessKwh === 50, '0 bessKwh must clamp to 50');
+  assert.ok(zeroRes.dieselDisplacementPct === 0, '0 dieselPct must be 0');
+  assert.ok(zeroRes.dieselBackupSavingsBdt === 0, '0 diesel displacement savings must be 0');
+
+  // Test Pitch Deck slide navigation directly
+  const openPitchDeck = vm.runInContext('openPitchDeckModal', context);
+  const nextPitch = vm.runInContext('nextPitchSlide', context);
+  const prevPitch = vm.runInContext('prevPitchSlide', context);
+  const closePitch = vm.runInContext('closePitchDeckModal', context);
+  const AppState = vm.runInContext('AppState', context);
+
+  openPitchDeck(0);
+  assert.equal(AppState.pitchDeck.isOpen, true, 'Pitch deck must be open');
+  assert.equal(AppState.pitchDeck.activeSlide, 0, 'Active slide must be 0');
+
+  nextPitch();
+  assert.equal(AppState.pitchDeck.activeSlide, 1, 'Next slide must advance to 1');
+
+  prevPitch();
+  assert.equal(AppState.pitchDeck.activeSlide, 0, 'Prev slide must return to 0');
+
+  closePitch();
+  assert.equal(AppState.pitchDeck.isOpen, false, 'Pitch deck must close');
+}
+
+console.log('✓ PASS: All 5 Full-Suite Hackathon Enhancements verified (static & functional VM execution)');
+
+console.log('ALL 11 E2E ROUTE & FLOW VERIFICATION SUITES PASSED (11/11).');
 

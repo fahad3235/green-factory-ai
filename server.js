@@ -50,7 +50,7 @@ function getZipStats() {
 
 let zipInfo = getZipStats();
 
-function serveFile(res, filePath, contentType, asAttachment = false, downloadName = '') {
+function serveFile(res, filePath, contentType, asAttachment = false, downloadName = '', isHead = false) {
   fs.stat(filePath, (err, fileStats) => {
     if (err || !fileStats.isFile()) {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -70,12 +70,27 @@ function serveFile(res, filePath, contentType, asAttachment = false, downloadNam
     }
 
     res.writeHead(200, headers);
+    if (isHead) {
+      res.end();
+      return;
+    }
     fs.createReadStream(filePath).pipe(res);
   });
 }
 
 const server = http.createServer((req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`);
+  // HTTP Method Hardening: Only GET and HEAD methods are permitted for static and portal delivery
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    res.writeHead(405, {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Allow': 'GET, HEAD'
+    });
+    res.end('405 Method Not Allowed');
+    return;
+  }
+
+  const isHead = req.method === 'HEAD';
+  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const pathname = decodeURIComponent(url.pathname);
 
   // 1. Direct ZIP Download Routes
@@ -89,19 +104,19 @@ const server = http.createServer((req, res) => {
     const dlFile = pathname === '/netlify_deploy_green_factory_brain.zip' 
       ? path.join(__dirname, 'netlify_deploy_green_factory_brain.zip')
       : ZIP_FILE_PATH;
-    serveFile(res, dlFile, 'application/zip', true, path.basename(dlFile));
+    serveFile(res, dlFile, 'application/zip', true, path.basename(dlFile), isHead);
     return;
   }
 
   // 2. Standalone Simulation Control Center HTML file
   if (pathname === '/simulation.html') {
-    serveFile(res, path.join(PREVIEW_DIR, 'simulation.html'), 'text/html; charset=utf-8');
+    serveFile(res, path.join(PREVIEW_DIR, 'simulation.html'), 'text/html; charset=utf-8', false, '', isHead);
     return;
   }
 
   // 3D Machine Digital Twin (EPMS Interactive Three.js WebGL Simulation)
   if (pathname === '/digital-twin.html' || pathname === '/digital-twin' || pathname === '/digital-twin/') {
-    serveFile(res, path.join(PREVIEW_DIR, 'digital-twin.html'), 'text/html; charset=utf-8');
+    serveFile(res, path.join(PREVIEW_DIR, 'digital-twin.html'), 'text/html; charset=utf-8', false, '', isHead);
     return;
   }
 
@@ -135,7 +150,7 @@ const server = http.createServer((req, res) => {
     pathname === '/preview/index.html' ||
     pathname === '/app'
   ) {
-    serveFile(res, path.join(PREVIEW_DIR, 'index.html'), 'text/html; charset=utf-8');
+    serveFile(res, path.join(PREVIEW_DIR, 'index.html'), 'text/html; charset=utf-8', false, '', isHead);
     return;
   }
 
@@ -265,7 +280,14 @@ const server = http.createServer((req, res) => {
   </div>
 </body>
 </html>`;
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.writeHead(200, {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Content-Length': Buffer.byteLength(html, 'utf8')
+    });
+    if (isHead) {
+      res.end();
+      return;
+    }
     res.end(html);
     return;
   }
@@ -287,11 +309,15 @@ const server = http.createServer((req, res) => {
       '.jpeg': 'image/jpeg',
       '.svg': 'image/svg+xml'
     };
-    serveFile(res, safePath, contentTypes[ext] || 'application/octet-stream');
+    serveFile(res, safePath, contentTypes[ext] || 'application/octet-stream', false, '', isHead);
     return;
   }
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+  if (isHead) {
+    res.end();
+    return;
+  }
   res.end('404 Not Found');
 });
 

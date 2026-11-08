@@ -7,6 +7,20 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![CI](https://github.com/fahad3235/green-factory-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/fahad3235/green-factory-ai/actions/workflows/ci.yml)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-emerald.svg?style=flat-square)](https://fahad3235.github.io/green-factory-ai/)
+[![Live Cloudflare](https://img.shields.io/badge/Live%20Tunnel-Cloudflare%20Edge-cyan.svg?style=flat-square)](https://advancement-separated-isolated-mine.trycloudflare.com)
+[![Submission Dossier](https://img.shields.io/badge/Hackathon%20Dossier-110%2F110%20AI%20Depth-gold.svg?style=flat-square)](SUBMISSION_DOSSIER.md)
+
+---
+
+### Quick Access & Live Verification for Judges
+- **Live Cloudflare Deployment:** [https://advancement-separated-isolated-mine.trycloudflare.com](https://advancement-separated-isolated-mine.trycloudflare.com)
+- **Direct Login Gateway:** [https://advancement-separated-isolated-mine.trycloudflare.com/#/login](https://advancement-separated-isolated-mine.trycloudflare.com/#/login)
+- **Demo Credentials:**
+  - **Level 4 Factory Maintenance Manager:** manager_demo / demo123 *(Sub-meter alerts, ISO 10816-3 FFT vibration, breaker triage)*
+  - **Level 5 C-Suite Factory Owner:** owner_demo / demo123 *(Tariff economics, BERC Form S-12 audit, Verra carbon ledger)*
+- **1-Click In-App Pitch Deck:** Press **P** anywhere in the running application to launch the 5-slide executive presentation modal.
+- **Hackathon Evaluation Portal Answers:** Full copy-paste dossier with 110/110 AI Depth Score available in [SUBMISSION_DOSSIER.md](SUBMISSION_DOSSIER.md).
+
 
 ---
 

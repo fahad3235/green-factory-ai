@@ -193,3 +193,73 @@ export function createDeterministicPrng(seed = 20261018) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+
+/**
+ * Calculate Rooftop Solar PV & BESS Microgrid metrics.
+ * Techno-economic model for industrial rooftop solar, battery energy storage, and diesel displacement in Gazipur, Bangladesh.
+ */
+export function calculateMicrogridMetrics({
+  solarKwp = 320,
+  bessKwh = 150,
+  dieselDisplacementPct = 45,
+  tariffBdtPerKwh = 12.40,
+  peakTariffBdtPerKwh = 14.88
+} = {}) {
+  const sVal = (solarKwp === undefined || solarKwp === null || isNaN(Number(solarKwp))) ? 320 : Number(solarKwp);
+  const sKwp = Math.max(100, Math.min(1000, sVal));
+
+  const bVal = (bessKwh === undefined || bessKwh === null || isNaN(Number(bessKwh))) ? 150 : Number(bessKwh);
+  const bKwh = Math.max(50, Math.min(500, bVal));
+
+  const dVal = (dieselDisplacementPct === undefined || dieselDisplacementPct === null || isNaN(Number(dieselDisplacementPct))) ? 45 : Number(dieselDisplacementPct);
+  const dPct = Math.max(0, Math.min(100, dVal));
+
+  // Gazipur industrial rooftop specific yield: ~1,400 peak sun hours equivalent yield / yr (3.84 kWh/kWp/day)
+  const annualSolarMwh = Number(((sKwp * 1400) / 1000).toFixed(1));
+
+  // Battery storage cycling ~300 days/yr for peak load shaving
+  const storageCyclingMwh = Number(((bKwh * 300) / 1000).toFixed(1));
+
+  // Direct clean solar generation value + battery peak discharge value
+  const solarDirectKwh = (annualSolarMwh * 1000) * 0.85;
+  const batteryPeakKwh = storageCyclingMwh * 1000;
+  const gridBdtSavings = Math.round((solarDirectKwh * tariffBdtPerKwh) + (batteryPeakKwh * (peakTariffBdtPerKwh - tariffBdtPerKwh)));
+
+  // Diesel generator displacement:
+  // Factory baseline diesel backup generation is approx 28,000 kWh/yr during shedding
+  // Diesel genset cost: ~৳32.50 / kWh
+  const baselineDieselKwh = 28000;
+  const displacedDieselKwh = Math.round(baselineDieselKwh * (dPct / 100));
+  const dieselDeltaBdt = 32.50 - tariffBdtPerKwh; // Savings per kWh compared to grid
+  const dieselBackupSavingsBdt = Math.round(displacedDieselKwh * dieselDeltaBdt);
+
+  const totalAnnualSavingsBdt = gridBdtSavings + dieselBackupSavingsBdt;
+
+  // EPC Capex in Bangladesh:
+  // Solar PV: ৳52,000 / kWp installed (Tier-1 TOPCon)
+  // BESS: ৳36,000 / kWh installed (Industrial LiFePO4 rack)
+  const totalCapexBdt = (sKwp * 52000) + (bKwh * 36000);
+
+  const paybackYears = totalAnnualSavingsBdt > 0 ? Number((totalCapexBdt / totalAnnualSavingsBdt).toFixed(1)) : 0.0;
+
+  // Additional VCS Carbon Credits (tCO2e / year):
+  // Grid factor: 0.560 kg/kWh (0.560 tCO2e/MWh)
+  // Diesel factor: 0.740 tCO2e/MWh
+  const gridCarbonAvoidedTons = (annualSolarMwh * 0.560);
+  const dieselCarbonAvoidedTons = (displacedDieselKwh / 1000) * 0.740;
+  const vcsCarbonCreditsTons = Number((gridCarbonAvoidedTons + dieselCarbonAvoidedTons).toFixed(1));
+
+  return {
+    solarKwp: sKwp,
+    bessKwh: bKwh,
+    dieselDisplacementPct: dPct,
+    annualSolarMwh,
+    storageCyclingMwh,
+    gridBdtSavings,
+    dieselBackupSavingsBdt,
+    totalAnnualSavingsBdt,
+    totalCapexBdt,
+    paybackYears,
+    vcsCarbonCreditsTons
+  };
+}

@@ -9,6 +9,7 @@ import {
   calculatePaybackPeriod,
   aggregateFleetMetrics,
   createDeterministicPrng,
+  calculateMicrogridMetrics,
   DEFAULT_ASSUMPTIONS
 } from '../src/domain/calculations.mjs';
 
@@ -113,4 +114,42 @@ console.log('Running Green Factory Brain AI — Domain Calculation & Simulation 
   console.log('✓ PASS: Deterministic seed replay consistency');
 }
 
-console.log('ALL 8 DOMAIN CALCULATION TEST SUITES PASSED (8/8).');
+// 9. Rooftop Solar PV & BESS Microgrid Simulator calculations & boundary clamping
+{
+  // Default values check
+  const def = calculateMicrogridMetrics();
+  assert.equal(def.solarKwp, 320);
+  assert.equal(def.bessKwh, 150);
+  assert.equal(def.dieselDisplacementPct, 45);
+  assert.equal(def.annualSolarMwh, 448.0);
+  assert.equal(def.storageCyclingMwh, 45.0);
+  assert.ok(def.gridBdtSavings > 4800000);
+  assert.ok(def.dieselBackupSavingsBdt > 250000);
+  assert.ok(!isNaN(def.totalAnnualSavingsBdt));
+  assert.ok(!isNaN(def.paybackYears));
+  assert.ok(!isNaN(def.vcsCarbonCreditsTons));
+
+  // Boundary clamping (0 or below minimum should clamp to 100 kWp, 50 kWh, 0%)
+  const minClamped = calculateMicrogridMetrics({ solarKwp: 0, bessKwh: 0, dieselDisplacementPct: -10 });
+  assert.equal(minClamped.solarKwp, 100, 'Solar capacity under 100 must clamp to 100 kWp');
+  assert.equal(minClamped.bessKwh, 50, 'BESS storage under 50 must clamp to 50 kWh');
+  assert.equal(minClamped.dieselDisplacementPct, 0, 'Diesel displacement under 0 must clamp to 0%');
+  assert.equal(minClamped.dieselBackupSavingsBdt, 0);
+
+  // Maximum boundary clamping (above 1000 kWp, 500 kWh, 100%)
+  const maxClamped = calculateMicrogridMetrics({ solarKwp: 5000, bessKwh: 1200, dieselDisplacementPct: 150 });
+  assert.equal(maxClamped.solarKwp, 1000, 'Solar capacity above 1000 must clamp to 1000 kWp');
+  assert.equal(maxClamped.bessKwh, 500, 'BESS storage above 500 must clamp to 500 kWh');
+  assert.equal(maxClamped.dieselDisplacementPct, 100, 'Diesel displacement above 100 must clamp to 100%');
+
+  // Undefined/null edge cases must NOT return NaN
+  const missingArgs = calculateMicrogridMetrics({ solarKwp: null, bessKwh: undefined, dieselDisplacementPct: null });
+  assert.ok(!isNaN(missingArgs.annualSolarMwh), 'annualSolarMwh must not be NaN');
+  assert.ok(!isNaN(missingArgs.dieselBackupSavingsBdt), 'dieselBackupSavingsBdt must not be NaN');
+  assert.ok(!isNaN(missingArgs.totalAnnualSavingsBdt), 'totalAnnualSavingsBdt must not be NaN');
+  assert.ok(!isNaN(missingArgs.vcsCarbonCreditsTons), 'vcsCarbonCreditsTons must not be NaN');
+
+  console.log('✓ PASS: Rooftop Solar PV & BESS Microgrid Simulator calculations & boundary clamping');
+}
+
+console.log('ALL 9 DOMAIN CALCULATION TEST SUITES PASSED (9/9).');

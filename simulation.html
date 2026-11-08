@@ -41,6 +41,7 @@
   })();
 </script>
 <style>
+/* [HALLMARK-SYSTEM: ISA-101 SIMULATION CONSOLE DESIGN TOKENS] */
 /* Complete suppression of Netlify badges, deploy preview drawers, and branding */
 iframe[src*="netlify"],
 iframe#netlify-drawer,
@@ -92,13 +93,20 @@ div[class*="netlify"],
   }
 }
 *{box-sizing:border-box}
+:focus-visible { outline: 2px solid #0284C7; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+html, body { overflow-x: clip; }
 html{scroll-behavior:smooth}
 body{
-  margin:0; background:
-    radial-gradient(1100px 480px at 85% -120px, rgba(11,184,148,.14), transparent 60%),
-    radial-gradient(900px 420px at -10% 0, rgba(46,166,207,.10), transparent 55%),
-    linear-gradient(180deg,var(--bg2),var(--bg) 340px);
-  color:var(--ink);
+  margin:0; background: #0B1120;
+  color: #F1F5F9;
   font-family:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
   font-size:15px; line-height:1.5;
   -webkit-font-smoothing:antialiased;
@@ -126,7 +134,7 @@ body.in-iframe .topbar{
   background:linear-gradient(140deg,#0bb894,#078a6e);box-shadow:0 8px 20px rgba(11,184,148,.35)}
 .brand h1{font-size:18px;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
 .brand h1 em{font-style:normal;color:var(--teal-b)}
-.brand small{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--muted);font-weight:500}
+.brand small{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:0.02em;color:var(--muted);font-weight:500}
 .top-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .chip{display:inline-flex;align-items:center;gap:8px;background:var(--chip);border:1px solid var(--line);
   border-radius:999px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--ink2);text-decoration:none}
@@ -148,7 +156,7 @@ body.in-iframe .topbar{
 /* ---------- data flow ---------- */
 .flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:10px;align-items:stretch;margin:16px 0}
 .flow-node{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:13px 15px;min-width:0;overflow:hidden;word-break:break-word}
-.flow-node .fn-tag{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.15em;color:var(--teal-b);font-weight:600}
+.flow-node .fn-tag{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:0.02em;color:var(--teal-b);font-weight:600}
 .flow-node h3{font-size:14px;margin:3px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .flow-node p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
 .flow-node .fn-live{margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink2);
@@ -164,7 +172,7 @@ body.in-iframe .topbar{
 .card h3{font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:9px}
 .card h3 .tag{margin-left:auto}
 .card .sub{color:var(--muted);font-size:12.5px;margin:4px 0 0}
-.tag{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;font-weight:600;
+.tag{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:0.02em;font-weight:600;
   padding:4px 8px;border-radius:6px;background:var(--chip);border:1px solid var(--line);color:var(--muted)}
 .tag.ok{color:var(--green);border-color:rgba(34,181,115,.4)}
 .tag.warn{color:var(--amber);border-color:rgba(240,161,43,.45)}
@@ -184,9 +192,9 @@ body.in-iframe .topbar{
 .transport{display:flex;gap:8px;margin:14px 0 4px}
 .btn{border:1px solid var(--line2);background:var(--panel3);color:var(--ink);border-radius:11px;
   padding:10px 14px;font-weight:800;font-size:13.5px;display:inline-flex;align-items:center;gap:8px;justify-content:center;
-  transition:transform .12s,border-color .12s,background .12s}
-.btn:hover{border-color:var(--teal);transform:translateY(-1px)}
-.btn:active{transform:translateY(0)}
+  transition:border-color .12s,background .12s}
+.btn:hover{border-color:var(--teal)}
+.btn:active{transform:none}
 .btn.primary{background:linear-gradient(135deg,#0bb894,#078a6e);border-color:transparent;color:#fff;
   box-shadow:0 10px 22px rgba(11,184,148,.3)}
 .btn.primary:hover{filter:brightness(1.07)}
@@ -198,7 +206,7 @@ body.in-iframe .topbar{
 .seg button{flex:1;border:0;background:transparent;color:var(--muted);font-weight:800;font-size:12.5px;
   padding:7px 4px;border-radius:8px;font-family:"IBM Plex Mono",monospace}
 .seg button.on{background:var(--teal);color:#fff;box-shadow:0 4px 12px rgba(11,184,148,.35)}
-.ctl-label{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;color:var(--faint);
+.ctl-label{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:0.02em;color:var(--faint);
   font-weight:600;margin:15px 0 7px;text-transform:uppercase}
 .stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
 .stat{background:var(--chip);border:1px solid var(--line);border-radius:11px;padding:9px 11px}
@@ -209,8 +217,8 @@ body.in-iframe .topbar{
 .scen{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .scen button{display:flex;gap:11px;align-items:flex-start;text-align:left;width:100%;
   background:var(--panel3);border:1px solid var(--line);border-radius:12px;padding:11px 13px;color:var(--ink);
-  transition:border-color .12s,transform .12s}
-.scen button:hover{border-color:var(--teal);transform:translateY(-1px)}
+  transition:border-color .12s}
+.scen button:hover{border-color:var(--teal)}
 .scen button.active{border-color:var(--amber);background:rgba(240,161,43,.08)}
 .scen button b{font-size:13.5px;display:block}
 .scen button span{font-size:12px;color:var(--muted);display:block;line-height:1.4}
@@ -235,7 +243,7 @@ details.json-in summary:hover{color:var(--teal-b)}
 .meter-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .meter-table-in{min-width:480px}
 .meter-head,.meter-row{display:grid;grid-template-columns:14px minmax(130px,1.6fr) minmax(90px,1.2fr) minmax(64px,0.9fr) minmax(76px,1fr) minmax(78px,1fr);gap:8px 10px;align-items:center;position:relative}
-.meter-head{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;color:var(--faint);
+.meter-head{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:0.02em;color:var(--faint);
   padding:12px 4px 8px;border-bottom:1px solid var(--line)}
 .meter-row{padding:11px 4px;border-bottom:1px solid var(--line)}
 .meter-row:last-child{border-bottom:0}
@@ -376,7 +384,7 @@ details.json-in summary:hover{color:var(--teal-b)}
   <div class="topbar-in">
     <a href="index.html#/dashboard" class="brand" title="Open Main Green Factory Brain Application">
       <div class="leaf" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 21c-4.5-1.2-7-4.6-7-9.5C5 6.6 8.2 3.4 19 3c.6 10.8-2.4 14-7 18Z" fill="#fff" opacity=".95"/><path d="M5.5 18.5C8 13 12 9.5 17 7" stroke="#078a6e" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 21c-4.5-1.2-7-4.6-7-9.5C5 6.6 8.2 3.4 19 3c.6 10.8-2.4 14-7 18Z" fill="#fff" opacity=".95"/><path d="M5.5 18.5C8 13 12 9.5 17 7" stroke="#078a6e" stroke-width="1.6" stroke-linecap="round"/></svg>
       </div>
       <div>
         <h1>Green Factory Brain <em>· Simulation Control Center</em></h1>
@@ -384,7 +392,7 @@ details.json-in summary:hover{color:var(--teal-b)}
       </div>
     </a>
     <div class="top-right">
-      <a href="index.html#/dashboard" class="chip" style="color:var(--teal-b);border-color:rgba(11,184,148,.4)">← Main Dashboard</a>
+      <a href="index.html#/dashboard" class="chip" style="color:var(--teal-b);border-color:rgba(11,184,148,.4)"><svg aria-hidden="true" class="w-3 h-3 inline-block mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>Main Dashboard</a>
       <a href="digital-twin.html" class="chip" style="color:var(--sky);border-color:rgba(46,166,207,.4)">3D Digital Twin ↗</a>
       <span class="chip"><span class="mono" id="clockChip">—</span></span>
       <span class="chip eng-pill running" id="enginePill"><span class="dot live" id="engineDot"></span><span id="enginePillTxt">ENGINE RUNNING</span></span>
@@ -404,28 +412,28 @@ details.json-in summary:hover{color:var(--teal-b)}
   <!-- data flow -->
   <section class="flow" aria-label="Data flow">
     <div class="flow-node">
-      <span class="fn-tag">STEP 1 · SOURCE</span>
+      <span class="fn-tag">Telemetry Source</span>
       <h3>Simulated Meters</h3>
       <p>18 virtual sub-meters generate readings — in production these are real clamp meters on each machine.</p>
       <div class="fn-live" id="flowMeters">— kW total draw</div>
     </div>
-    <div class="flow-arrow" aria-hidden="true">→</div>
+    <div class="flow-arrow" aria-hidden="true"><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
     <div class="flow-node" id="flowEngineNode">
-      <span class="fn-tag">STEP 2 · ENGINE</span>
+      <span class="fn-tag">Physics Engine</span>
       <h3>Simulation Engine</h3>
       <p>Advances factory time, applies shift patterns, waste events and faults, totals energy, bill &amp; carbon.</p>
       <div class="fn-live" id="flowEngine">tick #0</div>
     </div>
-    <div class="flow-arrow" aria-hidden="true">→</div>
+    <div class="flow-arrow" aria-hidden="true"><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
     <div class="flow-node" id="flowApiNode">
-      <span class="fn-tag">STEP 3 · API</span>
+      <span class="fn-tag">Ingest API</span>
       <h3>JSON Push</h3>
       <p>The same 4 endpoints the production backend exposes — the website and copilot only ever read this data.</p>
       <div class="fn-live" id="flowApi">waiting for first push…</div>
     </div>
-    <div class="flow-arrow" aria-hidden="true">→</div>
+    <div class="flow-arrow" aria-hidden="true"><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
     <div class="flow-node" id="flowSite">
-      <span class="fn-tag">STEP 4 · WEBSITE</span>
+      <span class="fn-tag">EPMS Portal</span>
       <h3>Main Website Platform</h3>
       <p>Dashboard KPIs, 3D Digital Twin, machine monitoring, forecast, savings and CarbonIQ re-render from every live push.</p>
       <div class="fn-live" id="flowSiteText">last synced —</div>
@@ -436,7 +444,7 @@ details.json-in summary:hover{color:var(--teal-b)}
     <!-- LEFT -->
     <div class="col">
       <section class="card" aria-label="Simulation engine">
-        <h3><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor" stroke="none"/></svg></span>Simulation Engine <span class="tag ok" id="tickTag">TICK #0</span></h3>
+        <h3><span class="ico"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor" stroke="none"/></svg></span>Simulation Engine <span class="tag ok" id="tickTag">TICK #0</span></h3>
         <div class="clock-big" id="clockBig">—</div>
         <div class="clock-sub"><span id="clockDate">—</span><span class="shift-badge day" id="shiftBadge">DAY SHIFT</span><span id="shiftHours">06:00 – 22:00 production</span></div>
         <div class="transport">
@@ -465,14 +473,14 @@ details.json-in summary:hover{color:var(--teal-b)}
       </section>
 
       <section class="card" aria-label="Scenario presets">
-        <h3><span class="ico amber"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 4.5 13.5H11L9.5 22 19 9.5h-6.5L13 2Z" fill="currentColor" stroke="none"/></svg></span>Scenario Presets</h3>
+        <h3><span class="ico amber"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 4.5 13.5H11L9.5 22 19 9.5h-6.5L13 2Z" fill="currentColor" stroke="none"/></svg></span>Scenario Presets</h3>
         <p class="sub">One click sets up the story. Everything downstream — alarms, API, website — reacts on its own.</p>
         <div class="scen">
-          <button data-scen="waste"><span class="s-ico"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span><span><b>Night shift — Machine 3 waste</b><span>Jumps the clock to 23:10. Machine 3 idles at 38 kW producing nothing; the waste alarm fires.</span></span></button>
-          <button data-scen="surge"><span class="s-ico"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span><span><b>Peak demand surge</b><span>All loads × the level below for 30 simulated minutes. Past the 218 kW contract peak the breach alarm fires and a demand charge lands on the bill.</span></span></button>
-          <button data-scen="breakdown"><span class="s-ico"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><span><b>Machine breakdown — Boiler</b><span>The boiler stops dead: meter reads 0 kW, health crashes to 31, steam is lost and a production-loss alarm fires. Repair it from its meter row.</span></span></button>
-          <button data-scen="outage"><span class="s-ico"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg></span><span><b>Grid power cut</b><span>Mains supply drops for the length below, then auto-restores. Machines stop; the diesel generator carries lighting &amp; HVAC only. Click again to restore early.</span></span></button>
-          <button data-scen="normal"><span class="s-ico"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span><span><b>Normal operations</b><span>Clears every event and returns to a clean day-shift pattern.</span></span></button>
+          <button data-scen="waste"><span class="s-ico"><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span><span><b>Night shift — Machine 3 waste</b><span>Jumps the clock to 23:10. Machine 3 idles at 38 kW producing nothing; the waste alarm fires.</span></span></button>
+          <button data-scen="surge"><span class="s-ico"><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span><span><b>Peak demand surge</b><span>All loads × the level below for 30 simulated minutes. Past the 218 kW contract peak the breach alarm fires and a demand charge lands on the bill.</span></span></button>
+          <button data-scen="breakdown"><span class="s-ico"><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><span><b>Machine breakdown — Boiler</b><span>The boiler stops dead: meter reads 0 kW, health crashes to 31, steam is lost and a production-loss alarm fires. Repair it from its meter row.</span></span></button>
+          <button data-scen="outage"><span class="s-ico"><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg></span><span><b>Grid power cut</b><span>Mains supply drops for the length below, then auto-restores. Machines stop; the diesel generator carries lighting &amp; HVAC only. Click again to restore early.</span></span></button>
+          <button data-scen="normal"><span class="s-ico"><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span><span><b>Normal operations</b><span>Clears every event and returns to a clean day-shift pattern.</span></span></button>
         </div>
         <div class="ctl-label">Peak demand level</div>
         <div class="seg" id="surgeSeg" role="group" aria-label="Peak demand surge level">
@@ -486,12 +494,12 @@ details.json-in summary:hover{color:var(--teal-b)}
           <button data-dur="30">30 min</button>
           <button data-dur="60">60 min</button>
         </div>
-        <button class="btn primary story-btn" id="btnStory">▶ Run the 60-second judge story</button>
-        <p class="hint">Night waste → alarm → AI fix applied from the website preview → savings &amp; carbon move. Fully automatic; touch any control to take over.</p>
+        <button class="btn primary story-btn" id="btnStory"><svg aria-hidden="true" class="w-3.5 h-3.5 inline-block mr-1" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>Run the 60-second judge story</button>
+        <p class="hint">Night waste <span aria-hidden="true" class="inline-flex items-center mx-1"><svg aria-hidden="true" class="w-3 h-3 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> alarm <span aria-hidden="true" class="inline-flex items-center mx-1"><svg aria-hidden="true" class="w-3 h-3 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> AI fix applied from the website preview <span aria-hidden="true" class="inline-flex items-center mx-1"><svg aria-hidden="true" class="w-3 h-3 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span> savings &amp; carbon move. Fully automatic; touch any control to take over.</p>
       </section>
 
       <section class="card" aria-label="Global inputs">
-        <h3><span class="ico sky"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span>Global Inputs</h3>
+        <h3><span class="ico sky"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span>Global Inputs</h3>
         <p class="sub">The numbers a factory manager sets — tariff, targets, and monthly bill import.</p>
         <div class="field">
           <label>Electricity tariff <output id="tariffOut">৳12.40 /kWh</output></label>
@@ -521,7 +529,7 @@ details.json-in summary:hover{color:var(--teal-b)}
     <!-- CENTER -->
     <div class="col">
       <section class="card" aria-label="Simulated meters">
-        <h3><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span>Simulated Meters — Rupsha Garments Ltd. <span class="tag ok" id="meterTag">8 / 8 ONLINE</span></h3>
+        <h3><span class="ico"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span>Simulated Meters — Rupsha Garments Ltd. <span class="tag ok" id="meterTag">8 / 8 ONLINE</span></h3>
         <div class="meter-table-wrap">
           <div class="meter-table-in">
             <div class="meter-head" aria-hidden="true"><span></span><span>METER</span><span>LOAD</span><span style="text-align:right">DRAW</span><span style="text-align:right">TODAY</span><span style="text-align:right">HEALTH</span></div>
@@ -536,7 +544,7 @@ details.json-in summary:hover{color:var(--teal-b)}
       </section>
 
       <section class="card" aria-label="Live load chart">
-        <h3><span class="ico sky"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-5 3 3 5-7"/></svg></span>Live Factory Load <span class="tag">LAST 60 TICKS</span></h3>
+        <h3><span class="ico sky"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-5 3 3 5-7"/></svg></span>Live Factory Load <span class="tag">LAST 60 TICKS</span></h3>
         <div class="chart-wrap">
           <svg id="loadChart" viewBox="0 0 640 190" role="img" aria-label="Line chart of total factory power draw over the last 60 simulation ticks"></svg>
         </div>
@@ -550,12 +558,12 @@ details.json-in summary:hover{color:var(--teal-b)}
       </section>
 
       <section class="card" aria-label="Alerts">
-        <h3><span class="ico red"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17.2v.3"/></svg></span>Alarms &amp; Events <span class="tag warn" id="alertTag">0 ACTIVE</span></h3>
+        <h3><span class="ico red"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 10v4M12 17.2v.3"/></svg></span>Alarms &amp; Events <span class="tag warn" id="alertTag">0 ACTIVE</span></h3>
         <div id="alertList"></div>
       </section>
 
       <section class="card" aria-label="Engine event log">
-        <h3><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 7 5 5-5 5M12 19h7"/></svg></span>Engine Event Log</h3>
+        <h3><span class="ico"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 7 5 5-5 5M12 19h7"/></svg></span>Engine Event Log</h3>
         <div class="term" id="termLog" aria-live="polite"></div>
       </section>
     </div>
@@ -563,7 +571,7 @@ details.json-in summary:hover{color:var(--teal-b)}
     <!-- RIGHT -->
     <div class="col col-right">
       <section class="card" aria-label="Live API response">
-        <h3><span class="ico sky"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg></span>Live API Response <span class="tag ok">200 OK</span></h3>
+        <h3><span class="ico sky"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg></span>Live API Response <span class="tag ok">200 OK</span></h3>
         <p class="sub">Exactly what the main website receives on every push. Switch endpoints to inspect each payload.</p>
         <div class="api-tabs" id="apiTabs" role="group" aria-label="API endpoint">
           <button data-ep="energy" class="on">/api/energy</button>
@@ -575,7 +583,7 @@ details.json-in summary:hover{color:var(--teal-b)}
       </section>
 
       <section class="card" aria-label="Push log">
-        <h3><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>Push Log — Backend → Website</h3>
+        <h3><span class="ico"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>Push Log — Backend to Website</h3>
         <div id="pushLog"><p class="empty-note">No pushes yet — the engine sends the first payload as soon as it starts.</p></div>
       </section>
     </div>
@@ -585,7 +593,7 @@ details.json-in summary:hover{color:var(--teal-b)}
   <section class="card bridge-card" aria-label="Live Website Synchronization Bridge">
     <div class="bridge-in">
       <div class="bridge-info">
-        <div class="bridge-icon"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="bridge-icon"><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
         <div>
           <h4>Real-Time Telemetry Synchronization Active</h4>
           <p>Every simulated tick is broadcast via BroadcastChannel, postMessage, and local storage to the Green Factory Brain application suite.</p>
@@ -593,18 +601,18 @@ details.json-in summary:hover{color:var(--teal-b)}
       </div>
       <div class="bridge-links">
         <a href="index.html#/dashboard" target="_top" class="btn primary sm" style="text-decoration:none">
-          <span><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg> Open Main Dashboard ↗</span>
+          <span><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg> Open Main Dashboard <svg aria-hidden="true" class="w-3 h-3 inline-block ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></span>
         </a>
         <a href="index.html#/monitoring" target="_top" class="btn sm" style="text-decoration:none">
-          <span><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Machine Telemetry ↗</span>
+          <span><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Machine Telemetry <svg aria-hidden="true" class="w-3 h-3 inline-block ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></span>
         </a>
         <a href="digital-twin.html" target="_top" class="btn sm" style="text-decoration:none">
-          <span><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-9 5-9-5V8l9-5 9 5v8Z"/><path d="m3.27 6.96 8.73 4.89 8.73-4.89"/><path d="M12 22V12"/></svg> 3D EPMS Twin ↗</span>
+          <span><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-9 5-9-5V8l9-5 9 5v8Z"/><path d="m3.27 6.96 8.73 4.89 8.73-4.89"/><path d="M12 22V12"/></svg> 3D EPMS Twin <svg aria-hidden="true" class="w-3 h-3 inline-block ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></span>
         </a>
       </div>
     </div>
   </section>
-  <p class="foot-note"><b>How to demo:</b> press <b>▶ Run the 60-second judge story</b>, or jump to the night shift — the simulation engine pushes live telemetry via REST and WebSockets directly to the Green Factory Brain main website in real-time. All data is simulated; no real factory is connected.</p>
+  <p class="foot-note"><b>How to demo:</b> press <b>Run the 60-second judge story</b>, or jump to the night shift — the simulation engine pushes live telemetry via REST and WebSockets directly to the Green Factory Brain main website in real-time. All data is simulated; no real factory is connected.</p>
 </div>
 
 <div class="toast" id="toast" role="status"></div>
@@ -820,6 +828,9 @@ function handleExternalAction(data){
     var tr = $("tariffRange"); if(tr) tr.value = S.tariff;
     var to = $("tariffOut"); if(to) to.textContent = "৳" + S.tariff.toFixed(2) + " /kWh";
     push(); syncSharedStorage();
+  } else if(data.action === 'applyMicrogrid'){
+    logEvent("ev", "Microgrid Active: " + (data.solarKwp || 320) + " kWp Solar PV & " + (data.bessKwh || 150) + " kWh BESS (" + (data.dieselDisplacementPct || 45) + "% diesel disp.)");
+    push(); syncSharedStorage();
   }
 }
 try {
@@ -963,7 +974,7 @@ function push(){
   var log = $("pushLog"); if(log && log.querySelector(".empty-note")) log.innerHTML = "";
   if(log) { log.prepend(row); while(log.children.length > 7) log.removeChild(log.lastChild); }
   var pill = $("syncPill"); if(pill){ pill.classList.remove("flash"); void pill.offsetWidth; pill.classList.add("flash"); }
-  if($("flowApi")) $("flowApi").textContent = "POST " + ep + " → 200 OK · just now";
+  if($("flowApi")) $("flowApi").textContent = "POST " + ep + " -> 200 OK · just now";
   if($("flowSiteText")) $("flowSiteText").textContent = "last synced just now · push #" + S.pushes;
   if ($("pvLive")) { $("pvLive").textContent = "LAST PUSH " + clockStr() + " SIM · PUSH #" + S.pushes; }
   renderPreview();
@@ -975,8 +986,8 @@ function buildMeters(){
   var host = $("meterRows"); if(!host) return; host.innerHTML = ""; mEls = {};
   S.machines.forEach(function(m, i){
     var row = document.createElement("div"); row.className = "meter-row";
-    var faultBtns = '<button class="mini-btn" data-fault="' + m.id + '"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg> Breakdown</button>' +
-      '<button class="mini-btn fix hidden" data-repair="' + m.id + '"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Repair</button>';
+    var faultBtns = '<button class="mini-btn" data-fault="' + m.id + '"><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg> Breakdown</button>' +
+      '<button class="mini-btn fix hidden" data-repair="' + m.id + '"><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Repair</button>';
     var extra = "";
     if(m.id==="m3"){
       extra = '<span class="mini">Night idle waste (38 kW)' +
@@ -1058,9 +1069,9 @@ function renderAlerts(){
   if(!S.alerts.length){ host.innerHTML = '<p class="empty-note">No active alarms. The factory is running clean.</p>'; return; }
   S.alerts.forEach(function(a){
     var d = document.createElement("div"); d.className = "alert " + a.sev;
-    d.innerHTML = '<span class="a-ico">' + (a.sev==="crit"?'<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" x2="19.07" y1="4.93" y2="19.07"/></svg>':a.sev==="warn"?'<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>':'<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>') + '</span><div><b>' +
+    d.innerHTML = '<span class="a-ico">' + (a.sev==="crit"?'<svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" x2="19.07" y1="4.93" y2="19.07"/></svg>':a.sev==="warn"?'<svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>':'<svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>') + '</span><div><b>' +
       esc(a.title) + '</b><p>' + esc(a.body) + '</p></div><time>' + a.time + '</time>' +
-      '<button class="a-x" aria-label="Dismiss alert"><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg></button>';
+      '<button class="a-x" aria-label="Dismiss alert"><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg></button>';
     d.querySelector(".a-x").addEventListener("click", function(){ clearAlert(a.id); });
     host.appendChild(d);
   });
@@ -1174,11 +1185,11 @@ function renderFixes(){
   FIXES.forEach(function(f, i){
     var done = !!S.fixesApplied[f.id];
     var d = document.createElement("div"); d.className = "fix" + (done ? " done" : "");
-    d.innerHTML = '<span class="f-num">' + (done ? '<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : (i+1)) + '</span><div style="flex:1;min-width:0">' +
+    d.innerHTML = '<span class="f-num">' + (done ? '<svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : (i+1)) + '</span><div style="flex:1;min-width:0">' +
       '<div style="display:flex;align-items:flex-start;gap:8px"><b>' + esc(f.name) + '</b>' +
       '<span class="impact ' + f.impact + '">' + (f.impact==="high" ? "High Impact" : "Medium Impact") + '</span></div>' +
       '<p>' + esc(f.desc) + '</p>' +
-      '<div class="f-nums"><span><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> ' + f.saveLabel + '</span><span><svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/></svg> ' + bdt(f.money) + '/month</span><span>Payback: ' + f.payback + '</span></div>' +
+      '<div class="f-nums"><span><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> ' + f.saveLabel + '</span><span><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/></svg> ' + bdt(f.money) + '/month</span><span>Payback: ' + f.payback + '</span></div>' +
       '<button class="apply-btn' + (done ? " done" : "") + '" data-fix="' + f.id + '"' + (done ? " disabled" : "") + '>' +
       (done ? "Applied — verified by meters" : "Apply fix") + '</button></div>';
     host.appendChild(d);
@@ -1196,7 +1207,7 @@ function applyFix(id, via, fromStory){
   S.realized += f.money * 0.1;
   if(id==="f1"){ clearAlert("waste"); flags.waste = false; S.wastePct = 6; }
   logEvent("ok", "AI fix applied: “" + f.name + "” — saving " + bdt(f.money) + "/month");
-  toast("Fix applied → simulation updated: " + f.name + " saves " + bdt(f.money) + "/month");
+  toast("Fix applied -> simulation updated: " + f.name + " saves " + bdt(f.money) + "/month");
   renderFixes(); push(); render();
 }
 
@@ -1273,7 +1284,7 @@ function setScenario(name){
 }
 function runStory(){
   cancelStory(); ensureRunning();
-  logEvent("ev","▶ Judge story started — night waste → alarm → AI fix → verified savings");
+  logEvent("ev","Judge story started — night waste -> alarm -> AI fix -> verified savings");
   toast("Judge story running: watch Machine 3, alarm, then savings");
   var t = [];
   t.push(setTimeout(function(){ setScenarioKeep("waste"); }, 600));
@@ -1471,7 +1482,7 @@ document.addEventListener("DOMContentLoaded", function(){
       <span style="padding:2px 7px;border-radius:99px;background:#dcfce7;color:#15803d;border:1px solid #bbf7d0;font-size:9px;">LIVE AGENT</span>
     </a>
     <a href="digital-twin.html" target="_top" class="gfb-sim-pill" style="padding-left:13px;background:#0a2534;color:#2fe0bd;border-color:#1f5064;">
-      <svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-9 5-9-5V8l9-5 9 5v8Z"/><path d="m3.27 6.96 8.73 4.89 8.73-4.89"/><path d="M12 22V12"/></svg> 3D EPMS Twin
+      <svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-9 5-9-5V8l9-5 9 5v8Z"/><path d="m3.27 6.96 8.73 4.89 8.73-4.89"/><path d="M12 22V12"/></svg> 3D EPMS Twin
     </a>
   </div>
 </body>

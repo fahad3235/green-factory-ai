@@ -322,7 +322,7 @@ In adherence to **Section 5 of the AI DEV FEST 2026 Official Rulebook**, this re
 
 ---
 
-**Developed for the AI DEV FEST 2026 AI Hackathon**  
+**ooo**  
 *Green Factory Brain AI — Smarter Energy. Lower Costs. Measurable Climate Impact.*
 
 

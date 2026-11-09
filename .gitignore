@@ -73,3 +73,5 @@ desktop.ini
 *.bak
 *.tmp
 *~
+# Agent working notes (never ship in the public repo)
+.agents/

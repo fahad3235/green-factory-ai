@@ -78,11 +78,15 @@ console.log('✓ PASS: 3D WebGL Digital Twin + 2D Isometric & SLD fallbacks veri
 assert.ok(html.includes('orb-sphere') && html.includes('orb-eye'), '3D animated glowing orb avatar with blinking eyes present');
 assert.ok(html.includes('mini-orb') && html.includes('status-dot'), 'Mini-orb avatar and 3 wave status dots present');
 assert.ok(html.includes('LIVE AGENT'), 'LIVE AGENT badge present');
-assert.ok(html.includes('NVIDIA NEMOTRON 3 ULTRA (550B) • COPILOT+ AGENT'), 'Copilot+ Agent model badge present');
-assert.ok(html.includes('Thought for 1.4s • View reasoning process'), 'Collapsible reasoning process accordion present');
+assert.ok(html.includes('LIVE AGENT • LLAMA-3.3'), 'LIVE AGENT • LLAMA-3.3 badge present');
+assert.ok(!html.includes('DEMO RULE-BASED'), 'DEMO RULE-BASED badge must be removed');
+assert.ok(!html.includes('NVIDIA NEMOTRON'), 'Legacy NVIDIA NEMOTRON string must be removed');
+assert.ok(html.includes('DIGITAL TWIN SANDBOX'), 'Production-grade DIGITAL TWIN SANDBOX badge present');
+assert.ok(html.includes('Thought for ') && html.includes('View reasoning process'), 'Collapsible reasoning process accordion present');
 assert.ok(html.includes('AI Copilot Thinking...'), 'Live step-by-step thinking animation present');
 assert.ok(html.includes('Quick-suggest · 4-Mo Savings Plan'), 'Quick-suggest pills present');
-assert.ok(html.includes('Amar factory-r night shift energy waste komate hobe'), 'Banglish target prompt marquee pill present');
+assert.ok(html.includes('Build a night-shift energy waste reduction and ৳ 68,000/mo savings plan'), 'Clean English target prompt present');
+assert.ok(!html.includes('Amar factory-r night shift'), 'Legacy Banglish marquee string must be removed');
 console.log('✓ PASS: 3D Animated Orb AI Copilot & Live Agent UI verified');
 
 // 8. Verify Phase 2 Full-Website Enhancements (Auto-Demo, Voice Synthesis, Dashboard Sync Strip, Quick Persona & Expanded Copilot Intents)
@@ -148,7 +152,13 @@ assert.ok(html.includes('closePitchDeckModal'), 'closePitchDeckModal function mu
 assert.ok(html.includes('nextPitchSlide') && html.includes('prevPitchSlide'), 'Slide navigation functions must exist');
 assert.ok(html.includes('Deterministic ISA-101 Physics'), 'Slide 2 Solution content verified');
 assert.ok(html.includes('Verra VCS'), 'Slide 3 Impact content verified');
-assert.ok(html.includes('NVIDIA Nemotron 3 Ultra 550B'), 'Slide 4 Architecture content verified');
+assert.ok(html.includes('Llama-3.3-70B') && html.includes('Gemini 2.5 Flash'), 'Slide 4 Live LLM Architecture content verified');
+assert.ok(html.includes('id="dashboard-business-impact-card"'), 'Dashboard Business Impact Card present');
+assert.ok(html.includes('id="carbon-profit-prediction-panel"'), 'Carbon Credit & Business Profit Prediction panel present');
+assert.ok(html.includes('160.2 t'), 'Corrected 286 MWh * 0.560 = 160.2 t CO2e sidebar value present');
+assert.ok(html.includes('এটি ধারণামূলক মূল্য, বাস্তব বাজারদর নয়'), 'Illustrative credit pricing disclaimer present');
+assert.ok(html.includes('Manager Confirmation Gate'), 'Autonomous Confirmation Gate present');
+assert.ok(html.includes('ethical-ai-transparency-footer'), 'Persistent Ethical AI Transparency footer present');
 
 // Modal Structural Isolation Check: pitch-deck-modal must NOT be nested inside app-modal-backdrop
 const backdropIdx = html.indexOf('id="app-modal-backdrop"');
@@ -273,6 +283,48 @@ assert.ok(html.includes('FORM S-12') || html.includes('Form S-12 Compliance Shee
 
   closePitch();
   assert.equal(AppState.pitchDeck.isOpen, false, 'Pitch deck must close');
+
+  // Test Autonomous Scenario Alert + ROI + Confirmation Gate & Live Compressor Telemetry Grounding
+  const applyScen = vm.runInContext('applyScenarioState', context);
+  const approveGate = vm.runInContext('approveAutonomousScenarioMitigation', context);
+  const getMetrics = vm.runInContext('getDerivedMetrics', context);
+  const copilotReply = vm.runInContext('generateGroundedCopilotReply', context);
+  const updateCarbonCfg = vm.runInContext('updateCarbonPredictionConfig', context);
+  const resetCarbonCfg = vm.runInContext('resetCarbonPredictionConfig', context);
+
+  // Night Shift Waste triggers automatic alert + higher recoverable ROI
+  const nightAlertId = applyScen('night_idle', 'Night Shift Waste');
+  assert.equal(nightAlertId, 'ALT-AUTO-NIGHT_IDLE', 'Night Shift Waste must generate ALT-AUTO-NIGHT_IDLE alert');
+  assert.ok(AppState.alerts.some(al => al.id === nightAlertId && al.status === 'Unacknowledged'), 'Night alert must be unacknowledged');
+  const nightMetrics = getMetrics();
+  assert.ok(nightMetrics.businessImpact.monthlySavingsBdt > 68000, 'Night Shift Waste recoverable ROI must exceed baseline 68,000 BDT');
+  approveGate('night_idle', nightAlertId);
+  assert.equal(AppState.alerts.find(al => al.id === nightAlertId).status, 'Acknowledged', 'Manager Confirmation Gate approval must acknowledge alert');
+
+  // Peak Grid Tariffs applies 14.88 BDT/kWh peak rate and generates peak alert
+  const peakAlertId = applyScen('peak_grid', 'Peak Grid Tariffs');
+  assert.equal(peakAlertId, 'ALT-AUTO-PEAK_GRID', 'Peak Grid Tariffs must auto-generate ALT-AUTO-PEAK_GRID alert');
+  assert.equal(getMetrics().effectiveTariff, 14.88, 'Peak Grid Tariffs must activate 14.88 BDT/kWh rate');
+
+  // Rooftop Solar Surge increases clean offset savings & lowers residual grid carbon
+  applyScen('solar_surge', 'Rooftop Solar Surge');
+  const solarMetrics = getMetrics();
+  assert.equal(solarMetrics.solarOffsetKwh, 10460, 'Rooftop Solar Surge must track 10,460 kWh offset');
+  assert.ok(solarMetrics.businessImpact.monthlySavingsBdt > 150000, 'Rooftop Solar Surge monthly savings must jump cleanly');
+
+  // Live Compressor Air Leak telemetry changes AI Copilot reasoning values dynamically
+  applyScen('compressor_leak', 'Compressor Air Leak');
+  const compReply = copilotReply('Why is COMP-01 compressor air leak drawing high power right now?');
+  assert.ok(compReply.includes('31.2 kW') && compReply.includes('74.5'), 'Copilot must read live COMP-01 fault kW/temp during Compressor Leak scenario');
+  assert.ok(compReply.includes('[REASONING TRACE]') && compReply.includes('[SAFETY GUARDRAIL]'), 'Copilot reply must include reasoning trace and safety guardrail');
+
+  // Carbon prediction config updates live metrics
+  applyScen('baseline', 'Normal Baseline');
+  updateCarbonCfg('customPriceUsdPerTon', 30);
+  const highPriceMetrics = getMetrics();
+  assert.equal(highPriceMetrics.carbonForecast.customPriceUsdPerTon, 30, 'Carbon price slider/config must update live');
+  resetCarbonCfg();
+  assert.equal(getMetrics().carbonForecast.customPriceUsdPerTon, 18, 'Carbon price reset must restore 18 USD/t default');
 }
 
 console.log('✓ PASS: All 5 Full-Suite Hackathon Enhancements verified (static & functional VM execution)');

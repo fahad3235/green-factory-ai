@@ -1273,6 +1273,17 @@ function setScenario(name){
     var bm = S.machines.filter(function(x){ return x.id==="boiler"; })[0];
     if(!bm.fault){ setFault("boiler", true); toast("Boiler breakdown: steam lost"); }
     else toast("Boiler already down"); }
+  if(name==="tariff"){
+    $("tariffRange").value = 14.88; $("tariffOut").textContent = "৳14.88 /kWh";
+    logEvent("warn","Scenario: Peak Grid Tariff window active (৳ 14.88/kWh) — AI load-shifting advisory triggered");
+    toast("Peak Grid Tariffs active (৳ 14.88/kWh)");
+  }
+  if(name==="solar"){
+    S.outage = false; S.outageUntil = -1; clearAlert("outage");
+    S.machines.forEach(function(m){ if(m.id!=="solar"){ m.solarOffsetPct = 20; } });
+    logEvent("ok","Scenario: Rooftop Solar Surge (+10,460 kWh clean offset) — grid draw reduced");
+    toast("Rooftop Solar Surge active: grid load reduced cleanly");
+  }
   if(name==="outage"){
     if(S.outage){ endOutage(false); toast("Grid power restored early"); }
     else { startOutage(); toast("Power cut: factory on generator"); } }

@@ -8,7 +8,8 @@ const emojiRegex = /[\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u
 const emojiMatches = html.match(emojiRegex);
 console.log('Emoji count in preview/index.html:', emojiMatches ? emojiMatches.length : 0);
 if (emojiMatches) {
-  console.warn('Found emojis:', [...new Set(emojiMatches)]);
+  console.error('Found forbidden emojis:', [...new Set(emojiMatches)]);
+  process.exit(1);
 }
 
 // 2. Syntax validation of all <script> blocks

@@ -6,6 +6,7 @@
 .env
 .env.*
 *.env
+!.env.example
 
 # Node dependencies & package managers
 node_modules/
@@ -75,3 +76,12 @@ desktop.ini
 *~
 # Agent working notes (never ship in the public repo)
 .agents/
+
+# Python runtime & test artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/

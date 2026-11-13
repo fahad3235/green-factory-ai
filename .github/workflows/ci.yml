@@ -38,3 +38,25 @@ jobs:
 
     - name: Validate Emoji Count and JavaScript Syntax
       run: node scripts/test_carbon_credit_integration.js
+
+    - name: Verify TypeScript/JavaScript Formula Parity
+      run: node scripts/test_typescript_parity.mjs
+
+  backend-test:
+    name: Run FastAPI Backend Pytest Suite (Python 3.12)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install backend dependencies
+      run: pip install --no-cache-dir -r requirements.txt
+
+    - name: Run Pytest suite
+      run: pytest -v

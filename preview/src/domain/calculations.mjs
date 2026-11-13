@@ -263,3 +263,155 @@ export function calculateMicrogridMetrics({
     vcsCarbonCreditsTons
   };
 }
+
+/**
+ * Calculate Potential Carbon Credit Revenue, 12-Month Forecast, ROI,
+ * Target Attainment, Buyer Compliance Risk, and Carbon Price / CBAM Sensitivity.
+ * Note: Carbon credit prices are illustrative assumptions subject to MRV verification.
+ */
+export function calculateCarbonCreditForecast(options = {}) {
+  const safeNum = (v, fallback) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+  };
+
+  const monthlyAvoidedTons = Math.max(0, safeNum(options.monthlyAvoidedTons, 3.994));
+  const monthlyEnergySavingsBdt = Math.max(0, safeNum(options.monthlyEnergySavingsBdt, 88435));
+  const monthlySavedKwh = Math.max(0, safeNum(options.monthlySavedKwh, 7132));
+  const baselineAnnualTons = Math.max(0.1, safeNum(options.baselineAnnualTons, 458.3));
+  const residualMonthlyTons = Math.max(0, safeNum(options.residualMonthlyTons, 34.20));
+  const customPriceUsdPerTon = Math.min(150, Math.max(1, safeNum(options.customPriceUsdPerTon, 18)));
+  const usdToBdt = Math.max(1, safeNum(options.usdToBdt, 120));
+  const implementationCapexBdt = Math.max(0, safeNum(options.implementationCapexBdt, 485000));
+  const annualTargetTons = Math.max(1, safeNum(options.annualTargetTons, 52.0));
+  const cbamRateUsdPerTon = Math.min(200, Math.max(0, safeNum(options.cbamRateUsdPerTon, 65)));
+  const gridFactorKgPerKwh = Math.max(0.01, safeNum(options.gridFactorKgPerKwh, DEFAULT_ASSUMPTIONS.gridEmissionFactorKgPerKwh));
+
+  const scenarios = [
+    { id: 'low', label: 'Conservative (Low)', priceUsdPerTon: 10 },
+    { id: 'medium', label: 'Assumed Base (Medium)', priceUsdPerTon: 18 },
+    { id: 'high', label: 'High-Integrity VCM (High)', priceUsdPerTon: 30 }
+  ].map((s) => {
+    const priceBdtPerTon = Math.round(s.priceUsdPerTon * usdToBdt);
+    const monthlyRevenueBdt = Math.round(monthlyAvoidedTons * priceBdtPerTon);
+    const annualRevenueBdt = monthlyRevenueBdt * 12;
+    return {
+      ...s,
+      priceBdtPerTon,
+      monthlyRevenueBdt,
+      annualRevenueBdt
+    };
+  });
+
+  const customPriceBdtPerTon = Math.round(customPriceUsdPerTon * usdToBdt);
+  const monthlyPotentialCreditBdt = Math.round(monthlyAvoidedTons * customPriceBdtPerTon);
+  const annualPotentialCreditBdt = monthlyPotentialCreditBdt * 12;
+
+  const annualEnergySavingsBdt = Math.round(monthlyEnergySavingsBdt * 12);
+  const projectedAnnualTons = Number((monthlyAvoidedTons * 12).toFixed(2));
+  const annualTotalBenefitBdt = annualEnergySavingsBdt + annualPotentialCreditBdt;
+  const monthlyTotalBenefitBdt = Math.round(monthlyEnergySavingsBdt + monthlyPotentialCreditBdt);
+
+  const paybackMonthsEnergyOnly = monthlyEnergySavingsBdt > 0
+    ? Number((implementationCapexBdt / monthlyEnergySavingsBdt).toFixed(1))
+    : null;
+  const paybackMonthsWithCredits = monthlyTotalBenefitBdt > 0
+    ? Number((implementationCapexBdt / monthlyTotalBenefitBdt).toFixed(1))
+    : null;
+
+  const roi12MonthPct = implementationCapexBdt > 0
+    ? Number((((annualTotalBenefitBdt - implementationCapexBdt) / implementationCapexBdt) * 100).toFixed(1))
+    : 0;
+  const net3YearProfitBdt = Math.round((annualTotalBenefitBdt * 3) - implementationCapexBdt);
+
+  // 12-Month deterministic seasonal ramp (reflecting Gazipur summer load & continuous tuning)
+  const monthLabels = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12'];
+  const seasonalWeights = [0.92, 0.94, 0.97, 1.00, 1.02, 1.04, 1.05, 1.04, 1.02, 1.01, 1.00, 0.99];
+  let cumTons = 0;
+  let cumBdt = 0;
+  const monthlySeries = monthLabels.map((label, idx) => {
+    const w = seasonalWeights[idx];
+    const mTons = Number((monthlyAvoidedTons * w).toFixed(3));
+    const mEnergyBdt = Math.round(monthlyEnergySavingsBdt * w);
+    const mCreditBdt = Math.round(monthlyPotentialCreditBdt * w);
+    const mTotalBdt = mEnergyBdt + mCreditBdt;
+    cumTons = Number((cumTons + mTons).toFixed(2));
+    cumBdt += mTotalBdt;
+    return {
+      month: label,
+      avoidedTons: mTons,
+      cumulativeTons: cumTons,
+      energySavingsBdt: mEnergyBdt,
+      creditRevenueBdt: mCreditBdt,
+      totalBusinessValueBdt: mTotalBdt,
+      cumulativeBusinessValueBdt: cumBdt
+    };
+  });
+
+  // Target tracker
+  const attainmentPct = Number(Math.min(200, (projectedAnnualTons / annualTargetTons) * 100).toFixed(1));
+  const shortfallTons = Number(Math.max(0, annualTargetTons - projectedAnnualTons).toFixed(2));
+  const rawProb = 35 + ((attainmentPct - 60) * 1.15);
+  const probabilityPct = Math.round(Math.min(98, Math.max(8, rawProb)));
+  const onTrack = projectedAnnualTons >= annualTargetTons;
+
+  // Buyer compliance risk score (Scope 3 buyer target benchmark = 10% annual cut)
+  const reductionPct = Number(((projectedAnnualTons / baselineAnnualTons) * 100).toFixed(1));
+  const complianceScore = Math.round(Math.min(99, Math.max(15, (reductionPct / 12.0) * 88)));
+  const riskTier = complianceScore >= 75 ? 'LOW' : (complianceScore >= 50 ? 'MODERATE' : 'HIGH');
+
+  // Carbon tax / EU CBAM sensitivity simulation
+  const residualAnnualTons = Number((residualMonthlyTons * 12).toFixed(2));
+  const grossExposureAnnualTons = Number((residualAnnualTons + projectedAnnualTons).toFixed(2));
+  const avoidedCbamLiabilityBdt = Math.round(projectedAnnualTons * cbamRateUsdPerTon * usdToBdt);
+  const netResidualCbamCostBdt = Math.round(residualAnnualTons * cbamRateUsdPerTon * usdToBdt);
+  const grossAnnualCbamExposureBdt = avoidedCbamLiabilityBdt + netResidualCbamCostBdt;
+
+  return {
+    monthlyAvoidedTons: Number(monthlyAvoidedTons.toFixed(3)),
+    projectedAnnualTons,
+    monthlySavedKwh: Math.round(monthlySavedKwh),
+    gridFactorKgPerKwh,
+    formulaSummary: `${Math.round(monthlySavedKwh).toLocaleString('en-US')} kWh * ${gridFactorKgPerKwh.toFixed(3)} kg CO2e/kWh / 1,000 = ${monthlyAvoidedTons.toFixed(3)} tCO2e/mo`,
+    customPriceUsdPerTon,
+    customPriceBdtPerTon,
+    usdToBdt,
+    monthlyPotentialCreditBdt,
+    annualPotentialCreditBdt,
+    monthlyEnergySavingsBdt: Math.round(monthlyEnergySavingsBdt),
+    annualEnergySavingsBdt,
+    monthlyTotalBenefitBdt,
+    annualTotalBenefitBdt,
+    implementationCapexBdt,
+    paybackMonthsEnergyOnly,
+    paybackMonthsWithCredits,
+    roi12MonthPct,
+    net3YearProfitBdt,
+    scenarios,
+    monthlySeries,
+    targetTracker: {
+      annualTargetTons,
+      projectedAnnualTons,
+      attainmentPct,
+      shortfallTons,
+      probabilityPct,
+      onTrack
+    },
+    buyerCompliance: {
+      reductionPct,
+      complianceScore,
+      riskTier,
+      buyerBenchmarkPct: 10.0
+    },
+    cbamSimulation: {
+      cbamRateUsdPerTon,
+      residualAnnualTons,
+      grossExposureAnnualTons,
+      avoidedCbamLiabilityBdt,
+      netResidualCbamCostBdt,
+      grossAnnualCbamExposureBdt
+    },
+    verificationStatus: 'POTENTIAL_UNVERIFIED',
+    priceBasisDisclaimer: 'Illustrative assumed carbon credit price — NOT real spot market pricing. Bangladesh voluntary/compliance MRV verification required.'
+  };
+}

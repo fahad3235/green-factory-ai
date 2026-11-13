@@ -68,6 +68,17 @@ const a = ts.createDeterministicPrng(42);
 const b = js.createDeterministicPrng(42);
 eq([a(), a(), a()], [b(), b(), b()], 'PRNG sequences identical');
 
+// Microgrid & Carbon Credit Profit Prediction parity
+eq(ts.calculateMicrogridMetrics({ solarKwp: 320, bessKwh: 150, dieselDisplacementPct: 45 }),
+   js.calculateMicrogridMetrics({ solarKwp: 320, bessKwh: 150, dieselDisplacementPct: 45 }),
+   'microgrid metrics');
+eq(ts.calculateCarbonCreditForecast({ monthlyAvoidedTons: 4.0, monthlyEnergySavingsBdt: 90000, customPriceUsdPerTon: 22, cbamRateUsdPerTon: 70 }),
+   js.calculateCarbonCreditForecast({ monthlyAvoidedTons: 4.0, monthlyEnergySavingsBdt: 90000, customPriceUsdPerTon: 22, cbamRateUsdPerTon: 70 }),
+   'carbon credit forecast default');
+eq(ts.calculateCarbonCreditForecast({ monthlyAvoidedTons: 0, monthlyEnergySavingsBdt: 0, customPriceUsdPerTon: 500 }),
+   js.calculateCarbonCreditForecast({ monthlyAvoidedTons: 0, monthlyEnergySavingsBdt: 0, customPriceUsdPerTon: 500 }),
+   'carbon credit forecast edge case');
+
 // Error behavior identical
 for (const fn of [
   () => ts.calculateEnergyKwh(-5, 10), () => js.calculateEnergyKwh(-5, 10),

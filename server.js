@@ -261,7 +261,7 @@ const server = http.createServer((req, res) => {
       </div>
       <div>
         <div style="font-weight:800;font-size:0.95rem;color:#fff;">Ask Green AI Copilot &amp; 6 Live Simulation Agents Ready</div>
-        <div style="font-size:0.8rem;color:#a7f3d0;">NVIDIA Nemotron 3 Ultra (550B) • 3D Animated Orb • Real-Time Telemetry Sync</div>
+        <div style="font-size:0.8rem;color:#a7f3d0;">Green Factory Brain AI (Llama-3.3-70B) • 3D Animated Orb • Real-Time Telemetry Sync</div>
       </div>
     </div>
     <div class="btn-group">

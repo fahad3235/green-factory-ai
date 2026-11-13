@@ -1,0 +1,632 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Green Factory Brain AI API",
+    "description": "Industrial Energy Intelligence, Live LLM Copilot (Llama-3.3-70B / Gemini 2.5 Flash), and Carbon Credit Forecast API.",
+    "version": "2.0.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Check Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/copilot/chat": {
+      "post": {
+        "summary": "Copilot Chat",
+        "operationId": "copilot_chat_api_v1_copilot_chat_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopilotChatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CopilotChatResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/copilot": {
+      "post": {
+        "summary": "Copilot Chat",
+        "operationId": "copilot_chat_api_copilot_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopilotChatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CopilotChatResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/carbon/forecast": {
+      "get": {
+        "summary": "Get Carbon Forecast",
+        "operationId": "get_carbon_forecast_api_v1_carbon_forecast_get",
+        "parameters": [
+          {
+            "name": "monthlyAvoidedTons",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 3.07,
+              "title": "Monthlyavoidedtons"
+            }
+          },
+          {
+            "name": "monthlyEnergySavingsBdt",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 68000.0,
+              "title": "Monthlyenergysavingsbdt"
+            }
+          },
+          {
+            "name": "monthlySavedKwh",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 5484.0,
+              "title": "Monthlysavedkwh"
+            }
+          },
+          {
+            "name": "customPriceUsdPerTon",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 18.0,
+              "title": "Custompriceusdperton"
+            }
+          },
+          {
+            "name": "implementationCapexBdt",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 350000.0,
+              "title": "Implementationcapexbdt"
+            }
+          },
+          {
+            "name": "annualTargetTons",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 55.0,
+              "title": "Annualtargettons"
+            }
+          },
+          {
+            "name": "cbamRateUsdPerTon",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 75.0,
+              "title": "Cbamrateusdperton"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Carbon Forecast Api V1 Carbon Forecast Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Post Carbon Forecast",
+        "operationId": "post_carbon_forecast_api_v1_carbon_forecast_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarbonForecastRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Post Carbon Forecast Api V1 Carbon Forecast Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workflow/trigger": {
+      "post": {
+        "summary": "Trigger Autonomous Workflow",
+        "operationId": "trigger_autonomous_workflow_api_v1_workflow_trigger_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AutonomousWorkflowRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutonomousWorkflowResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/telemetry/summary": {
+      "get": {
+        "summary": "Get Telemetry Summary",
+        "operationId": "get_telemetry_summary_api_v1_telemetry_summary_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Get Telemetry Summary Api V1 Telemetry Summary Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AutonomousWorkflowRequest": {
+        "properties": {
+          "scenarioKey": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Scenariokey"
+          },
+          "telemetry": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Telemetry"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenarioKey"
+        ],
+        "title": "AutonomousWorkflowRequest"
+      },
+      "AutonomousWorkflowResponse": {
+        "properties": {
+          "scenarioKey": {
+            "type": "string",
+            "title": "Scenariokey"
+          },
+          "alertId": {
+            "type": "string",
+            "title": "Alertid"
+          },
+          "machineId": {
+            "type": "string",
+            "title": "Machineid"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity"
+          },
+          "agentPipeline": {
+            "type": "string",
+            "title": "Agentpipeline"
+          },
+          "alertTitle": {
+            "type": "string",
+            "title": "Alerttitle"
+          },
+          "mitigationTitle": {
+            "type": "string",
+            "title": "Mitigationtitle"
+          },
+          "monthlySavingsBdt": {
+            "type": "integer",
+            "title": "Monthlysavingsbdt"
+          },
+          "annualSavingsBdt": {
+            "type": "integer",
+            "title": "Annualsavingsbdt"
+          },
+          "potentialCreditMonthlyBdt": {
+            "type": "integer",
+            "title": "Potentialcreditmonthlybdt"
+          },
+          "estCostBdt": {
+            "type": "integer",
+            "title": "Estcostbdt"
+          },
+          "paybackMonths": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paybackmonths"
+          },
+          "roi12Pct": {
+            "type": "number",
+            "title": "Roi12Pct"
+          },
+          "requiresManagerConfirmation": {
+            "type": "boolean",
+            "title": "Requiresmanagerconfirmation",
+            "default": true
+          },
+          "safetyGuardrail": {
+            "type": "string",
+            "title": "Safetyguardrail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenarioKey",
+          "alertId",
+          "machineId",
+          "severity",
+          "agentPipeline",
+          "alertTitle",
+          "mitigationTitle",
+          "monthlySavingsBdt",
+          "annualSavingsBdt",
+          "potentialCreditMonthlyBdt",
+          "estCostBdt",
+          "paybackMonths",
+          "roi12Pct",
+          "safetyGuardrail"
+        ],
+        "title": "AutonomousWorkflowResponse"
+      },
+      "CarbonForecastRequest": {
+        "properties": {
+          "monthlyAvoidedTons": {
+            "type": "number",
+            "maximum": 1000.0,
+            "minimum": 0.0,
+            "title": "Monthlyavoidedtons",
+            "default": 3.07
+          },
+          "monthlyEnergySavingsBdt": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Monthlyenergysavingsbdt",
+            "default": 68000.0
+          },
+          "monthlySavedKwh": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Monthlysavedkwh",
+            "default": 5484.0
+          },
+          "baselineAnnualTons": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Baselineannualtons",
+            "default": 458.3
+          },
+          "residualMonthlyTons": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Residualmonthlytons",
+            "default": 34.2
+          },
+          "customPriceUsdPerTon": {
+            "type": "number",
+            "maximum": 150.0,
+            "minimum": 1.0,
+            "title": "Custompriceusdperton",
+            "default": 18.0
+          },
+          "usdToBdt": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Usdtobdt",
+            "default": 120.0
+          },
+          "implementationCapexBdt": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Implementationcapexbdt",
+            "default": 350000.0
+          },
+          "annualTargetTons": {
+            "type": "number",
+            "minimum": 1.0,
+            "title": "Annualtargettons",
+            "default": 55.0
+          },
+          "cbamRateUsdPerTon": {
+            "type": "number",
+            "maximum": 200.0,
+            "minimum": 0.0,
+            "title": "Cbamrateusdperton",
+            "default": 75.0
+          },
+          "gridFactorKgPerKwh": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Gridfactorkgperkwh",
+            "default": 0.56
+          }
+        },
+        "type": "object",
+        "title": "CarbonForecastRequest"
+      },
+      "CopilotChatRequest": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Query",
+            "description": "User question for AI Copilot"
+          },
+          "language": {
+            "type": "string",
+            "pattern": "^(en|bn)$",
+            "title": "Language",
+            "default": "en"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider",
+            "description": "Preferred LLM provider: groq | gemini | backend",
+            "default": "groq"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model",
+            "description": "Optional model override"
+          },
+          "telemetry": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Telemetry",
+            "description": "Live factory telemetry snapshot"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "title": "CopilotChatRequest"
+      },
+      "CopilotChatResponse": {
+        "properties": {
+          "reply": {
+            "type": "string",
+            "title": "Reply"
+          },
+          "providerLabel": {
+            "type": "string",
+            "title": "Providerlabel"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "isHtml": {
+            "type": "boolean",
+            "title": "Ishtml",
+            "default": false
+          },
+          "usedFallback": {
+            "type": "boolean",
+            "title": "Usedfallback",
+            "default": false
+          },
+          "latencyMs": {
+            "type": "number",
+            "title": "Latencyms",
+            "default": 0.0
+          }
+        },
+        "type": "object",
+        "required": [
+          "reply",
+          "providerLabel",
+          "model"
+        ],
+        "title": "CopilotChatResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

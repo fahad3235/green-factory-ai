@@ -10,6 +10,7 @@ import {
   aggregateFleetMetrics,
   createDeterministicPrng,
   calculateMicrogridMetrics,
+  calculateCarbonCreditForecast,
   DEFAULT_ASSUMPTIONS
 } from '../src/domain/calculations.mjs';
 
@@ -152,4 +153,44 @@ console.log('Running Green Factory Brain AI — Domain Calculation & Simulation 
   console.log('✓ PASS: Rooftop Solar PV & BESS Microgrid Simulator calculations & boundary clamping');
 }
 
-console.log('ALL 9 DOMAIN CALCULATION TEST SUITES PASSED (9/9).');
+// 10. Carbon Credit & Business Profit Prediction calculations & edge cases
+{
+  const forecast = calculateCarbonCreditForecast({
+    monthlyAvoidedTons: 4.0,
+    monthlyEnergySavingsBdt: 90000,
+    monthlySavedKwh: 7143,
+    customPriceUsdPerTon: 18,
+    usdToBdt: 120,
+    implementationCapexBdt: 485000,
+    annualTargetTons: 52.0,
+    cbamRateUsdPerTon: 65
+  });
+  assert.equal(forecast.scenarios.length, 3, 'Must produce Low/Medium/High scenarios');
+  assert.equal(forecast.scenarios[0].priceUsdPerTon, 10);
+  assert.equal(forecast.scenarios[1].priceUsdPerTon, 18);
+  assert.equal(forecast.scenarios[2].priceUsdPerTon, 30);
+  assert.equal(forecast.monthlyPotentialCreditBdt, Math.round(4.0 * 18 * 120));
+  assert.equal(forecast.monthlySeries.length, 12, 'Must generate 12-month forecast series');
+  assert.equal(forecast.projectedAnnualTons, 48.0);
+  assert.equal(forecast.targetTracker.shortfallTons, 4.0);
+  assert.equal(forecast.targetTracker.onTrack, false);
+  assert.equal(forecast.verificationStatus, 'POTENTIAL_UNVERIFIED');
+  assert.ok(forecast.paybackMonthsWithCredits < forecast.paybackMonthsEnergyOnly);
+  assert.ok(forecast.cbamSimulation.avoidedCbamLiabilityBdt > 0);
+
+  // Zero / negative / missing edge cases must never produce NaN or crash
+  const zeroCase = calculateCarbonCreditForecast({
+    monthlyAvoidedTons: -5,
+    monthlyEnergySavingsBdt: 0,
+    customPriceUsdPerTon: 999,
+    cbamRateUsdPerTon: -20
+  });
+  assert.equal(zeroCase.monthlyAvoidedTons, 0);
+  assert.equal(zeroCase.customPriceUsdPerTon, 150, 'Credit price above max clamps to 150');
+  assert.equal(zeroCase.paybackMonthsEnergyOnly, null);
+  assert.equal(zeroCase.cbamSimulation.cbamRateUsdPerTon, 0);
+  assert.ok(!Number.isNaN(zeroCase.roi12MonthPct));
+  console.log('✓ PASS: Carbon Credit & Business Profit Prediction calculations & edge cases');
+}
+
+console.log('ALL 10 DOMAIN CALCULATION TEST SUITES PASSED (10/10).');

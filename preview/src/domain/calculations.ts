@@ -289,3 +289,306 @@ export function createDeterministicPrng(seed = 20261018): () => number {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+
+export interface MicrogridOptions {
+  solarKwp?: number | null;
+  bessKwh?: number | null;
+  dieselDisplacementPct?: number | null;
+  tariffBdtPerKwh?: number;
+  peakTariffBdtPerKwh?: number;
+}
+
+export interface MicrogridMetricsResult {
+  solarKwp: number;
+  bessKwh: number;
+  dieselDisplacementPct: number;
+  annualSolarMwh: number;
+  storageCyclingMwh: number;
+  gridBdtSavings: number;
+  dieselBackupSavingsBdt: number;
+  totalAnnualSavingsBdt: number;
+  totalCapexBdt: number;
+  paybackYears: number;
+  vcsCarbonCreditsTons: number;
+}
+
+export function calculateMicrogridMetrics(options: MicrogridOptions = {}): MicrogridMetricsResult {
+  const {
+    solarKwp = 320,
+    bessKwh = 150,
+    dieselDisplacementPct = 45,
+    tariffBdtPerKwh = 12.40,
+    peakTariffBdtPerKwh = 14.88
+  } = options;
+
+  const sVal = (solarKwp === undefined || solarKwp === null || isNaN(Number(solarKwp))) ? 320 : Number(solarKwp);
+  const sKwp = Math.max(100, Math.min(1000, sVal));
+
+  const bVal = (bessKwh === undefined || bessKwh === null || isNaN(Number(bessKwh))) ? 150 : Number(bessKwh);
+  const bKwh = Math.max(50, Math.min(500, bVal));
+
+  const dVal = (dieselDisplacementPct === undefined || dieselDisplacementPct === null || isNaN(Number(dieselDisplacementPct))) ? 45 : Number(dieselDisplacementPct);
+  const dPct = Math.max(0, Math.min(100, dVal));
+
+  const annualSolarMwh = Number(((sKwp * 1400) / 1000).toFixed(1));
+  const storageCyclingMwh = Number(((bKwh * 300) / 1000).toFixed(1));
+
+  const solarDirectKwh = (annualSolarMwh * 1000) * 0.85;
+  const batteryPeakKwh = storageCyclingMwh * 1000;
+  const gridBdtSavings = Math.round((solarDirectKwh * tariffBdtPerKwh) + (batteryPeakKwh * (peakTariffBdtPerKwh - tariffBdtPerKwh)));
+
+  const baselineDieselKwh = 28000;
+  const displacedDieselKwh = Math.round(baselineDieselKwh * (dPct / 100));
+  const dieselDeltaBdt = 32.50 - tariffBdtPerKwh;
+  const dieselBackupSavingsBdt = Math.round(displacedDieselKwh * dieselDeltaBdt);
+
+  const totalAnnualSavingsBdt = gridBdtSavings + dieselBackupSavingsBdt;
+  const totalCapexBdt = (sKwp * 52000) + (bKwh * 36000);
+  const paybackYears = totalAnnualSavingsBdt > 0 ? Number((totalCapexBdt / totalAnnualSavingsBdt).toFixed(1)) : 0.0;
+
+  const gridCarbonAvoidedTons = (annualSolarMwh * 0.560);
+  const dieselCarbonAvoidedTons = (displacedDieselKwh / 1000) * 0.740;
+  const vcsCarbonCreditsTons = Number((gridCarbonAvoidedTons + dieselCarbonAvoidedTons).toFixed(1));
+
+  return {
+    solarKwp: sKwp,
+    bessKwh: bKwh,
+    dieselDisplacementPct: dPct,
+    annualSolarMwh,
+    storageCyclingMwh,
+    gridBdtSavings,
+    dieselBackupSavingsBdt,
+    totalAnnualSavingsBdt,
+    totalCapexBdt,
+    paybackYears,
+    vcsCarbonCreditsTons
+  };
+}
+
+export interface CarbonForecastOptions {
+  monthlyAvoidedTons?: number;
+  monthlyEnergySavingsBdt?: number;
+  monthlySavedKwh?: number;
+  baselineAnnualTons?: number;
+  residualMonthlyTons?: number;
+  customPriceUsdPerTon?: number;
+  usdToBdt?: number;
+  implementationCapexBdt?: number;
+  annualTargetTons?: number;
+  cbamRateUsdPerTon?: number;
+  gridFactorKgPerKwh?: number;
+}
+
+export interface CarbonPriceScenario {
+  id: string;
+  label: string;
+  priceUsdPerTon: number;
+  priceBdtPerTon: number;
+  monthlyRevenueBdt: number;
+  annualRevenueBdt: number;
+}
+
+export interface CarbonMonthlyPoint {
+  month: string;
+  avoidedTons: number;
+  cumulativeTons: number;
+  energySavingsBdt: number;
+  creditRevenueBdt: number;
+  totalBusinessValueBdt: number;
+  cumulativeBusinessValueBdt: number;
+}
+
+export interface CarbonCreditForecastResult {
+  monthlyAvoidedTons: number;
+  projectedAnnualTons: number;
+  monthlySavedKwh: number;
+  gridFactorKgPerKwh: number;
+  formulaSummary: string;
+  customPriceUsdPerTon: number;
+  customPriceBdtPerTon: number;
+  usdToBdt: number;
+  monthlyPotentialCreditBdt: number;
+  annualPotentialCreditBdt: number;
+  monthlyEnergySavingsBdt: number;
+  annualEnergySavingsBdt: number;
+  monthlyTotalBenefitBdt: number;
+  annualTotalBenefitBdt: number;
+  implementationCapexBdt: number;
+  paybackMonthsEnergyOnly: number | null;
+  paybackMonthsWithCredits: number | null;
+  roi12MonthPct: number;
+  net3YearProfitBdt: number;
+  scenarios: CarbonPriceScenario[];
+  monthlySeries: CarbonMonthlyPoint[];
+  targetTracker: {
+    annualTargetTons: number;
+    projectedAnnualTons: number;
+    attainmentPct: number;
+    shortfallTons: number;
+    probabilityPct: number;
+    onTrack: boolean;
+  };
+  buyerCompliance: {
+    reductionPct: number;
+    complianceScore: number;
+    riskTier: 'LOW' | 'MODERATE' | 'HIGH';
+    buyerBenchmarkPct: number;
+  };
+  cbamSimulation: {
+    cbamRateUsdPerTon: number;
+    residualAnnualTons: number;
+    grossExposureAnnualTons: number;
+    avoidedCbamLiabilityBdt: number;
+    netResidualCbamCostBdt: number;
+    grossAnnualCbamExposureBdt: number;
+  };
+  verificationStatus: 'POTENTIAL_UNVERIFIED';
+  priceBasisDisclaimer: string;
+}
+
+/**
+ * Calculate Potential Carbon Credit Revenue, 12-Month Forecast, ROI,
+ * Target Attainment, Buyer Compliance Risk, and Carbon Price / CBAM Sensitivity.
+ */
+export function calculateCarbonCreditForecast(options: CarbonForecastOptions = {}): CarbonCreditForecastResult {
+  const safeNum = (v: unknown, fallback: number): number => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+  };
+
+  const monthlyAvoidedTons = Math.max(0, safeNum(options.monthlyAvoidedTons, 3.994));
+  const monthlyEnergySavingsBdt = Math.max(0, safeNum(options.monthlyEnergySavingsBdt, 88435));
+  const monthlySavedKwh = Math.max(0, safeNum(options.monthlySavedKwh, 7132));
+  const baselineAnnualTons = Math.max(0.1, safeNum(options.baselineAnnualTons, 458.3));
+  const residualMonthlyTons = Math.max(0, safeNum(options.residualMonthlyTons, 34.20));
+  const customPriceUsdPerTon = Math.min(150, Math.max(1, safeNum(options.customPriceUsdPerTon, 18)));
+  const usdToBdt = Math.max(1, safeNum(options.usdToBdt, 120));
+  const implementationCapexBdt = Math.max(0, safeNum(options.implementationCapexBdt, 485000));
+  const annualTargetTons = Math.max(1, safeNum(options.annualTargetTons, 52.0));
+  const cbamRateUsdPerTon = Math.min(200, Math.max(0, safeNum(options.cbamRateUsdPerTon, 65)));
+  const gridFactorKgPerKwh = Math.max(0.01, safeNum(options.gridFactorKgPerKwh, DEFAULT_ASSUMPTIONS.gridEmissionFactorKgPerKwh));
+
+  const scenarios: CarbonPriceScenario[] = [
+    { id: 'low', label: 'Conservative (Low)', priceUsdPerTon: 10 },
+    { id: 'medium', label: 'Assumed Base (Medium)', priceUsdPerTon: 18 },
+    { id: 'high', label: 'High-Integrity VCM (High)', priceUsdPerTon: 30 }
+  ].map((s) => {
+    const priceBdtPerTon = Math.round(s.priceUsdPerTon * usdToBdt);
+    const monthlyRevenueBdt = Math.round(monthlyAvoidedTons * priceBdtPerTon);
+    const annualRevenueBdt = monthlyRevenueBdt * 12;
+    return {
+      ...s,
+      priceBdtPerTon,
+      monthlyRevenueBdt,
+      annualRevenueBdt
+    };
+  });
+
+  const customPriceBdtPerTon = Math.round(customPriceUsdPerTon * usdToBdt);
+  const monthlyPotentialCreditBdt = Math.round(monthlyAvoidedTons * customPriceBdtPerTon);
+  const annualPotentialCreditBdt = monthlyPotentialCreditBdt * 12;
+
+  const annualEnergySavingsBdt = Math.round(monthlyEnergySavingsBdt * 12);
+  const projectedAnnualTons = Number((monthlyAvoidedTons * 12).toFixed(2));
+  const annualTotalBenefitBdt = annualEnergySavingsBdt + annualPotentialCreditBdt;
+  const monthlyTotalBenefitBdt = Math.round(monthlyEnergySavingsBdt + monthlyPotentialCreditBdt);
+
+  const paybackMonthsEnergyOnly = monthlyEnergySavingsBdt > 0
+    ? Number((implementationCapexBdt / monthlyEnergySavingsBdt).toFixed(1))
+    : null;
+  const paybackMonthsWithCredits = monthlyTotalBenefitBdt > 0
+    ? Number((implementationCapexBdt / monthlyTotalBenefitBdt).toFixed(1))
+    : null;
+
+  const roi12MonthPct = implementationCapexBdt > 0
+    ? Number((((annualTotalBenefitBdt - implementationCapexBdt) / implementationCapexBdt) * 100).toFixed(1))
+    : 0;
+  const net3YearProfitBdt = Math.round((annualTotalBenefitBdt * 3) - implementationCapexBdt);
+
+  const monthLabels = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10', 'M11', 'M12'];
+  const seasonalWeights = [0.92, 0.94, 0.97, 1.00, 1.02, 1.04, 1.05, 1.04, 1.02, 1.01, 1.00, 0.99];
+  let cumTons = 0;
+  let cumBdt = 0;
+  const monthlySeries: CarbonMonthlyPoint[] = monthLabels.map((label, idx) => {
+    const w = seasonalWeights[idx];
+    const mTons = Number((monthlyAvoidedTons * w).toFixed(3));
+    const mEnergyBdt = Math.round(monthlyEnergySavingsBdt * w);
+    const mCreditBdt = Math.round(monthlyPotentialCreditBdt * w);
+    const mTotalBdt = mEnergyBdt + mCreditBdt;
+    cumTons = Number((cumTons + mTons).toFixed(2));
+    cumBdt += mTotalBdt;
+    return {
+      month: label,
+      avoidedTons: mTons,
+      cumulativeTons: cumTons,
+      energySavingsBdt: mEnergyBdt,
+      creditRevenueBdt: mCreditBdt,
+      totalBusinessValueBdt: mTotalBdt,
+      cumulativeBusinessValueBdt: cumBdt
+    };
+  });
+
+  const attainmentPct = Number(Math.min(200, (projectedAnnualTons / annualTargetTons) * 100).toFixed(1));
+  const shortfallTons = Number(Math.max(0, annualTargetTons - projectedAnnualTons).toFixed(2));
+  const rawProb = 35 + ((attainmentPct - 60) * 1.15);
+  const probabilityPct = Math.round(Math.min(98, Math.max(8, rawProb)));
+  const onTrack = projectedAnnualTons >= annualTargetTons;
+
+  const reductionPct = Number(((projectedAnnualTons / baselineAnnualTons) * 100).toFixed(1));
+  const complianceScore = Math.round(Math.min(99, Math.max(15, (reductionPct / 12.0) * 88)));
+  const riskTier: 'LOW' | 'MODERATE' | 'HIGH' = complianceScore >= 75 ? 'LOW' : (complianceScore >= 50 ? 'MODERATE' : 'HIGH');
+
+  const residualAnnualTons = Number((residualMonthlyTons * 12).toFixed(2));
+  const grossExposureAnnualTons = Number((residualAnnualTons + projectedAnnualTons).toFixed(2));
+  const avoidedCbamLiabilityBdt = Math.round(projectedAnnualTons * cbamRateUsdPerTon * usdToBdt);
+  const netResidualCbamCostBdt = Math.round(residualAnnualTons * cbamRateUsdPerTon * usdToBdt);
+  const grossAnnualCbamExposureBdt = avoidedCbamLiabilityBdt + netResidualCbamCostBdt;
+
+  return {
+    monthlyAvoidedTons: Number(monthlyAvoidedTons.toFixed(3)),
+    projectedAnnualTons,
+    monthlySavedKwh: Math.round(monthlySavedKwh),
+    gridFactorKgPerKwh,
+    formulaSummary: `${Math.round(monthlySavedKwh).toLocaleString('en-US')} kWh * ${gridFactorKgPerKwh.toFixed(3)} kg CO2e/kWh / 1,000 = ${monthlyAvoidedTons.toFixed(3)} tCO2e/mo`,
+    customPriceUsdPerTon,
+    customPriceBdtPerTon,
+    usdToBdt,
+    monthlyPotentialCreditBdt,
+    annualPotentialCreditBdt,
+    monthlyEnergySavingsBdt: Math.round(monthlyEnergySavingsBdt),
+    annualEnergySavingsBdt,
+    monthlyTotalBenefitBdt,
+    annualTotalBenefitBdt,
+    implementationCapexBdt,
+    paybackMonthsEnergyOnly,
+    paybackMonthsWithCredits,
+    roi12MonthPct,
+    net3YearProfitBdt,
+    scenarios,
+    monthlySeries,
+    targetTracker: {
+      annualTargetTons,
+      projectedAnnualTons,
+      attainmentPct,
+      shortfallTons,
+      probabilityPct,
+      onTrack
+    },
+    buyerCompliance: {
+      reductionPct,
+      complianceScore,
+      riskTier,
+      buyerBenchmarkPct: 10.0
+    },
+    cbamSimulation: {
+      cbamRateUsdPerTon,
+      residualAnnualTons,
+      grossExposureAnnualTons,
+      avoidedCbamLiabilityBdt,
+      netResidualCbamCostBdt,
+      grossAnnualCbamExposureBdt
+    },
+    verificationStatus: 'POTENTIAL_UNVERIFIED',
+    priceBasisDisclaimer: 'Illustrative assumed carbon credit price — NOT real spot market pricing. Bangladesh voluntary/compliance MRV verification required.'
+  };
+}

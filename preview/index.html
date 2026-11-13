@@ -138,6 +138,19 @@
     .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scroll::-webkit-scrollbar-track { background: transparent; }
     .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.35); border-radius: 9999px; }
+    #carbon-profit-prediction-panel {
+      container-type: inline-size;
+    }
+    @container (max-width: 820px) {
+      #carbon-profit-prediction-panel .cp-row-slider,
+      #carbon-profit-prediction-panel .cp-row-chart,
+      #carbon-profit-prediction-panel .cp-row-engines {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+      #carbon-profit-prediction-panel .cp-span-full {
+        grid-column: 1 / -1 !important;
+      }
+    }
     .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.55); }
     .epms-panel {
       background: rgba(13, 22, 33, 0.88);
@@ -398,7 +411,10 @@
             </svg>
           </div>
           <div>
-            <div class="font-bold text-base tracking-tight text-white leading-tight">Green Factory Brain</div>
+            <div class="font-bold text-base tracking-tight text-white leading-tight flex items-center gap-1.5">
+              <span>Green Factory Brain AI</span>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">v2.0</span>
+            </div>
             <div class="text-[10px] text-slate-400 font-medium leading-tight mt-0.5" id="sidebar-tagline">Smarter Factories. Greener Future.</div>
           </div>
         </button>
@@ -673,7 +689,7 @@
         </div>
       </div>
 
-      <!-- 5. User Profile Footer & Green Brain v2.0 Branding -->
+      <!-- 5. User Profile Footer & Green Factory Brain AI v2.0 Branding -->
       <div class="p-3 pt-1 border-t border-slate-800/80 space-y-2">
         <div class="flex items-center justify-between p-1.5 rounded-xl bg-slate-900/60 border border-slate-800/80">
           <div class="flex items-center gap-2.5 min-w-0 cursor-pointer" onclick="openUserProfileModal()" title="View profile & security clearance">
@@ -704,7 +720,7 @@
             <svg aria-hidden="true" class="w-3.5 h-3.5 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
             </svg>
-            <span>GREEN BRAIN v2.0</span>
+            <span>v2.0</span>
           </div>
         </div>
       </div>
@@ -725,7 +741,7 @@
           </span>
           <div class="flex items-center gap-1.5 text-[10.5px] sm:text-[11px] text-slate-300 font-medium truncate">
             <svg aria-hidden="true" class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-            <span class="truncate"><span class="hidden sm:inline">Pilot Facility: </span><strong class="text-white">Rupsha Garments Ltd.</strong><span class="hidden sm:inline"> · Gazipur, Bangladesh</span></span>
+            <span class="truncate"><span class="hidden sm:inline">Pilot Facility: </span><strong class="text-white">Rupsha Garments Ltd.</strong><span class="hidden md:inline"> • LIVE TWIN</span><span class="hidden sm:inline"> · Gazipur, Bangladesh</span></span>
           </div>
           <span class="hidden md:inline-flex items-center gap-1 text-[10px] text-emerald-400 font-mono">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
@@ -778,22 +794,25 @@
               </svg>
             </div>
             <div class="text-left">
-              <div class="font-bold text-xs text-slate-900 dark:text-white leading-tight">Green Factory Brain</div>
+              <div class="font-bold text-xs text-slate-900 dark:text-white leading-tight flex items-center gap-1">
+                <span>Green Factory Brain AI</span>
+                <span class="px-1 py-0.2 rounded text-[8.5px] font-mono font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">v2.0</span>
+              </div>
               <div class="text-[9px] text-slate-500 dark:text-slate-400 leading-tight">Smarter Factories. Greener Future.</div>
             </div>
           </div>
         </div>
 
         <!-- Global Search / Command Bar with SVG Icon (Full width row 2 on <sm, inline flex-1 on sm+) -->
-        <div class="relative w-full sm:w-auto sm:flex-1 sm:min-w-[230px] md:min-w-[270px] sm:max-w-xl order-last sm:order-none">
+        <div class="relative w-full sm:w-auto sm:flex-1 sm:min-w-[210px] md:min-w-[230px] sm:max-w-xl order-last sm:order-none">
           <input
             type="text"
             id="global-search-input"
             oninput="handleGlobalSearchInput(this.value)"
             onkeydown="if(event.key==='Enter'){executeGlobalSearch(this.value)}"
-            placeholder="Search energy, carbon, machines, reports... (Ctrl + K)"
+            placeholder="Search metrics, machines, reports..."
             aria-label="Global search across views, machines, and recommendations"
-            class="w-full pl-9 pr-14 sm:pr-16 py-1.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            class="w-full pl-9 pr-16 py-1.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
           <svg aria-hidden="true" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
           <button type="button" onclick="openCommandPaletteModal()" class="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-mono bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-600 hover:border-emerald-500">
@@ -920,10 +939,10 @@
       </div>
 
       <!-- Sub-header Strip: Tracking Telemetry + LIVE AGENT pill -->
-      <div class="px-3.5 py-2 bg-[#effaf3] dark:bg-slate-950/90 border-b border-[#d5f0df] dark:border-emerald-500/20 flex items-center justify-between gap-2">
-        <div class="flex items-center gap-1.5 text-[11.5px] font-semibold text-[#1b5e37] dark:text-emerald-400 truncate">
-          <span class="text-emerald-500"><svg aria-hidden="true" class="w-3.5 h-3.5 inline-block animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg></span>
-          <span id="copilot-mode-status" class="truncate">Tracking Energy, Carbon, Bill &amp; 18+ Machines live</span>
+      <div class="px-3.5 py-2 bg-[#effaf3] dark:bg-slate-950/90 border-b border-[#d5f0df] dark:border-emerald-500/20 flex flex-wrap items-center justify-between gap-1.5">
+        <div class="flex items-center gap-1.5 text-[11px] font-semibold text-[#1b5e37] dark:text-emerald-400 min-w-0">
+          <span class="text-emerald-500 shrink-0"><svg aria-hidden="true" class="w-3.5 h-3.5 inline-block animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg></span>
+          <span id="copilot-mode-status" class="whitespace-nowrap">18 Machines Live</span>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
           <button type="button" onclick="runCopilotAutoDemo()" class="px-2 py-0.5 rounded-full text-[9.5px] font-extrabold bg-[#15803d] hover:bg-[#166534] text-white transition shadow-2xs" title="Run Automated Live Agent Demo"><svg aria-hidden="true" class="w-2.5 h-2.5 inline" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg> Auto-Demo</button>
@@ -1025,7 +1044,7 @@
           <div>
             <div class="text-base sm:text-lg font-black tracking-tight text-white flex items-center gap-2">
               <span>Green Factory Brain <span class="text-emerald-400">AI</span></span>
-              <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">OPERATIONAL TWIN v2.0</span>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">v2.0</span>
             </div>
             <div class="text-[11px] text-slate-300 font-medium">Smarter Factories. Greener Tomorrow.</div>
           </div>
@@ -1033,11 +1052,11 @@
         <div class="flex items-center gap-2.5">
           <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#062024]/90 text-emerald-300 border border-emerald-500/50 shadow-sm">
             <svg aria-hidden="true" class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0110 0v4"></path></svg>
-            <span>SECURE AUTHENTICATION GATE</span>
+            <span>DEMO SANDBOX ACCESS</span>
           </span>
           <span class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#062024]/90 text-emerald-300 border border-emerald-500/50 shadow-sm">
             <svg aria-hidden="true" class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-            <span>MANAGER &amp; OWNER ACCESS ONLY</span>
+            <span>ROLE PREVIEW: MANAGER &amp; OWNER</span>
           </span>
         </div>
       </div>
@@ -1170,14 +1189,30 @@
                   <svg aria-hidden="true" class="w-5 h-5 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
                 <div>
-                  <div class="font-extrabold text-sm text-white">Green Factory Brain AI</div>
-                  <div class="text-[10.5px] text-slate-400 font-medium">Executive Security Gate</div>
+                  <div class="font-extrabold text-sm text-white">Green Factory Brain AI <span class="text-emerald-400 font-mono text-xs">v2.0</span></div>
+                  <div class="text-[10.5px] text-slate-400 font-medium">Demo Access &amp; Role Selector</div>
                 </div>
               </div>
               <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-[#062024] text-emerald-300 border border-emerald-400/40 flex items-center gap-1">
                 <svg aria-hidden="true" class="w-3.5 h-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <span>SECURE ACCESS</span>
+                <span>DEMO ACCESS</span>
               </span>
+            </div>
+
+            <!-- 1-Click Demo Quick Access Box (For Hackathon Judges & Evaluators) -->
+            <div class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-400/40 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10.5px] font-extrabold uppercase tracking-wider text-emerald-300">1-Click Demo Access (Judge Quick Entry)</span>
+                <span class="text-[9.5px] font-mono text-slate-300">No setup required</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" id="btn-quick-enter-manager" onclick="quickEnterDemoRole('manager')" class="py-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[11px] shadow-sm transition flex items-center justify-center gap-1.5">
+                  <span>Enter as Manager</span>
+                </button>
+                <button type="button" id="btn-quick-enter-owner" onclick="quickEnterDemoRole('owner')" class="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 font-bold text-[11px] transition flex items-center justify-center gap-1.5">
+                  <span>Enter as Owner</span>
+                </button>
+              </div>
             </div>
 
             <!-- Select Operator Role -->
@@ -1254,9 +1289,9 @@
                 </div>
               </div>
 
-              <!-- Operator Access Token (Sandbox Pre-filled) -->
+              <!-- Sandbox Access Key (Pre-filled for Demo) -->
               <div>
-                <label class="block text-[11px] font-semibold text-slate-300 mb-1">Operator Access Token <span class="text-slate-500 font-normal">(Sandbox Pre-filled)</span></label>
+                <label class="block text-[11px] font-semibold text-slate-300 mb-1">Sandbox Access Key <span class="text-slate-500 font-normal">(Pre-filled for Demo)</span></label>
                 <div class="relative">
                   <input type="text" id="demo-login-passkey" value="PASSKEY-MGR-8899" placeholder="Enter demo token (if provided)" class="w-full pl-9 pr-3 py-2 rounded-xl bg-[#091a26] border border-slate-700 text-xs text-white font-mono placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
                   <svg aria-hidden="true" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
@@ -1270,18 +1305,18 @@
                 <span><svg aria-hidden="true" class="w-3.5 h-3.5 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
               </button>
 
-              <!-- Secondary Button: Verify Operator Token -->
+              <!-- Secondary Button: Verify Sandbox Credentials -->
               <button type="button" onclick="verifyDemoTokenQuick()" class="w-full py-2 px-4 rounded-xl bg-[#091a26] hover:bg-[#0d2232] text-slate-300 font-semibold text-xs border border-slate-700 transition flex items-center justify-center gap-2">
                 <svg aria-hidden="true" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-                <span>Verify Operator Token</span>
+                <span>Verify Sandbox Credentials</span>
               </button>
             </form>
 
-            <!-- Footer Security Pills -->
+            <!-- Footer Role Pills -->
             <div class="flex items-center justify-between text-[10px] text-slate-400 pt-3 border-t border-slate-800">
-              <span class="inline-flex items-center gap-1"><span class="text-emerald-400"><svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span> Manager &amp; Owner Only</span>
+              <span class="inline-flex items-center gap-1"><span class="text-emerald-400"><svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span> Manager &amp; Owner Roles</span>
               <span class="text-slate-700">|</span>
-              <span class="inline-flex items-center gap-1"><span class="text-emerald-400"><svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span> Mandatory Auth Gate</span>
+              <span class="inline-flex items-center gap-1"><span class="text-emerald-400"><svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span> Simulated Session Gate</span>
               <span class="text-slate-700">|</span>
               <span class="inline-flex items-center gap-1"><span class="text-emerald-400"><svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span> Role-Based Sandbox Access</span>
             </div>
@@ -1518,7 +1553,7 @@
         ask_green_ai: 'Ask Green AI',
         copilot_suggested: 'Suggested Grounded Prompts',
         hero_tagline: 'Smarter energy. Lower costs. Measurable climate impact.',
-        hero_desc: 'Green Factory Brain finds where energy is wasted, predicts next bill + carbon, and gives evidence-backed fixes that save money + cut carbon — then verifies the savings.',
+        hero_desc: 'Green Factory Brain AI finds where energy is wasted, predicts next bill + carbon, and gives evidence-backed fixes that save money + cut carbon — then verifies the savings.',
         kpi_energy: 'Total Energy Use',
         kpi_bill: 'Electricity Bill Estimate',
         kpi_carbon: 'Carbon Emissions',
@@ -2168,22 +2203,23 @@
         { id: 'ACT-102', time: '04:00:00', actor: 'System Seed Engine', action: 'Initialized deterministic simulation state for Rupsha Garments Ltd. (Seed #20261018).' }
       ],
 
-      // Grounded AI Copilot Conversation History (Pre-loaded with Reference Image 1 Bangla Q&A + English welcome)
+      // Grounded AI Copilot Conversation History (Adapts dynamically to EN or BN language)
       copilotMessages: [
         {
           id: 'MSG-1',
           sender: 'user',
-          lang: 'bn',
+          lang: 'en',
           time: '05:01',
-          text: 'এই মাসে বিদ্যুৎ খরচ কেন বেড়েছে? কোন কোন মেশিনে বেশি বিদ্যুৎ খরচ হচ্ছে?'
+          isDynamicInitial: true,
+          text: ''
         },
         {
           id: 'MSG-2',
           sender: 'assistant',
-          lang: 'bn',
+          lang: 'en',
           time: '05:01',
           isDynamicInitial: true,
-          text: '' // Populated dynamically from shared state so numbers always match!
+          text: '' // Populated dynamically from shared state & active language!
         }
       ]
     };
@@ -2451,7 +2487,7 @@
 
       // Real-time Simulation Carbon Abatement & Credit Forecast
       const simAvoidedKwh = (AppState.simAvoidedKwh || 0);
-      const simLiveAvoidedCo2Tons = (simAvoidedKwh * (a.gridEmissionFactorKgPerKwh || 0.62)) / 1000.0;
+      const simLiveAvoidedCo2Tons = (simAvoidedKwh * (a.gridEmissionFactorKgPerKwh || 0.560)) / 1000.0;
       
       // Benchmark Scenario Baseline Abatement (Scope 1 + Scope 2 avoided vs legacy unoptimized plant)
       // Guarantees credits strictly grow monotonically as simulation ticks advance (never decreases!)
@@ -2477,7 +2513,7 @@
       let appliedRecCo2Tons = 0;
       for (const r of AppState.recommendations) {
         if (r.status === 'Applied in simulation' || r.status === 'Verified in simulation') {
-          appliedRecCo2Tons += (r.estSavedKwh * (a.gridEmissionFactorKgPerKwh || 0.62)) / 1000.0;
+          appliedRecCo2Tons += (r.estSavedKwh * (a.gridEmissionFactorKgPerKwh || 0.560)) / 1000.0;
         }
       }
       
@@ -2528,6 +2564,7 @@
         biActionCapexBdt = defaultCapex;
       }
 
+      const effectiveBiCapexBdt = cfg._customCapexSet ? defaultCapex : biActionCapexBdt;
       const carbonForecast = calcCarbonForecastMetrics({
         monthlyAvoidedTons: biAvoidedCo2Tons,
         monthlyEnergySavingsBdt: biMonthlySavingsBdt,
@@ -2536,13 +2573,13 @@
         residualMonthlyTons: Math.max(0, Number((totalCarbonTons - biAvoidedCo2Tons * 0.25).toFixed(2))),
         customPriceUsdPerTon: cfg.customPriceUsdPerTon || 18,
         usdToBdt: cfg.exchangeRateBdtPerUsd || 120,
-        implementationCapexBdt: defaultCapex,
+        implementationCapexBdt: effectiveBiCapexBdt,
         annualTargetTons: cfg.annualTargetCo2Tons || 55.0,
         cbamRateUsdPerTon: cfg.cbamRateUsdPerTon !== undefined ? cfg.cbamRateUsdPerTon : 75,
-        gridFactorKgPerKwh: a.gridEmissionFactorKgPerKwh || 0.56
+        gridFactorKgPerKwh: a.gridEmissionFactorKgPerKwh || 0.560
       });
 
-      const actionPayback = calcPaybackMonths(biActionCapexBdt, biMonthlySavingsBdt + carbonForecast.monthlyPotentialCreditBdt);
+      const actionPayback = calcPaybackMonths(effectiveBiCapexBdt, biMonthlySavingsBdt + carbonForecast.monthlyPotentialCreditBdt);
       const businessImpact = {
         modeLabel: biModeLabel,
         scenarioKey: AppState.activeScenario,
@@ -2553,7 +2590,7 @@
         potentialCreditAnnualBdt: carbonForecast.annualPotentialCreditBdt,
         monthlyAvoidedTons: carbonForecast.monthlyAvoidedTons,
         paybackMonths: carbonForecast.paybackMonthsWithCredits,
-        actionCapexBdt: biActionCapexBdt,
+        actionCapexBdt: effectiveBiCapexBdt,
         actionPaybackMonths: actionPayback.valid ? actionPayback.value : null,
         roi12MonthPct: carbonForecast.roi12MonthPct
       };
@@ -2891,8 +2928,9 @@
                   ${renderDataBadge('SIMULATION')}
                   <span class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">Scenario: <strong class="text-slate-800 dark:text-slate-200">${AppState.activeScenario.replace(/_/g, ' ').toUpperCase()}</strong></span>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                  <span class="text-emerald-700 dark:text-emerald-400">Green</span> Factory Brain
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
+                  <span><span class="text-emerald-700 dark:text-emerald-400">Green</span> Factory Brain AI</span>
+                  <span class="px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">v2.0</span>
                 </h1>
                 <p class="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200">
                   ${isBn ? I18N.bn.hero_tagline : I18N.en.hero_tagline}
@@ -3118,7 +3156,8 @@
                     <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">${bi.modeLabel || 'Baseline Optimization Plan'}</span>
                     <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40">POTENTIAL REVENUE • ILLUSTRATIVE PRICE</span>
                   </div>
-                  <p class="text-[11px] text-slate-300 mt-1">Monthly Savings &rarr; 12-Mo Financial Return &rarr; Potential Carbon Credit Revenue (Assumed $${cf.customPriceUsdPerTon || 18}/tCO₂e • 0.560 kg CO₂e/kWh) &rarr; Payback</p>
+                  <p class="text-[11px] text-slate-300 mt-1">Monthly Savings &rarr; 12-Mo Financial Return &rarr; Potential Carbon Credit Revenue (Assumed $${cf.customPriceUsdPerTon || 18}/tCO₂e &bull; 0.560 kg CO₂e/kWh) &rarr; Payback</p>
+                  <p class="text-[10.5px] text-emerald-300/90 mt-0.5">10-Sec Judge Story: Click <strong>Night Shift Waste</strong> or <strong>Peak Grid Tariffs</strong> &rarr; Auto-Alert &amp; ROI &rarr; Approve Confirmation Gate.</p>
                 </div>
                 <div class="flex items-center gap-1.5 flex-wrap">
                   <button type="button" onclick="selectDashboardScenario('baseline')" class="px-2.5 py-1 rounded-lg text-[11px] transition ${btnCls('baseline', 'bg-slate-600 text-white border border-slate-400')}">Normal Baseline</button>
@@ -4616,9 +4655,9 @@
                 </div>
 
                 <!-- 1. Potential Carbon Credit Revenue Scenarios + Interactive Credit Price Slider -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-                  <div class="lg:col-span-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-3">
-                    <div class="flex items-center justify-between">
+                <div class="cp-row-slider grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+                  <div class="cp-span-full lg:col-span-4 min-w-0 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-3">
+                    <div class="flex items-center justify-between gap-2 flex-wrap">
                       <label for="carbon-price-slider" class="text-xs font-bold text-slate-800 dark:text-slate-100">Assumed Carbon Credit Price ($/tCO₂e)</label>
                       <span id="carbon-price-badge" class="font-mono text-sm font-extrabold text-emerald-600">$${cf.customPriceUsdPerTon}/t (৳ ${formatNum(cf.customPriceBdtPerTon)})</span>
                     </div>
@@ -4626,11 +4665,11 @@
                       oninput="document.getElementById('carbon-price-badge').textContent='$'+this.value+'/t (৳ '+Math.round(this.value*${cf.usdToBdt}).toLocaleString()+')'; var ni=document.getElementById('carbon-price-input'); if(ni) ni.value=this.value;"
                       onchange="updateCarbonPredictionConfig('customPriceUsdPerTon', Number(this.value))"
                       class="w-full accent-emerald-600 cursor-pointer" />
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center flex-wrap gap-2">
                       <span class="text-[11px] text-slate-500">Custom Input ($/t):</span>
                       <input id="carbon-price-input" type="number" min="1" max="150" step="1" value="${cf.customPriceUsdPerTon}"
                         onchange="updateCarbonPredictionConfig('customPriceUsdPerTon', Number(this.value))"
-                        class="w-24 px-2 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white" />
+                        class="w-20 px-2 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-slate-900 dark:text-white" />
                       <span class="text-[11px] text-slate-400">Rate: ৳ ${cf.usdToBdt}/USD</span>
                     </div>
                     <div class="pt-2 border-t border-slate-200 dark:border-slate-700 text-xs">
@@ -4640,11 +4679,11 @@
                     </div>
                   </div>
 
-                  <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div class="cp-span-full lg:col-span-8 min-w-0 grid grid-cols-1 sm:grid-cols-3 gap-3">
                     ${cf.scenarios.map(s => `
-                      <div class="p-4 rounded-xl border ${s.id === 'medium' ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200 dark:border-slate-700'} space-y-2">
+                      <div class="min-w-0 p-4 rounded-xl border ${s.id === 'medium' ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200 dark:border-slate-700'} space-y-2">
                         <div class="text-[10.5px] font-bold uppercase tracking-wider text-slate-500">${s.label}</div>
-                        <div class="text-xl font-extrabold text-slate-900 dark:text-white font-mono">$${s.priceUsdPerTon}/tCO₂e</div>
+                        <div class="text-lg font-extrabold text-slate-900 dark:text-white font-mono whitespace-nowrap">$${s.priceUsdPerTon}<span class="text-xs font-semibold text-slate-500">/tCO₂e</span></div>
                         <div class="text-[11px] text-slate-500 font-mono">${formatBdt(s.priceBdtPerTon)} per ton</div>
                         <div class="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-0.5">
                           <div class="text-xs font-bold text-emerald-600 font-mono">Monthly: ${formatBdt(s.monthlyRevenueBdt)}</div>
@@ -4657,8 +4696,8 @@
                 </div>
 
                 <!-- 2. 12-Month Carbon & Cost Savings Trajectory Graph + 3. ROI & Payback Period -->
-                <div class="grid grid-cols-1 xl:grid-cols-12 gap-4">
-                  <div class="xl:col-span-7 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                <div class="cp-row-chart grid grid-cols-1 xl:grid-cols-12 gap-4">
+                  <div class="cp-span-full xl:col-span-7 min-w-0 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                       <div>
                         <h3 class="text-sm font-bold text-slate-900 dark:text-white">12-Month Carbon Abatement &amp; Financial Savings Projection</h3>
@@ -4671,34 +4710,34 @@
                     </div>
                   </div>
 
-                  <div class="xl:col-span-5 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
-                    <div class="flex items-center justify-between">
+                  <div class="cp-span-full xl:col-span-5 min-w-0 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
+                    <div class="flex items-center justify-between gap-2 flex-wrap">
                       <h3 class="text-sm font-bold text-slate-900 dark:text-white">ROI &amp; Payback Period (CapEx Recovery)</h3>
                       <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">+${cf.roi12MonthPct}% 12-Mo ROI</span>
                     </div>
                     <div>
-                      <div class="flex items-center justify-between text-xs mb-1">
+                      <div class="flex items-center justify-between flex-wrap gap-2 text-xs mb-1">
                         <label for="carbon-capex-input" class="font-semibold text-slate-600 dark:text-slate-300">System Implementation Cost (CapEx ৳):</label>
                         <input id="carbon-capex-input" type="number" min="50000" max="5000000" step="10000" value="${cf.implementationCapexBdt}"
                           onchange="updateCarbonPredictionConfig('capexBdt', Number(this.value))"
-                          class="w-32 px-2 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-right text-slate-900 dark:text-white" />
+                          class="w-28 px-2 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs font-mono font-bold text-right text-slate-900 dark:text-white" />
                       </div>
                       <p class="text-[10.5px] text-slate-500">IoT sensors, smart relays, VFD controller &amp; edge gateway installation budget.</p>
                     </div>
                     <div class="grid grid-cols-2 gap-2.5 pt-1">
-                      <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                      <div class="min-w-0 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
                         <div class="text-[10px] text-slate-400">Payback (Energy Only)</div>
-                        <div class="text-lg font-extrabold text-slate-900 dark:text-white font-mono">${cf.paybackMonthsEnergyOnly !== null ? cf.paybackMonthsEnergyOnly + ' mo' : 'N/A'}</div>
+                        <div class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white font-mono">${cf.paybackMonthsEnergyOnly !== null ? cf.paybackMonthsEnergyOnly + ' mo' : 'N/A'}</div>
                       </div>
-                      <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-emerald-500/40">
+                      <div class="min-w-0 p-3 rounded-xl bg-white dark:bg-slate-900 border border-emerald-500/40">
                         <div class="text-[10px] text-emerald-600 font-bold">Payback (With Potential Credits)</div>
-                        <div class="text-lg font-extrabold text-emerald-600 font-mono">${cf.paybackMonthsWithCredits !== null ? cf.paybackMonthsWithCredits + ' mo' : 'N/A'}</div>
+                        <div class="text-base sm:text-lg font-extrabold text-emerald-600 font-mono">${cf.paybackMonthsWithCredits !== null ? cf.paybackMonthsWithCredits + ' mo' : 'N/A'}</div>
                       </div>
-                      <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                      <div class="min-w-0 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
                         <div class="text-[10px] text-slate-400">12-Mo Total Business Value</div>
                         <div class="text-sm font-extrabold text-slate-900 dark:text-white font-mono">${formatBdt(cf.annualTotalBenefitBdt)}</div>
                       </div>
-                      <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                      <div class="min-w-0 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
                         <div class="text-[10px] text-slate-400">3-Year Net Profit</div>
                         <div class="text-sm font-extrabold text-teal-600 font-mono">${formatBdt(cf.net3YearProfitBdt)}</div>
                       </div>
@@ -4707,7 +4746,7 @@
                 </div>
 
                 <!-- 4. Carbon Goal Tracker + 5. Buyer Compliance Risk + 6. CBAM What-If Simulator -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="cp-row-engines grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <!-- 4. Carbon Target Tracker -->
                   <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
                     <div class="flex items-center justify-between">
@@ -4770,11 +4809,19 @@
       if (!AppState.carbonPredictionConfig) AppState.carbonPredictionConfig = {};
       const num = Number(value);
       if (!Number.isFinite(num)) return;
+      const activeId = (typeof document !== 'undefined' && document.activeElement) ? document.activeElement.id : null;
       if (field === 'customPriceUsdPerTon') AppState.carbonPredictionConfig.customPriceUsdPerTon = Math.min(150, Math.max(1, num));
-      else if (field === 'capexBdt') AppState.carbonPredictionConfig.capexBdt = Math.min(10000000, Math.max(0, num));
+      else if (field === 'capexBdt') {
+        AppState.carbonPredictionConfig.capexBdt = Math.min(10000000, Math.max(0, num));
+        AppState.carbonPredictionConfig._customCapexSet = true;
+      }
       else if (field === 'annualTargetCo2Tons') AppState.carbonPredictionConfig.annualTargetCo2Tons = Math.min(1000, Math.max(1, num));
       else if (field === 'cbamRateUsdPerTon') AppState.carbonPredictionConfig.cbamRateUsdPerTon = Math.min(200, Math.max(0, num));
       renderActiveView();
+      if (activeId && typeof document !== 'undefined') {
+        const el = document.getElementById(activeId);
+        if (el && typeof el.focus === 'function') el.focus();
+      }
     }
 
     function resetCarbonPredictionConfig() {
@@ -4786,7 +4833,8 @@
         capexBdt: 350000,
         annualTargetCo2Tons: 55.0,
         cbamRateUsdPerTon: 75,
-        exchangeRateBdtPerUsd: 120
+        exchangeRateBdtPerUsd: 120,
+        _customCapexSet: false
       };
       renderActiveView();
       if (typeof showToast === 'function') showToast('Carbon credit & ROI sliders reset to default assumptions.', 'info');
@@ -5400,7 +5448,7 @@
     }
 
     // ============================================================================
-    // 9. GROUNDED BILINGUAL AI COPILOT ENGINE (ENGLISH, বাংলা & BANGLISH — SECTION 18)
+    // 9. GROUNDED BILINGUAL AI COPILOT ENGINE (ENGLISH & বাংলা — SECTION 18)
     // ============================================================================
     const SUGGESTED_PROMPTS = [
       { en: 'How do simulation changes affect our carbon credits?', bn: 'সিমুলেশন পরিবর্তন কীভাবে আমাদের কার্বন ক্রেডিট প্রভাবিত করে?' },
@@ -5416,6 +5464,20 @@
     ];
 
     let copilotThinkingTimer = null;
+
+    function buildGroundedDefaultAnswer(m) {
+      if (AppState.language === 'bn') return buildGroundedBanglaDefaultAnswer(m);
+      const sewPct = formatNum(m.deptSharePct.Sewing, 0);
+      const cutPct = formatNum(m.deptSharePct.Cutting, 0);
+      const finPct = formatNum(m.deptSharePct.Finishing, 0);
+      return `<strong>[REASONING TRACE]</strong><br/>
+      • Total factory consumption is <strong>${formatNum(m.totalPeriodKwh)} kWh</strong> (Live Load: <strong>${formatNum(m.totalCurrentKw, 1)} kW</strong>, Scope 1+2: <strong>${formatNum(m.totalCarbonTons, 2)} tCO₂e</strong> [SIMULATION]).<br/>
+      • Top 3 drivers: Sewing (<strong>${sewPct}%</strong>, ${formatNum(m.deptKwh.Sewing)} kWh — night-shift idle on <code class="font-mono">MCH-SEW-03</code>), Cutting (<strong>${cutPct}%</strong>, ${formatNum(m.deptKwh.Cutting)} kWh — <code class="font-mono">MCH-CUT-02</code>), and Finishing (<strong>${finPct}%</strong>, ${formatNum(m.deptKwh.Finishing)} kWh).<br/>
+      <strong>[AUTONOMOUS RECOMMENDATION &amp; ROI]</strong><br/>
+      • Applying auto-standby + compressor leak fixes saves <strong>${formatBdt(m.estimatedSavingsBdt)}/mo</strong> and generates ~<strong>${formatNum(m.businessImpact.monthlyAvoidedTons, 2)} tCO₂e/mo</strong> potential abatement.<br/>
+      <strong>[SAFETY GUARDRAIL]</strong><br/>
+      • Digital twin simulation only; physical PLC/breaker changes require Manager Confirmation Gate approval.`;
+    }
 
     function buildGroundedBanglaDefaultAnswer(m) {
       const sewPct = formatNum(m.deptSharePct.Sewing, 0);
@@ -5435,8 +5497,8 @@
       const useBn = AppState.language === 'bn' || q.includes('বাংলা') || q.includes('bangla') || /[\u0980-\u09F2\u09F4-\u09FF]/.test(queryText);
       const nowTime = new Date().toTimeString().split(' ')[0];
 
-      // 1. Banglish / 4-month or Monthly Savings + Night-Shift Plan ("Amar ... plan kore dao")
-      if (q.includes('amar ') || q.includes('plan kore dao') || q.includes('4-mo') || q.includes('4 month')) {
+      // 1. 4-month or Monthly Savings + Night-Shift Plan
+      if (q.includes('4-mo') || q.includes('4 month')) {
         return `<strong>Night-Shift Waste Reduction &amp; ৳ 68,000/mo Savings Plan Ready <span class="text-emerald-400 inline-block align-middle ml-1">${AppIcons.checkCircle('w-4 h-4 inline-block')}</span></strong><br/>
         • <strong>Step 1 (Night-Shift Auto-Standby — REC-01):</strong> Fitted auto-idle relay on <code class="font-mono">MCH-SEW-03</code> (4.8 kW idle draw eliminated) &rarr; saves <strong>1,492 kWh &amp; ${formatBdt(18500)}/mo</strong> (Payback: 2.1 mo).<br/>
         • <strong>Step 2 (Air Compressor Leak Seal — REC-02):</strong> Sealed 2.1 bar header leak on <code class="font-mono">COMP-01</code> (18.4 kW draw) &rarr; saves <strong>1,467 kWh &amp; ${formatBdt(18200)}/mo</strong> (Payback: 3.8 mo).<br/>
@@ -5492,7 +5554,7 @@
         const monthlyLeakBdt = Math.round(monthlyLeakKwh * m.effectiveTariff);
         return useBn
           ? `<strong>[REASONING TRACE] কম্প্রেসার (<code class="font-mono">COMP-01</code>) লাইভ টেলিম্যাট্রি অডিট:</strong><br/>• <strong>সেন্সর রিডিং:</strong> লোড <strong>${formatNum(comp.currentKw, 1)} kW</strong> (${comp.status}), তাপমাত্রা <strong>${formatNum(comp.tempC, 1)}°C</strong>, পিরিয়ড ব্যবহার ${formatNum(comp.periodKwh)} kWh।<br/>• <strong>বিশ্লেষণ:</strong> ${isFault ? 'তীব্র এয়ার লিক ও হেডার প্রেশার ড্রপ (২.১+ বার) শনাক্ত হয়েছে!' : '২.১ বার হেডার প্রেশার ড্রপ পরিলক্ষিত হচ্ছে।'}<br/><strong>[AUTONOMOUS RECOMMENDATION &amp; ROI]</strong><br/>• আল্ট্রাসনিক লিক সিলিং (REC-02) সম্পন্ন করলে মাসে ~<strong>${formatBdt(Math.max(18200, monthlyLeakBdt))}</strong> (${formatNum(monthlyLeakKwh)} kWh) সাশ্রয় হবে।<br/><strong>[SAFETY GUARDRAIL]</strong> ন্যূনতম ৬.২ বার লাইন প্রেশার বজায় রেখে Confirmation Gate অনুমোদন সাপেক্ষে প্রেশার সেটপয়েন্ট সমন্বয় করুন।`
-          : `<strong>[REASONING TRACE] Air Compressor (<code class="font-mono">COMP-01</code>) Live Sensor Reasoning:</strong><br/>• <strong>Live Telemetry (<code class="font-mono">${AppState.activeScenario}</code>):</strong> <code class="font-mono">COMP-01</code> currently reads <strong>${formatNum(comp.currentKw, 1)} kW</strong> (Rated ${comp.ratedKw || 30} kW) • Temp <strong>${formatNum(comp.tempC, 1)}°C</strong> • Status: <strong>${comp.status}</strong> • Period: ${formatNum(comp.periodKwh)} kWh.<br/>• <strong>Root-Cause Inference:</strong> ${isFault ? `Abnormal +${formatNum(leakDeltaKw, 1)} kW air leak spike above 15.8 kW nominal load (~2.4 bar header pressure drop), adding ~${formatNum(monthlyLeakKwh)} kWh/mo avoidable waste.` : `Elevated 18.4 kW draw indicates ~2.1 bar header pressure drop across pneumatic manifolds.`}<br/><strong>[AUTONOMOUS RECOMMENDATION &amp; ROI]</strong><br/>• Dispatch ultrasonic leak sealing &amp; header trim (<code class="font-mono">REC-02</code>): avoids <strong>${formatNum(monthlyLeakKwh)} kWh/mo</strong> (<strong>${formatBdt(Math.max(18200, monthlyLeakBdt))}/month</strong> • CapEx ৳ 68,000 • Payback <strong>${calcPaybackMonths(68000, Math.max(18200, monthlyLeakBdt)).value} mo</strong>).<br/><strong>[SAFETY GUARDRAIL]</strong> Preserve &ge;6.2 bar floor so pneumatic cutting tools remain safe; execute under Confirmation Gate.`;
+          : `<strong>[REASONING TRACE] Air Compressor (<code class="font-mono">COMP-01</code>) Live Sensor Reasoning:</strong><br/>• <strong>Live Telemetry (<code class="font-mono">${AppState.activeScenario}</code>):</strong> <code class="font-mono">COMP-01</code> currently reads <strong>${formatNum(comp.currentKw, 1)} kW</strong> (Rated ${comp.ratedKw || 30} kW) • Temp <strong>${formatNum(comp.tempC, 1)}°C</strong> • Status: <strong>${comp.status}</strong> • Period: ${formatNum(comp.periodKwh)} kWh.<br/>• <strong>Root-Cause Inference:</strong> ${isFault ? `Abnormal +${formatNum(leakDeltaKw, 1)} kW air leak spike above 15.8 kW nominal load (~2.4 bar header pressure drop), adding ~${formatNum(monthlyLeakKwh)} kWh/mo avoidable waste.` : `Elevated 18.4 kW draw indicates ~2.1 bar header pressure drop across pneumatic manifolds.`}<br/><strong>[AUTONOMOUS RECOMMENDATION &amp; ROI]</strong><br/>• Dispatch ultrasonic leak sealing &amp; header trim (<code class="font-mono">REC-02</code>): avoids <strong>${formatNum(monthlyLeakKwh)} kWh/mo</strong> (<strong>${formatBdt(Math.max(18200, monthlyLeakBdt))}/month</strong> • CapEx ৳ 68,000 • Payback <strong>${formatNum(calcPaybackMonths(68000, Math.max(18200, monthlyLeakBdt)).value || 0, 1)} mo</strong>).<br/><strong>[SAFETY GUARDRAIL]</strong> Preserve &ge;6.2 bar floor so pneumatic cutting tools remain safe; execute under Confirmation Gate.`;
       }
 
       if (q.includes('savings') || q.includes('68,000') || q.includes('68000') || q.includes('68k') || q.includes('সাশ্রয়')) {
@@ -5646,7 +5708,12 @@
 
         // 2. Map Conversation Messages (With Live Step-by-Step Thinking Animation & Completed Reasoning Accordion)
         const messagesHtml = AppState.copilotMessages.map((msg, index) => {
-          const bodyHtml = msg.isDynamicInitial ? buildGroundedBanglaDefaultAnswer(m) : msg.text;
+          const isUserInit = msg.isDynamicInitial && msg.sender === 'user';
+          const bodyHtml = isUserInit
+            ? (AppState.language === 'bn'
+                ? 'এই মাসে বিদ্যুৎ খরচ কেন বেড়েছে? কোন কোন মেশিনে বেশি বিদ্যুৎ খরচ হচ্ছে?'
+                : 'Why did energy use rise this month, and which machines drive the highest load?')
+            : (msg.isDynamicInitial ? buildGroundedDefaultAnswer(m) : msg.text);
           if (msg.sender === 'user') {
             return `
               <div class="flex justify-end msg-enter">
@@ -5764,14 +5831,15 @@
         {
           id: 'MSG-1',
           sender: 'user',
-          lang: 'bn',
+          lang: AppState.language || 'en',
           time: '05:01',
-          text: 'এই মাসে বিদ্যুৎ খরচ কেন বেড়েছে? কোন কোন মেশিনে বেশি বিদ্যুৎ খরচ হচ্ছে?'
+          isDynamicInitial: true,
+          text: ''
         },
         {
           id: 'MSG-2',
           sender: 'assistant',
-          lang: 'bn',
+          lang: AppState.language || 'en',
           time: '05:01',
           isDynamicInitial: true,
           text: ''
@@ -6211,7 +6279,7 @@
       const m = getDerivedMetrics();
       const lastAssistant = [...AppState.copilotMessages].reverse().find(x => x.sender === 'assistant');
       const rawHtml = lastAssistant
-        ? (lastAssistant.isDynamicInitial ? buildGroundedBanglaDefaultAnswer(m) : lastAssistant.text)
+        ? (lastAssistant.isDynamicInitial ? buildGroundedDefaultAnswer(m) : lastAssistant.text)
         : 'Green Factory Brain AI Copilot is online and tracking 18 machines live.';
       speakCopilotText(rawHtml);
     }
@@ -6453,7 +6521,7 @@
       const tariff = (AppState.assumptions && AppState.assumptions.tariffBdtPerKwh) || 12.40;
       AppState.simAvoidedKwh = (AppState.simAvoidedKwh || 0) + stepAvoidedKwh;
       AppState.simSavingsAccruedBdt = (AppState.simSavingsAccruedBdt || 0) + (stepAvoidedKwh * tariff);
-      const gridFactor = (AppState.assumptions && AppState.assumptions.gridEmissionFactorKgPerKwh) || 0.62;
+      const gridFactor = (AppState.assumptions && AppState.assumptions.gridEmissionFactorKgPerKwh) || 0.560;
       AppState.simAvoidedCo2Tons = (AppState.simAvoidedCo2Tons || 0) + (stepAvoidedKwh * gridFactor / 1000.0);
       if (stepWasteKwh > 0) {
         AppState.simWasteCostBdt = (AppState.simWasteCostBdt || 0) + (stepWasteKwh * tariff);
@@ -6602,7 +6670,7 @@
                   </div>
                   <div class="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
                     <div class="text-[9.5px] text-slate-400">Est. CapEx / Payback</div>
-                    <div class="font-extrabold text-slate-900 dark:text-white">${pbInfo.valid ? pbInfo.value + ' mo' : 'N/A'}</div>
+                    <div class="font-extrabold text-slate-900 dark:text-white">${pbInfo.valid ? formatNum(pbInfo.value, 1) + ' mo' : 'N/A'}</div>
                   </div>
                   <div class="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
                     <div class="text-[9.5px] text-slate-400">12-Mo Projected ROI</div>
@@ -8329,18 +8397,18 @@
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 font-mono text-[11px]">
                 <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
                   <div class="text-slate-400 text-[10px] font-bold">Scope 1 (Direct Fuels)</div>
-                  <div class="text-base font-bold text-amber-300">142.6 tCO₂e / yr</div>
-                  <div class="text-[9.5px] text-slate-500">Natural gas boilers (2,431 m³/mo) &amp; diesel generator backup</div>
+                  <div class="text-base font-bold text-amber-300">58.9 tCO₂e / yr</div>
+                  <div class="text-[9.5px] text-slate-500">Natural gas boiler BOIL-01 (2,431 m³/mo × 2.020 kg/m³ × 12)</div>
                 </div>
                 <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
                   <div class="text-slate-400 text-[10px] font-bold">Scope 2 (Grid Electricity)</div>
-                  <div class="text-base font-bold text-sky-300">490.7 tCO₂e / yr</div>
-                  <div class="text-[9.5px] text-slate-500">BPDB grid factor: 0.584 tCO₂e/MWh (840,336 kWh/yr base)</div>
+                  <div class="text-base font-bold text-sky-300">351.5 tCO₂e / yr</div>
+                  <div class="text-[9.5px] text-slate-500">DoE grid factor: 0.560 tCO₂e/MWh (627,600 kWh/yr base)</div>
                 </div>
                 <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
                   <div class="text-slate-400 text-[10px] font-bold">Total Gross Facility Carbon</div>
-                  <div class="text-base font-black text-emerald-300">633.3 tCO₂e / yr</div>
-                  <div class="text-[9.5px] text-emerald-400">Verified Abatement: 34.2 tCO₂e/mo</div>
+                  <div class="text-base font-black text-emerald-300">410.4 tCO₂e / yr</div>
+                  <div class="text-[9.5px] text-emerald-400">Baseline Run-Rate: 34.2 tCO₂e/mo • Abatement Potential: 3.99 t/mo</div>
                 </div>
               </div>
             </div>
@@ -9147,7 +9215,14 @@
         return;
       }
 
-      completeAuthorizedSignIn(op, 'Password + Passkey Gate');
+      completeAuthorizedSignIn(op, 'Demo Sandbox Access');
+    }
+
+    function quickEnterDemoRole(roleKey) {
+      const isOwner = roleKey === 'owner';
+      selectQuickPersona(isOwner ? 1 : 0);
+      const op = isOwner ? AUTHORIZED_OPERATORS.owner : AUTHORIZED_OPERATORS.manager;
+      completeAuthorizedSignIn(op, '1-Click Demo Access');
     }
 
     function simulatePasskeyDemoSignIn() {
@@ -9167,7 +9242,7 @@
         }
       }
 
-      completeAuthorizedSignIn(op, 'Executive Security Gate');
+      completeAuthorizedSignIn(op, 'Demo Sandbox Access Gate');
     }
 
     function handleSignOut() {
@@ -9347,14 +9422,14 @@
               </div>
             </div>
 
-            <!-- Security Gate & Role Clearance Cards (Strict Role Isolation: Manager sees ONLY Manager; Owner sees ONLY Owner) -->
+            <!-- Demo Session & Role Clearance Cards (Strict Role Isolation: Manager sees ONLY Manager; Owner sees ONLY Owner) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
               <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-xs">
-                <div class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Active Security Gate</div>
+                <div class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Demo Access Session</div>
                 <div class="font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1.5">
-                  <span class="text-emerald-400">${AppIcons.lock('w-3.5 h-3.5')}</span><span>Password + Passkey Verified</span>
+                  <span class="text-emerald-400">${AppIcons.lock('w-3.5 h-3.5')}</span><span>Sandbox Session Active</span>
                 </div>
-                <div class="text-[10.5px] text-slate-500 dark:text-slate-400 mt-1">Only Manager &amp; Owner roles permitted</div>
+                <div class="text-[10.5px] text-slate-500 dark:text-slate-400 mt-1">Simulated Manager &amp; Owner role switching</div>
               </div>
               ${roleClearanceHtml}
             </div>
@@ -9910,14 +9985,16 @@
               <span class="text-xs font-mono text-slate-400">Current: <strong id="sim-active-scenario-badge" class="text-emerald-600 uppercase">${AppState.activeScenario}</strong></span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
               ${[
                 { id: 'baseline', title: '1. Normal Baseline Operations', desc: 'Standard production day across all 18 machines at 52,300 kWh/mo.', badge: 'Standard', color: 'emerald' },
-                { id: 'night_idle', title: '2. Night-Shift Idle Waste', desc: 'Sewing Line 3 left running after-hours (+14% idle drain).', badge: 'Waste Anomaly', color: 'amber' },
-                { id: 'compressor_leak', title: '3. Compressed Air Leak', desc: 'COMP-01 header leaks air (+18.5 kW duty cycle spike).', badge: 'Pneumatic Fault', color: 'amber' },
-                { id: 'machine_overload', title: '4. Cutting Machine Overload', desc: 'Vacuum blower MCH-CUT-02 spikes to 24.6 kW / 68.4°C thermal trip.', badge: 'Thermal Critical', color: 'rose' },
-                { id: 'shift_change', title: '5. Shift Change Handover', desc: 'Day to Night transition: machines cycle through standby and idle.', badge: 'Operational', color: 'sky' },
-                { id: 'production_surge', title: '6. Production Surge (+22%)', desc: 'Rush export order: all lines running at 105% capacity with peak tariff.', badge: 'Heavy Load', color: 'indigo' }
+                { id: 'night_idle', title: '2. Night-Shift Idle Waste', desc: 'Sewing Line 3 left running after-hours (+14% idle drain -> Auto Confirmation Gate).', badge: 'Auto Gate', color: 'amber' },
+                { id: 'peak_grid', title: '3. Peak Grid Tariffs (14.88/kWh)', desc: 'DPDC 17:00-23:00 peak tariff spike -> auto-alert, ROI & Confirmation Gate.', badge: 'Auto Gate', color: 'rose' },
+                { id: 'compressor_leak', title: '4. Compressed Air Leak (COMP-01)', desc: 'COMP-01 header leaks air (31.2 kW / 74.5°C -> Auto Confirmation Gate).', badge: 'Auto Gate', color: 'amber' },
+                { id: 'solar_surge', title: '5. Rooftop Solar Surge', desc: '+10,460 kWh clean rooftop PV offset cuts grid draw & boosts carbon yield.', badge: 'Clean Offset', color: 'emerald' },
+                { id: 'machine_overload', title: '6. Cutting Machine Overload', desc: 'Vacuum blower MCH-CUT-02 spikes to 24.6 kW / 68.4°C thermal trip.', badge: 'Thermal Critical', color: 'rose' },
+                { id: 'shift_change', title: '7. Shift Change Handover', desc: 'Day to Night transition: machines cycle through standby and idle.', badge: 'Operational', color: 'sky' },
+                { id: 'production_surge', title: '8. Production Surge (+22%)', desc: 'Rush export order: all lines running at 105% capacity with peak tariff.', badge: 'Heavy Load', color: 'indigo' }
               ].map(sc => {
                 const isActive = AppState.activeScenario === sc.id;
                 return `
@@ -10256,7 +10333,7 @@
         <footer id="ethical-ai-transparency-footer" class="mt-6 pt-4 pb-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 flex flex-col lg:flex-row lg:items-center justify-between gap-2">
           <div class="flex items-center gap-2 flex-wrap">
             <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 font-bold uppercase text-[9.5px]">Ethical AI &amp; Data Transparency</span>
-            <span><strong>Digital Twin Sandbox:</strong> Synthetic seeded factory telemetry (<code class="font-mono">Seed #20261018</code>) — zero physical PLC/breaker actuation without Manager Confirmation Gate approval.</span>
+            <span>Powered by Deterministic Digital Twin &amp; Live LLM Reasoning &bull; Synthetic Industrial Telemetry (<code class="font-mono">Seed #20261018</code>) with Mandatory Human-in-the-Loop Action Gate.</span>
           </div>
           <div class="font-mono text-[10px] text-slate-400">
             Grid EF: ${a.gridEmissionFactorKgPerKwh.toFixed(3)} kg/kWh • Gas EF: ${a.gasEmissionFactorKgPerM3.toFixed(3)} kg/m³ • Carbon Credit figures are illustrative &amp; MRV-pending
@@ -10348,6 +10425,7 @@
 
     function initViewCharts(m) {
       if (typeof Chart === 'undefined') return;
+      m = m || getDerivedMetrics();
 
       const isDark = document.documentElement.classList.contains('dark') || AppState.theme === 'dark';
       const textColor = isDark ? '#94A3B8' : '#64748B';
@@ -10628,7 +10706,7 @@
       }
 
       // VIEW 8: 12-Month Carbon Abatement & Business Savings Chart
-      if (route === 'carboniq-report') {
+      if (AppState.activeRoute === 'carboniq-report') {
         const cfCanvas = document.getElementById('carbon-12mo-forecast-chart');
         if (cfCanvas && typeof Chart !== 'undefined' && m.carbonForecast && Array.isArray(m.carbonForecast.monthlySeries)) {
           destroyChartIfExists('carbon12Mo');
@@ -10664,9 +10742,18 @@
               maintainAspectRatio: false,
               plugins: { legend: { labels: { color: textColor, font: { size: 11 } } } },
               scales: {
-                x: { grid: { display: false }, ticks: { color: textColor } },
-                y: { type: 'linear', position: 'left', grid: { color: gridColor }, ticks: { color: textColor } },
-                y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#06b6d4' } }
+                x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10 } } },
+                y: {
+                  type: 'linear',
+                  position: 'left',
+                  grid: { color: gridColor },
+                  ticks: {
+                    color: textColor,
+                    font: { size: 10 },
+                    callback: val => val >= 1000000 ? '৳' + (val / 1000000).toFixed(1) + 'M' : (val >= 1000 ? '৳' + Math.round(val / 1000) + 'k' : '৳' + val)
+                  }
+                },
+                y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#06b6d4', font: { size: 10 } } }
               }
             }
           });

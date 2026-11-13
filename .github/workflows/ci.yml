@@ -24,6 +24,11 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
+    - name: Install Node Dev Dependencies & Run TypeScript Check
+      run: |
+        npm ci --no-audit --no-fund
+        npm run typecheck
+
     - name: Run Domain Calculation Unit Tests
       run: node preview/tests/domain-calculations.test.mjs
 

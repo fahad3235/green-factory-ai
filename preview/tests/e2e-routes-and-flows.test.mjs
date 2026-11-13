@@ -202,6 +202,69 @@ assert.ok(html.includes('FORM S-12') || html.includes('Form S-12 Compliance Shee
   }
   assert.ok(mainCode.length > 0, 'Main script block must be found');
 
+  const backdropClassSet = new Set();
+  const mockElements = new Map();
+  const getMockEl = (id) => {
+    if (!mockElements.has(id)) {
+      const cls = id === 'app-modal-backdrop' ? backdropClassSet : new Set();
+      mockElements.set(id, {
+        id,
+        value: '',
+        textContent: '',
+        innerHTML: '',
+        style: { setProperty: () => {}, removeProperty: () => {} },
+        scrollTop: 0,
+        scrollHeight: 0,
+        getContext: () => ({
+          clearRect: () => {},
+          fillRect: () => {},
+          beginPath: () => {},
+          moveTo: () => {},
+          lineTo: () => {},
+          stroke: () => {},
+          fillText: () => {},
+          createLinearGradient: () => ({ addColorStop: () => {} }),
+          arc: () => {},
+          fill: () => {},
+          closePath: () => {},
+          measureText: () => ({ width: 10 }),
+          setLineDash: () => {}
+        }),
+        classList: {
+          add: (...c) => c.forEach((x) => cls.add(x)),
+          remove: (...c) => c.forEach((x) => cls.delete(x)),
+          contains: (x) => cls.has(x),
+          toggle: (x, force) => {
+            if (force === undefined) {
+              if (cls.has(x)) { cls.delete(x); return false; }
+              cls.add(x); return true;
+            }
+            if (force) cls.add(x); else cls.delete(x);
+            return !!force;
+          }
+        },
+        focus: () => {},
+        setSelectionRange: () => {},
+        appendChild: () => {},
+        closest: () => null,
+        querySelector: () => null,
+        querySelectorAll: () => [],
+        getBoundingClientRect: () => ({ width: 400, height: 180 })
+      });
+    }
+    return mockElements.get(id);
+  };
+
+  class MockChart {
+    constructor(ctx, config) {
+      this.ctx = ctx;
+      this.config = config;
+      this.data = config.data;
+    }
+    destroy() {}
+    update() {}
+  }
+
   const context = {
     console,
     setTimeout,
@@ -215,21 +278,17 @@ assert.ok(html.includes('FORM S-12') || html.includes('Form S-12 Compliance Shee
     Array,
     Object,
     JSON,
+    Chart: MockChart,
+    requestAnimationFrame: () => 0,
     addEventListener: () => {},
     removeEventListener: () => {},
     matchMedia: () => ({ matches: false, addEventListener: () => {} }),
     window: null,
     document: {
       documentElement: { classList: { contains: () => true, add: () => {}, remove: () => {} } },
-      getElementById: (id) => ({
-        value: '',
-        textContent: '',
-        innerHTML: '',
-        classList: { add: () => {}, remove: () => {}, contains: () => false },
-        focus: () => {},
-        appendChild: () => {},
-        closest: () => null
-      }),
+      activeElement: null,
+      getElementById: (id) => getMockEl(id),
+      querySelector: () => null,
       querySelectorAll: () => [],
       createElement: () => ({ className: '', innerHTML: '', style: {}, classList: { add: () => {}, remove: () => {} }, appendChild: () => {} }),
       addEventListener: () => {},
@@ -237,8 +296,10 @@ assert.ok(html.includes('FORM S-12') || html.includes('Form S-12 Compliance Shee
       body: { classList: { add: () => {}, remove: () => {} } }
     },
     navigator: { userAgent: 'test' },
+    innerWidth: 1280,
     location: { hash: '#/dashboard' },
-    localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} }
+    localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+    sessionStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} }
   };
   context.window = context;
   vm.createContext(context);
@@ -325,9 +386,58 @@ assert.ok(html.includes('FORM S-12') || html.includes('Form S-12 Compliance Shee
   assert.equal(highPriceMetrics.carbonForecast.customPriceUsdPerTon, 30, 'Carbon price slider/config must update live');
   resetCarbonCfg();
   assert.equal(getMetrics().carbonForecast.customPriceUsdPerTon, 18, 'Carbon price reset must restore 18 USD/t default');
+
+  // Regression: Chart.js CarbonIQ route must NOT throw ReferenceError and must build carbon12Mo chart
+  const initCharts = vm.runInContext('initViewCharts', context);
+  const renderViewFn = vm.runInContext('renderActiveView', context);
+  const triggerWorkflow = vm.runInContext('triggerScenarioAutonomousWorkflow', context);
+  const closeModal = vm.runInContext('closeAppModal', context);
+  const quickEnter = vm.runInContext('quickEnterDemoRole', context);
+  const activeCharts = vm.runInContext('ActiveCharts', context);
+
+  AppState.activeRoute = 'carboniq-report';
+  renderViewFn();
+  initCharts();
+  assert.ok(activeCharts.carbon12Mo && activeCharts.carbon12Mo.data.labels.length === 12, 'CarbonIQ 12-month Chart.js trajectory must instantiate cleanly');
+
+  // Regression: triggerScenarioAutonomousWorkflow must open Confirmation Gate modal even with Chart loaded
+  AppState.activeRoute = 'dashboard';
+  backdropClassSet.clear();
+  backdropClassSet.add('hidden');
+  triggerWorkflow('peak_grid', 'Peak Grid Tariffs');
+  assert.equal(backdropClassSet.has('hidden'), false, 'triggerScenarioAutonomousWorkflow(peak_grid) must remove hidden class to open Confirmation Gate modal');
+  assert.ok(getMockEl('app-modal-title').innerHTML.includes('Confirmation Gate'), 'Modal title must announce Manager Confirmation Gate');
+  closeModal();
+
+  // Regression: 1-Click Demo Access sets English Copilot briefing in EN UI mode
+  AppState.language = 'en';
+  quickEnter('manager');
+  assert.equal(AppState.isLoggedIn, true, '1-Click Enter as Manager must authenticate sandbox session');
+  assert.equal(AppState.currentUser.role, 'Level-4 Operations Manager', '1-Click Manager session must bind Level-4 Operations Manager role');
+  const renderCopilotFn = vm.runInContext('renderCopilotDrawerContent', context);
+  renderCopilotFn();
+  assert.ok(getMockEl('copilot-messages').innerHTML.includes('[REASONING TRACE]'), 'Initial EN Copilot briefing must render clean English reasoning');
+}
+
+// 12. Verify Cross-Directory Sync Parity, Single Brand Identity & Clean Copy
+{
+  const rootDir = new URL('../../', import.meta.url);
+  for (const fn of ['index.html', 'digital-twin.html', 'simulation.html']) {
+    const pBuf = fs.readFileSync(new URL(`preview/${fn}`, rootDir));
+    const rBuf = fs.readFileSync(new URL(fn, rootDir));
+    const sBuf = fs.readFileSync(new URL(`src/frontend/${fn}`, rootDir));
+    assert.equal(Buffer.compare(pBuf, rBuf), 0, `Root ${fn} must be byte-identical to preview/${fn}`);
+    assert.equal(Buffer.compare(pBuf, sBuf), 0, `src/frontend/${fn} must be byte-identical to preview/${fn}`);
+  }
+  assert.ok(html.includes('id="btn-quick-enter-manager"') && html.includes('id="btn-quick-enter-owner"'), '1-Click Demo Access buttons must exist');
+  assert.ok(!html.includes('Password + Passkey'), 'Contradictory Password + Passkey overclaim must be removed');
+  assert.ok(!html.includes('GREEN BRAIN v2.0') && !html.includes('simulation engine v3.0') && !html.includes('OPERATIONAL TWIN v2.0'), 'Mixed legacy brand/version labels must be removed');
+  assert.ok(!html.includes('plan kore dao'), 'Banglish prompt phrasing must be removed');
+  assert.ok(!html.includes('0.654') && !html.includes('0.584') && !html.includes('|| 0.62'), 'Stale uncalibrated grid EFs must not remain in SPA');
+  assert.ok(html.includes('Powered by Deterministic Digital Twin') && html.includes('Mandatory Human-in-the-Loop Action Gate'), 'Exact Ethical AI footer copy must be present');
 }
 
 console.log('✓ PASS: All 5 Full-Suite Hackathon Enhancements verified (static & functional VM execution)');
 
-console.log('ALL 11 E2E ROUTE & FLOW VERIFICATION SUITES PASSED (11/11).');
+console.log('ALL 12 E2E ROUTE, CHART & SYNC VERIFICATION SUITES PASSED (12/12).');
 

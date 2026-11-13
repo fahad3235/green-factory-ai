@@ -71,13 +71,15 @@ green-factory-ai/
 ├── simulation.html                     # Root standalone deterministic factory simulator
 ├── docs/
 │   ├── architecture.png                # System architecture diagram
+│   ├── pitch-deck.pdf                  # 6-slide hackathon judge walkthrough deck
 │   └── api-schema.json                 # FastAPI OpenAPI 3.1 specification
 ├── src/
 │   ├── core/config.py                  # Settings loader via python-dotenv
 │   ├── core/calculations.py            # Python math engine (JS/TS parity)
 │   ├── models/schemas.py               # Pydantic v2 API request/response models
 │   ├── agents/copilot_agent.py         # Groq Llama-3.3-70B / Gemini 2.5 Flash + workflow gate
-│   └── api/{routes.py,main.py}         # FastAPI REST endpoints & static UI mounting
+│   ├── api/{routes.py,main.py}         # FastAPI REST endpoints & static UI mounting
+│   └── frontend/                       # Synced SPA, 3D Twin, Simulator & TS/JS domain modules
 ├── tests/
 │   └── test_pipeline.py                # FastAPI & calculation pytest suite
 ├── preview/

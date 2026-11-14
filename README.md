@@ -21,7 +21,7 @@
 - **1-Click Pitch Deck:** Press **P** anywhere in the app to open the 5-slide executive pitch modal.
 
 > **Digital Twin Sandbox & Data Transparency Notice:**  
-> All live telemetry (`Seed #20261018`, Rupsha Garments Ltd. pilot model), scenario triggers, and hardware interlocks run in an isolated simulation sandbox. Physical PLC/breaker writes are disabled; every autonomous agent mitigation requires explicit **Manager Confirmation Gate** approval.
+> All live telemetry (Rupsha Garments Ltd. pilot model), scenario triggers, and hardware interlocks run in an isolated simulation sandbox. Physical PLC/breaker writes are disabled; every autonomous agent mitigation requires explicit **Manager Confirmation Gate** approval.
 
 ---
 

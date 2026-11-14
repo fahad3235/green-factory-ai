@@ -435,6 +435,7 @@ assert.ok(html.includes('FORM S-12') || html.includes('Form S-12 Compliance Shee
   assert.ok(!html.includes('plan kore dao'), 'Banglish prompt phrasing must be removed');
   assert.ok(!html.includes('0.654') && !html.includes('0.584') && !html.includes('|| 0.62'), 'Stale uncalibrated grid EFs must not remain in SPA');
   assert.ok(html.includes('Powered by Deterministic Digital Twin') && html.includes('Mandatory Human-in-the-Loop Action Gate'), 'Exact Ethical AI footer copy must be present');
+  assert.ok(!html.includes('Synthetic telemetry') && !html.includes('Seed #20261018'), 'Synthetic telemetry (Seed #20261018) label must be hidden/removed from website UI');
 }
 
 console.log('✓ PASS: All 5 Full-Suite Hackathon Enhancements verified (static & functional VM execution)');

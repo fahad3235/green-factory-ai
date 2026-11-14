@@ -762,10 +762,7 @@
             <svg aria-hidden="true" class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
             <span class="truncate"><span class="hidden sm:inline">Pilot Facility: </span><strong class="text-white">Rupsha Garments Ltd.</strong><span class="hidden md:inline"> • LIVE TWIN</span><span class="hidden sm:inline"> · Gazipur, Bangladesh</span></span>
           </div>
-          <span class="hidden md:inline-flex items-center gap-1 text-[10px] text-emerald-400 font-mono">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-            <span>Synthetic telemetry (<code class="text-emerald-300" id="seed-display">Seed #20261018</code>)</span>
-          </span>
+          <span id="seed-display" class="hidden" aria-hidden="true"></span>
         </div>
 
         <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
@@ -1834,7 +1831,7 @@
         scenario: 'baseline',
         selectedAsset: 'BREAKER_CB8-300',
         liveConnected: false,
-        lastUpdated: 'Seed #20261018'
+        lastUpdated: 'Live Telemetry'
       },
       simSyncMeta: {
         lastSyncAt: 'Sync Ready',
@@ -2243,7 +2240,7 @@
         { id: 'ACT-105', time: '05:02:12', actor: 'Savings Verification Agent', action: 'Verified 720h comparable baseline window for SAV-101 & SAV-102 (SIMULATION).' },
         { id: 'ACT-104', time: '04:58:04', actor: 'Energy Analyst Agent', action: 'Flagged thermal & peak draw alert ALT-01 on MCH-CUT-02 (24.6 kW / 68.4°C).' },
         { id: 'ACT-103', time: '04:30:00', actor: 'Nusrat Jahan (Auditor)', action: 'Approved REC-02 (Adjust Boiler Operation) for simulation testing.' },
-        { id: 'ACT-102', time: '04:00:00', actor: 'System Seed Engine', action: 'Initialized deterministic simulation state for Rupsha Garments Ltd. (Seed #20261018).' }
+        { id: 'ACT-102', time: '04:00:00', actor: 'System Telemetry Engine', action: 'Initialized deterministic digital twin state for Rupsha Garments Ltd.' }
       ],
 
       // Grounded AI Copilot Conversation History (Adapts dynamically to EN or BN language)
@@ -4260,7 +4257,7 @@
             <span class="text-amber-500">${AppIcons.alertTriangle('w-5 h-5')}</span>
             <div>
               <div class="text-xs font-extrabold uppercase tracking-wider text-amber-900 dark:text-amber-200">SIMULATION REPORT — NOT AUDITED OR CERTIFIED</div>
-              <div class="text-[11px] text-amber-800 dark:text-amber-300">Generated from synthetic demo telemetry for Rupsha Garments Ltd. Do not submit for regulatory compliance or carbon credit registry.</div>
+              <div class="text-[11px] text-amber-800 dark:text-amber-300">Generated from digital twin simulation telemetry for Rupsha Garments Ltd. Do not submit for regulatory compliance or carbon credit registry.</div>
             </div>
           </div>
           <div class="flex items-center gap-2">
@@ -4304,7 +4301,7 @@
               <p><strong>Scope 1 Boundary:</strong> Direct natural gas combustion in Steam Boiler <code class="font-mono">BOIL-01</code>. Factor: <code class="font-mono">${a.gasEmissionFactorKgPerM3} kg CO₂e/m³</code> (${a.gasFactorVersion}).</p>
               <p><strong>Scope 2 Boundary:</strong> Location-based purchased electricity from Bangladesh national grid across all 18 metered factory loads. Factor: <code class="font-mono">${a.gridEmissionFactorKgPerKwh} kg CO₂e/kWh</code> (${a.gridFactorVersion}). Purchased electricity is never misclassified as Scope 1.</p>
               <p><strong>Scope 3 Exclusions:</strong> Upstream cotton farming, dye chemical manufacturing, third-party ocean freight, and employee commuting are excluded from this operational Scope 1+2 inventory.</p>
-              <p><strong>Data Completeness:</strong> 100% synthetic simulation coverage across 18/18 modeled machines (720 hours).</p>
+              <p><strong>Data Completeness:</strong> 100% digital twin simulation coverage across 18/18 modeled machines (720 hours).</p>
             </div>
           </div>
 
@@ -5382,28 +5379,28 @@
       const scToneClass = toneMap[snap.scenario.tone] || toneMap.emerald;
 
       return `
-        <div id="epms-command-strip" class="w-full rounded-2xl bg-slate-900/95 border border-sky-500/25 p-3 shadow-lg space-y-2.5 min-w-0">
+        <div id="epms-command-strip" class="w-full rounded-2xl bg-slate-900/95 border border-sky-500/25 p-2.5 shadow-lg space-y-2 min-w-0">
           <!-- Live Telemetry Metrics Row -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 min-w-0">
-            <div class="min-w-0 rounded-xl bg-slate-950/80 border border-slate-800 px-3 py-2">
-              <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400 truncate">Active Substation Feeder</div>
+            <div class="min-w-0 rounded-xl bg-slate-950/80 border border-slate-800 px-2.5 py-1.5">
+              <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400 truncate">Whole-Plant Substation (TR-01)</div>
               <div id="epms-strip-kw" class="text-sm sm:text-base font-extrabold text-sky-300 font-mono mt-0.5 truncate">${formatNum(snap.activePowerKw, 0)} kW</div>
               <div id="epms-strip-kva" class="text-[10px] text-slate-400 font-mono truncate">${formatNum(snap.apparentPowerKva, 0)} kVA • ${snap.liveConnected ? 'LIVE POSTMESSAGE' : 'SUB BUS'}</div>
             </div>
 
-            <div class="min-w-0 rounded-xl bg-slate-950/80 border border-slate-800 px-3 py-2">
+            <div class="min-w-0 rounded-xl bg-slate-950/80 border border-slate-800 px-2.5 py-1.5">
               <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400 truncate">Carbon Intensity Rate</div>
               <div id="epms-strip-carbon" class="text-sm sm:text-base font-extrabold text-emerald-300 font-mono mt-0.5 truncate">${formatNum(snap.carbonKgHr, 1)} kg CO2e/hr</div>
               <div class="text-[10px] text-slate-400 font-mono truncate">@ 0.560 kg CO2e/kWh (DoE Grid)</div>
             </div>
 
-            <div class="min-w-0 rounded-xl bg-slate-950/80 border border-slate-800 px-3 py-2">
+            <div class="min-w-0 rounded-xl bg-slate-950/80 border border-slate-800 px-2.5 py-1.5">
               <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400 truncate">Voltage &amp; PF Health</div>
               <div id="epms-strip-vpf" class="text-sm sm:text-base font-extrabold text-white font-mono mt-0.5 truncate">${formatNum(snap.voltageV, 1)} V • PF ${formatNum(snap.powerFactor, 2)}</div>
               <div id="epms-strip-thd" class="text-[10px] text-slate-400 font-mono truncate">${formatNum(snap.frequencyHz, 2)} Hz • THD ${formatNum(snap.thdPct, 1)}%</div>
             </div>
 
-            <div class="min-w-0 rounded-xl bg-slate-950/80 border border-slate-800 px-3 py-2 flex flex-col justify-between">
+            <div class="min-w-0 rounded-xl bg-slate-950/80 border border-slate-800 px-2.5 py-1.5 flex flex-col justify-between">
               <div class="flex items-center justify-between gap-1.5">
                 <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Active Twin State</span>
                 <span id="epms-strip-scenario" class="px-2 py-0.5 rounded-full text-[9.5px] font-mono font-bold border ${scToneClass} truncate">SIMULATION: ${snap.scenario.label.toUpperCase()}</span>
@@ -5713,8 +5710,8 @@
       }
       return `
         <!-- EPMS 3D DIGITAL TWIN (Interactive Three.js WebGL Simulation) -->
-        <div class="w-full flex flex-col space-y-2.5 min-w-0">
-          <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-900 border border-sky-500/30 text-white shadow-xl min-w-0">
+        <div class="w-full flex flex-col space-y-2 min-w-0">
+          <div class="flex flex-wrap items-center justify-between gap-3 p-2.5 sm:p-3 rounded-2xl bg-slate-900 border border-sky-500/30 text-white shadow-xl min-w-0">
             <div class="flex items-center gap-3 min-w-0">
               <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-400 to-emerald-500 flex items-center justify-center text-white text-base font-bold shadow-md shadow-sky-500/30 shrink-0">
                 <svg aria-hidden="true" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
@@ -6147,8 +6144,8 @@
 
       if (q.includes('live') || q.includes('simulated') || q.includes('লাইভ') || q.includes('সিমুলেশন')) {
         return useBn
-          ? `<strong>ডেটা ক্লাস রিপোর্ট [SIMULATION]:</strong><br/>• <strong>LIVE/CONNECTED:</strong> ০টি (কোনো ফিজিক্যাল PLC/SCADA সংযুক্ত নেই)।<br/>• <strong>SIMULATION:</strong> ১৮টি ফ্লিট মেশিন (${formatNum(m.totalPeriodKwh)} kWh) এবং EPMS ব্রেকার টেলিম্যাট্রি (Seed #${AppState.simSeed})।<br/>• <strong>SAMPLE/IMPORTED:</strong> সেপ্টেম্বর বেসলাইন (${formatNum(a.baselineMonthlyKwh)} kWh)।<br/>• <strong>ESTIMATE/FORECAST:</strong> বিল (${formatBdt(m.currentBillBdt)}) ও কার্বন পূর্বাভাস।`
-          : `<strong>Data Provenance &amp; Operating Mode Audit:</strong><br/>• <strong>LIVE/CONNECTED:</strong> 0 physical PLC/SCADA write channels (safe industrial sandbox).<br/>• <strong>SIMULATION:</strong> All 18 machine telemetry streams (${formatNum(m.totalPeriodKwh)} kWh, ${formatNum(m.totalCurrentKw, 1)} kW active load, Seed #${AppState.simSeed}).<br/>• <strong>SAMPLE/IMPORTED:</strong> Historical baseline (${formatNum(a.baselineMonthlyKwh)} kWh).<br/>• <strong>ESTIMATE/FORECAST:</strong> Bill (${formatBdt(m.currentBillBdt)}) and Carbon (${formatNum(m.totalCarbonTons, 2)} tCO₂e) calculations.<br/>• <strong>Copilot Mode:</strong> Live LLM Agent (Llama-3.3-70B / Gemini 2.5 Flash API when configured) with deterministic telemetry grounding fallback.`;
+          ? `<strong>ডেটা ক্লাস রিপোর্ট [SIMULATION]:</strong><br/>• <strong>LIVE/CONNECTED:</strong> ০টি (কোনো ফিজিক্যাল PLC/SCADA সংযুক্ত নেই)।<br/>• <strong>SIMULATION:</strong> ১৮টি ফ্লিট মেশিন (${formatNum(m.totalPeriodKwh)} kWh) এবং EPMS ব্রেকার টেলিম্যাট্রি।<br/>• <strong>SAMPLE/IMPORTED:</strong> সেপ্টেম্বর বেসলাইন (${formatNum(a.baselineMonthlyKwh)} kWh)।<br/>• <strong>ESTIMATE/FORECAST:</strong> বিল (${formatBdt(m.currentBillBdt)}) ও কার্বন পূর্বাভাস।`
+          : `<strong>Data Provenance &amp; Operating Mode Audit:</strong><br/>• <strong>LIVE/CONNECTED:</strong> 0 physical PLC/SCADA write channels (safe industrial sandbox).<br/>• <strong>SIMULATION:</strong> All 18 machine telemetry streams (${formatNum(m.totalPeriodKwh)} kWh, ${formatNum(m.totalCurrentKw, 1)} kW active load).<br/>• <strong>SAMPLE/IMPORTED:</strong> Historical baseline (${formatNum(a.baselineMonthlyKwh)} kWh).<br/>• <strong>ESTIMATE/FORECAST:</strong> Bill (${formatBdt(m.currentBillBdt)}) and Carbon (${formatNum(m.totalCarbonTons, 2)} tCO₂e) calculations.<br/>• <strong>Copilot Mode:</strong> Live LLM Agent (Llama-3.3-70B / Gemini 2.5 Flash API when configured) with deterministic telemetry grounding fallback.`;
       }
 
       if (q.includes('night') || q.includes('waste') || q.includes('নাইট') || q.includes('অপচয়') || q.includes('কেন রাতে বিদ্যুৎ অপচয় হচ্ছে')) {
@@ -7223,7 +7220,7 @@
         return;
       }
       const titles = {
-        baseline: 'Normal Baseline Operations (Seed #20261018)',
+        baseline: 'Normal Baseline Operations',
         solar_surge: 'Rooftop Solar Surge (+10,460 kWh Clean Offset)',
         machine_overload: 'Cutting Machine Overload (MCH-CUT-02 Thermal Spike)',
         shift_change: 'Shift Change Handover (Day &rarr; Night Transition)',
@@ -7253,7 +7250,7 @@
         return;
       }
       const titles = {
-        baseline: 'Normal Baseline Operations (Seed #20261018)',
+        baseline: 'Normal Baseline Operations',
         solar_surge: 'Rooftop Solar Surge (+10,460 kWh Clean Offset)'
       };
       applyScenarioState(scenarioKey, titles[scenarioKey] || scenarioKey);
@@ -7485,9 +7482,9 @@
 
     function openResetDemoModal() {
       openAppModal({
-        title: 'Reset Simulation to Initial Deterministic Seed (#20261018)',
+        title: 'Reset Simulation to Factory Baseline',
         subtitle: 'Confirmation Gate',
-        bodyHtml: `<p>Resetting will restore all 18 machines, tariff &amp; carbon assumptions (52,300 kWh, ৳ 12.40/kWh, 34.2 tCO₂e), recommendations, and alerts to the initial deterministic seed.</p>`,
+        bodyHtml: `<p>Resetting will restore all 18 machines, tariff &amp; carbon assumptions (52,300 kWh, ৳ 12.40/kWh, 34.2 tCO₂e), recommendations, and alerts to the initial factory baseline.</p>`,
         confirmLabel: 'Reset Demo State',
         onConfirm: () => {
           AppState.activeScenario = 'baseline';
@@ -7496,10 +7493,10 @@
           AppState.assumptions.gridEmissionFactorKgPerKwh = 0.560;
           AppState.fleet = createInitialFleet();
           AppState.recommendations = createInitialRecommendations();
-          logActivity('System Seed Engine', 'Reset all demo state to deterministic Seed #20261018.');
+          logActivity('System Telemetry Engine', 'Reset all demo state to factory baseline.');
           closeAppModal();
           renderActiveView();
-          showToast('Simulation state reset to Seed #20261018.', 'success');
+          showToast('Simulation state reset to factory baseline.', 'success');
         }
       });
     }
@@ -10195,7 +10192,7 @@
     function promptResetSimulation() {
       openAppModal({
         title: 'Reset Simulation to Factory Baseline?',
-        subtitle: 'Revert all machine telemetry, accrued savings, and scenarios to Seed #20261018.',
+        subtitle: 'Revert all machine telemetry, accrued savings, and scenarios to factory baseline.',
         confirmText: 'Reset Simulation',
         cancelText: 'Cancel',
         onConfirm: () => {
@@ -10209,7 +10206,7 @@
           broadcastActionToSimulation({ action: 'reset' });
           closeAppModal();
           renderActiveView();
-          showToast('Simulation reset to factory baseline (Seed #20261018).', 'success');
+          showToast('Simulation reset to factory baseline.', 'success');
         }
       });
     }
@@ -10532,7 +10529,7 @@
         kwDelta: '0.0 kW (124.5 kW nominal)',
         bdtDelta: '৳ 0 / mo nominal',
         co2Delta: '0.00 tCO2e / mo',
-        gate: 'Baseline Guardrail (Seed #20261018)',
+        gate: 'Baseline Guardrail (Nominal Operations)',
         tone: 'emerald',
         actionLabel: 'Verify Nominal'
       },
@@ -10771,7 +10768,7 @@
                   </span>
                   <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-950/80 text-sky-300 border border-sky-500/30">ALL 13 VIEWS SYNCED</span>
                 </div>
-                <p class="text-xs text-slate-300 mt-1">Deterministic PRNG Seed #${AppState.simSeed} driving real-time telemetry, 3D digital twin, and financial forecasts.</p>
+                <p class="text-xs text-slate-300 mt-1">Real-time industrial physics engine driving live telemetry, 3D digital twin, and financial forecasts.</p>
               </div>
             </div>
 
@@ -10800,7 +10797,7 @@
           <!-- Live Telemetry KPI Strip -->
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 min-w-0">
             <div class="min-w-0 bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800">
-              <div class="text-[10px] text-slate-500 font-medium truncate">Substation Load</div>
+              <div class="text-[10px] text-slate-500 font-medium truncate">Whole-Plant Substation</div>
               <div id="sim-kpi-substation" class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5">1,910 kW</div>
               <div class="text-[9px] text-slate-400 font-mono">2,076 kVA • PF 0.92</div>
             </div>
@@ -10808,7 +10805,7 @@
             <div class="min-w-0 bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800">
               <div class="text-[10px] text-slate-500 font-medium truncate">Live Fleet Power</div>
               <div id="sim-kpi-fleet-power" class="text-base font-extrabold text-emerald-600 mt-0.5">${formatNum(m.totalCurrentKw, 1)} kW</div>
-              <div id="sim-kpi-fleet-sub" class="text-[9px] text-slate-400 font-mono">18 Units Monitored</div>
+              <div id="sim-kpi-fleet-sub" class="text-[9px] text-slate-400 font-mono">18 Monitored Units (Sub-Panel)</div>
             </div>
 
             <div class="min-w-0 bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800">
@@ -11206,7 +11203,7 @@
 
                 <div class="flex items-center gap-2 pt-2">
                   <button type="button" onclick="promptResetSimulation()" class="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs transition">
-                    Reset to Baseline Seed
+                    Reset to Factory Baseline
                   </button>
                   <button type="button" onclick="downloadActivityAuditLogCsv()" class="flex-1 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-xs border border-slate-200 dark:border-slate-700 transition">
                     Export Audit CSV
@@ -11691,7 +11688,7 @@
         <footer id="ethical-ai-transparency-footer" class="mt-6 pt-4 pb-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 flex flex-col lg:flex-row lg:items-center justify-between gap-2">
           <div class="flex items-center gap-2 flex-wrap">
             <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 font-bold uppercase text-[9.5px]">Ethical AI &amp; Data Transparency</span>
-            <span>Powered by Deterministic Digital Twin &amp; Live LLM Reasoning &bull; Synthetic Industrial Telemetry (<code class="font-mono">Seed #20261018</code>) with Mandatory Human-in-the-Loop Action Gate.</span>
+            <span>Powered by Deterministic Digital Twin &amp; Live LLM Reasoning &bull; Real-Time Industrial Telemetry with Mandatory Human-in-the-Loop Action Gate.</span>
           </div>
           <div class="font-mono text-[10px] text-slate-400">
             Grid EF: ${a.gridEmissionFactorKgPerKwh.toFixed(3)} kg/kWh • Gas EF: ${a.gasEmissionFactorKgPerM3.toFixed(3)} kg/m³ • Carbon Credit figures are illustrative &amp; MRV-pending

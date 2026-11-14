@@ -276,8 +276,13 @@
     @keyframes lookAroundMicro { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(1.6px, -0.8px); } 55% { transform: translate(-1.6px, 0.6px); } 80% { transform: translate(0.8px, 1px); } }
     @keyframes dotWave { 0%, 100% { opacity: 0.35; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.15); } }
     
-    .prompt-marquee { white-space: nowrap; overflow-x: auto; scrollbar-width: none; }
-    .prompt-marquee::-webkit-scrollbar { display: none; }
+    @media (min-width: 640px) {
+      .prompt-marquee { white-space: nowrap; overflow-x: auto; scrollbar-width: none; }
+      .prompt-marquee::-webkit-scrollbar { display: none; }
+    }
+    @media (max-width: 639px) {
+      .prompt-marquee { white-space: normal; overflow-x: visible; }
+    }
     .msg-enter { animation: msgSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     @keyframes msgSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .thinking .orb-sphere { animation: floatOrb 0.9s ease-in-out infinite; box-shadow: 0 0 34px 6px rgba(34, 197, 94, 0.65); }
@@ -779,14 +784,14 @@
           </div>
         </div>
       </div>
-      <header class="bg-white dark:bg-slate-900 border-b border-slate-200/90 dark:border-slate-800 px-2.5 sm:px-4 py-2 sm:py-2.5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 sm:gap-3 shrink-0 z-20">
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+      <header class="bg-white dark:bg-slate-900 border-b border-slate-200/90 dark:border-slate-800 px-2 sm:px-3 2xl:px-4 py-2 flex flex-wrap sm:flex-nowrap items-center justify-between gap-1.5 sm:gap-2 shrink-0 z-20">
+        <div class="flex lg:hidden items-center gap-2 sm:gap-3 shrink-0">
           <button type="button" onclick="toggleMobileSidebar(true)" class="lg:hidden p-1.5 sm:p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center shrink-0" aria-label="Open navigation menu">
             <svg aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
           </button>
 
-          <!-- Brand Logo in Header (Matches Reference Image 2) -->
-          <div class="hidden md:flex items-center gap-2.5 shrink-0 pr-1">
+          <!-- Brand Logo in Header (Shown on tablet when sidebar is collapsed) -->
+          <div class="hidden md:flex lg:hidden items-center gap-2.5 shrink-0 pr-1">
             <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#022c22] via-[#064e3b] to-[#10b981] border border-emerald-400/50 flex items-center justify-center shadow-xs">
               <svg aria-hidden="true" class="w-5 h-5 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M11 20A7 7 0 0 1 4 13C4 9.5 7 4 13 3c5.5 0 8 2.5 8 8 0 5-4.5 9-10 9Z"/>
@@ -804,18 +809,18 @@
         </div>
 
         <!-- Global Search / Command Bar with SVG Icon (Full width row 2 on <sm, inline flex-1 on sm+) -->
-        <div class="relative w-full sm:w-auto sm:flex-1 sm:min-w-[210px] md:min-w-[230px] sm:max-w-xl order-last sm:order-none">
+        <div class="relative w-full sm:w-auto sm:flex-1 sm:min-w-[105px] xl:min-w-[115px] sm:max-w-sm order-last sm:order-none">
           <input
             type="text"
             id="global-search-input"
             oninput="handleGlobalSearchInput(this.value)"
             onkeydown="if(event.key==='Enter'){executeGlobalSearch(this.value)}"
-            placeholder="Search metrics, machines, reports..."
+            placeholder="Search metrics, machines..."
             aria-label="Global search across views, machines, and recommendations"
-            class="w-full pl-9 pr-16 py-1.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            class="w-full pl-9 pr-3 2xl:pr-16 py-1.5 text-xs rounded-full bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
           <svg aria-hidden="true" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <button type="button" onclick="openCommandPaletteModal()" class="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-mono bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-600 hover:border-emerald-500">
+          <button type="button" onclick="openCommandPaletteModal()" class="hidden 2xl:inline-block absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-mono bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300 rounded border border-slate-200 dark:border-slate-600 hover:border-emerald-500">
             Ctrl+K
           </button>
           <!-- Search Dropdown Results -->
@@ -823,7 +828,7 @@
         </div>
 
         <!-- Right Header Controls: Factory Selector, EN/বাংলা Switcher, Theme, Notifications, Profile, Copilot Toggle -->
-        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto sm:ml-0">
+        <div class="flex items-center gap-1 sm:gap-1.5 shrink-0 ml-auto sm:ml-0">
           <!-- Factory Selector Pill -->
           <div class="hidden 2xl:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
             <span class="text-emerald-400"><svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></svg></span>
@@ -838,30 +843,30 @@
 
           <!-- Language Switcher (EN / বাংলা) -->
           <div class="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700 shrink-0" role="group" aria-label="Language Switcher">
-            <button type="button" id="lang-btn-en" onclick="setAppLanguage('en')" class="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-semibold transition bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm">
-              <span class="inline-flex items-center gap-1"><span class="hidden sm:inline text-emerald-400"><svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>EN</span></span>
+            <button type="button" id="lang-btn-en" onclick="setAppLanguage('en')" class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[10.5px] font-semibold transition bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm">
+              <span class="inline-flex items-center gap-1"><span class="hidden 2xl:inline text-emerald-400"><svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>EN</span></span>
             </button>
-            <button type="button" id="lang-btn-bn" onclick="setAppLanguage('bn')" class="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-semibold font-bangla transition text-slate-600 dark:text-slate-300 hover:text-slate-900">
+            <button type="button" id="lang-btn-bn" onclick="setAppLanguage('bn')" class="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-[10.5px] font-semibold font-bangla transition text-slate-600 dark:text-slate-300 hover:text-slate-900">
               বাংলা
             </button>
           </div>
 
           <!-- 1-Click Interactive Hackathon Pitch Deck Mode Button -->
-          <button type="button" id="btn-pitch-deck-mode" onclick="openPitchDeckModal()" class="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-[11px] sm:text-xs font-extrabold shadow-xs hover:shadow transition cursor-pointer shrink-0" title="1-Click Interactive Pitch Deck (Shortcut: P or F2)">
+          <button type="button" id="btn-pitch-deck-mode" onclick="openPitchDeckModal()" class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-[10.5px] sm:text-[11px] font-extrabold shadow-xs hover:shadow transition cursor-pointer shrink-0 whitespace-nowrap" title="1-Click Interactive Pitch Deck (Shortcut: P or F2)">
             <svg aria-hidden="true" class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
             </svg>
             <span class="hidden md:inline">Pitch Mode</span>
-            <span class="hidden lg:inline text-[9px] px-1 py-0.2 rounded bg-black/30 font-mono">P</span>
+            <span class="hidden 2xl:inline text-[9px] px-1 py-0.2 rounded bg-black/30 font-mono">P</span>
           </button>
 
           <!-- Hidden Global Profile Photo Upload Input -->
           <input type="file" id="global-profile-photo-input" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(event)" />
 
           <!-- Combined Operator Profile & Status Capsule (Matches Reference Image 3) -->
-          <div class="flex items-center gap-1.5 sm:gap-2.5 px-2 sm:px-3 py-1 rounded-2xl bg-[#091522] border border-slate-800 shadow-md shrink-0">
+          <div class="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-1 rounded-2xl bg-[#091522] border border-slate-800 shadow-md shrink-0">
             <!-- Avatar with Green Glow Ring & Online Indicator -->
-            <div class="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden ring-2 ring-emerald-500/80 shrink-0 cursor-pointer group" onclick="openUserProfileModal()" title="Operator Profile: Click to inspect security clearance or upload photo">
+            <div class="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden ring-2 ring-emerald-500/80 shrink-0 cursor-pointer group" onclick="openUserProfileModal()" title="Operator Profile: Click to inspect role or upload photo">
               <div id="header-user-avatar" class="w-full h-full flex items-center justify-center text-white font-bold text-xs bg-slate-800">
                 <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='mfBg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23064e3b'/%3E%3Cstop offset='100%25' stop-color='%230f172a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='32' fill='url(%23mfBg)' stroke='%2310b981' stroke-width='2.5'/%3E%3Ctext x='32' y='39' text-anchor='middle' font-family='ui-monospace, SFMono-Regular, Menlo, monospace' font-weight='800' font-size='22' fill='%23ecfdf5' letter-spacing='0.5'%3EMF%3C/text%3E%3Ccircle cx='50' cy='14' r='4' fill='%2334d399' stroke='%23064e3b' stroke-width='1.5'/%3E%3C/svg%3E" alt="Md. Fahad - Operations Manager (MF)" class="w-full h-full object-cover rounded-full user-avatar-img" />
               </div>
@@ -869,8 +874,8 @@
               <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white"><svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div>
             </div>
 
-            <!-- Admin / Role Display (Matches Image 3) -->
-            <button type="button" id="header-profile-btn" onclick="openUserProfileModal()" class="hidden lg:block text-left cursor-pointer focus:outline-none" title="Security Clearance & Profile">
+            <!-- Admin / Role Display (Compact at 1280px when docked Copilot is open, expanded on lg & 2xl) -->
+            <button type="button" id="header-profile-btn" onclick="openUserProfileModal()" class="hidden lg:block xl:hidden 2xl:block text-left cursor-pointer focus:outline-none whitespace-nowrap" title="Operator Role &amp; Profile">
               <div class="text-xs font-extrabold text-white leading-tight" id="active-user-name">Admin</div>
               <div class="text-[10px] text-slate-400 font-medium leading-tight" id="active-user-role">Factory Manager</div>
             </button>
@@ -893,10 +898,10 @@
           </div>
 
           <!-- Toggle Ask Green AI Copilot Drawer (With 3D Animated Micro-Orb) -->
-          <button type="button" id="btn-copilot-drawer-toggle" onclick="toggleCopilotDrawer()" class="inline-flex items-center gap-1.5 sm:gap-2 pl-2 pr-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#e2f8ea] dark:bg-emerald-950/90 hover:bg-[#d0f4de] text-[#0f3f24] dark:text-emerald-200 border border-[#86efac] dark:border-emerald-500/40 text-[11px] sm:text-xs font-extrabold shadow-xs transition shrink-0 cursor-pointer">
+          <button type="button" id="btn-copilot-drawer-toggle" onclick="toggleCopilotDrawer()" class="inline-flex items-center gap-1.5 pl-1.5 pr-2 sm:px-2.5 py-1 rounded-full bg-[#e2f8ea] dark:bg-emerald-950/90 hover:bg-[#d0f4de] text-[#0f3f24] dark:text-emerald-200 border border-[#86efac] dark:border-emerald-500/40 text-[11px] font-extrabold shadow-xs transition shrink-0 cursor-pointer">
             <span class="micro-orb"><span class="micro-eye"></span><span class="micro-eye"></span></span>
             <span class="whitespace-nowrap tracking-tight" data-i18n="ask_green_ai">Ask Green AI</span>
-            <span class="px-1.5 py-0.5 rounded-full text-[8.5px] sm:text-[9px] font-black bg-[#15803d] text-white uppercase tracking-wider leading-none shadow-2xs">LIVE</span>
+            <span class="inline xl:hidden 2xl:inline px-1.5 py-0.5 rounded-full text-[8.5px] sm:text-[9px] font-black bg-[#15803d] text-white uppercase tracking-wider leading-none shadow-2xs">LIVE</span>
           </button>
         </div>
       </header>
@@ -913,20 +918,20 @@
     <!-- RIGHT PERSISTENT / DOCKED AI COPILOT DRAWER ("Ask Green AI Copilot Chat" — Matches Reference Image & Video) -->
     <aside id="copilot-drawer" aria-label="Ask Green AI Copilot" class="hidden xl:flex fixed xl:static inset-y-0 right-0 z-50 w-full sm:w-[420px] xl:w-[395px] 2xl:w-[420px] bg-[#f4fbf7] dark:bg-slate-900/98 border-l-[1.5px] xl:border-[1.5px] border-[#b9e6c9] dark:border-emerald-500/35 xl:rounded-[26px] xl:my-2.5 xl:mr-2.5 flex-col justify-between shrink-0 transition-colors duration-150 duration-300 shadow-[0_14px_40px_-12px_rgba(22,163,74,0.22)] text-[#111827] dark:text-slate-100 overflow-hidden">
       <!-- Top Bar Header: Title + 3 Wave Status Dots + Agents + Refresh + Close -->
-      <div class="px-3.5 sm:px-4 py-2.5 sm:py-3 bg-[#eafaf0] dark:bg-emerald-950/90 border-b border-[#cdecd8] dark:border-emerald-500/25 flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2 min-w-0">
-          <span class="text-[14.5px] sm:text-[15.5px] font-extrabold text-[#134e2c] dark:text-white tracking-tight truncate" data-i18n="ask_green_ai">Ask Green AI Copilot</span>
+      <div class="px-3 sm:px-4 py-2.5 sm:py-3 bg-[#eafaf0] dark:bg-emerald-950/90 border-b border-[#cdecd8] dark:border-emerald-500/25 flex items-center justify-between gap-1.5 sm:gap-2">
+        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+          <span class="text-[12.5px] sm:text-[15.5px] font-extrabold text-[#134e2c] dark:text-white tracking-tight truncate" data-i18n="ask_green_ai">Ask Green AI Copilot</span>
           <span id="copilot-mode-badge" class="hidden sm:inline-block px-1.5 py-0.5 rounded text-[8.5px] font-extrabold bg-emerald-500/20 dark:bg-emerald-500/20 text-[#14532d] dark:text-emerald-300 border border-[#86efac] dark:border-emerald-500/40 uppercase tracking-wider shrink-0">LIVE AGENT • LLAMA-3.3</span>
         </div>
-        <div class="flex items-center gap-1.5 shrink-0">
-          <div class="flex items-center gap-1.5 mr-0.5" title="Live Telemetry Sync Active">
+        <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
+          <div class="flex items-center gap-1 sm:gap-1.5 mr-0.5" title="Live Telemetry Sync Active">
             <span class="status-dot"></span><span class="status-dot"></span><span class="status-dot"></span>
           </div>
           <button type="button" onclick="openCopilotSettingsModal()" class="w-6 h-6 rounded-full bg-[#dcfce7] dark:bg-slate-800 hover:bg-[#bbf7d0] text-[#15803d] dark:text-emerald-300 border border-[#86efac] dark:border-emerald-500/40 flex items-center justify-center transition" title="Configure Live LLM API (Groq / Gemini)">
             <svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </button>
-          <button type="button" onclick="navigateTo('agent-console')" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#dcfce7] dark:bg-emerald-900/70 hover:bg-[#bbf7d0] text-[#15803d] dark:text-emerald-200 border border-[#86efac] dark:border-emerald-500/40 transition flex items-center gap-1" title="Open 6-Agent Console">
-            <span class="text-emerald-500"><svg aria-hidden="true" class="w-3.5 h-3.5 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="8" rx="2"/><path d="M12 2v6"/><circle cx="9" cy="14" r="1.5" fill="currentColor"/><circle cx="15" cy="14" r="1.5" fill="currentColor"/><path d="M8 18h8"/></svg></span><span>6 Agents</span>
+          <button type="button" onclick="navigateTo('agent-console')" class="px-1.5 sm:px-2 py-0.5 rounded-full text-[9.5px] sm:text-[10px] font-extrabold bg-[#dcfce7] dark:bg-emerald-900/70 hover:bg-[#bbf7d0] text-[#15803d] dark:text-emerald-200 border border-[#86efac] dark:border-emerald-500/40 transition flex items-center gap-1 whitespace-nowrap" title="Open 6-Agent Console">
+            <span class="text-emerald-500"><svg aria-hidden="true" class="w-3 h-3 sm:w-3.5 sm:h-3.5 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="8" rx="2"/><path d="M12 2v6"/><circle cx="9" cy="14" r="1.5" fill="currentColor"/><circle cx="15" cy="14" r="1.5" fill="currentColor"/><path d="M8 18h8"/></svg></span><span><span class="hidden sm:inline">6 </span>Agents</span>
           </button>
           <button type="button" onclick="resetCopilotChat()" class="text-[#15803d] dark:text-emerald-300 hover:bg-[#d8f3e2] dark:hover:bg-slate-800 w-6 h-6 rounded-full flex items-center justify-center transition text-base font-bold" title="Reset Copilot Chat" class="text-[#15803d] dark:text-emerald-300 hover:bg-[#d8f3e2] dark:hover:bg-slate-800 w-6 h-6 rounded-full flex items-center justify-center transition"><svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg></button>
           <button type="button" id="btn-close-copilot-drawer" onclick="toggleCopilotDrawer(false)" class="text-slate-600 dark:text-emerald-300 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-800 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition cursor-pointer shrink-0" aria-label="Close Ask Green AI Copilot" title="Close Copilot Panel">
@@ -991,9 +996,9 @@
       <!-- Bottom Prompt Bar: Target Marquee Prompt + Suggested Chips + Rounded Green Input Form -->
       <div class="px-3 py-2.5 bg-[#f4fbf7] dark:bg-slate-900 border-t border-[#d8f0e0] dark:border-emerald-500/25 space-y-2">
         <!-- Target Prompt Marquee Pill (Matches Reference Image & Video) -->
-        <button type="button" onclick="askCopilotDirect('Build a night-shift energy waste reduction and ৳ 68,000/mo savings plan')" class="w-full text-left px-3 py-1.5 rounded-full bg-white dark:bg-slate-950 border border-[#cdecd8] dark:border-emerald-500/30 hover:border-[#16a34a] shadow-2xs flex items-center gap-2 prompt-marquee transition group">
+        <button type="button" onclick="askCopilotDirect('Build a night-shift energy waste reduction and ৳ 68,000/mo savings plan')" class="w-full text-left px-3 py-1.5 rounded-2xl sm:rounded-full bg-white dark:bg-slate-950 border border-[#cdecd8] dark:border-emerald-500/30 hover:border-[#16a34a] shadow-2xs flex items-center gap-2 prompt-marquee transition group">
           <span class="text-emerald-500 shrink-0"><svg aria-hidden="true" class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
-          <span class="text-[12px] font-semibold text-[#14532d] dark:text-emerald-300 group-hover:text-[#15803d]">Reduce night-shift waste &amp; forecast ৳ 68,000/mo savings + carbon credit ROI</span>
+          <span class="text-[11px] sm:text-[12px] font-semibold text-[#14532d] dark:text-emerald-300 group-hover:text-[#15803d] min-w-0 leading-snug whitespace-normal sm:truncate">Reduce night-shift waste &amp; forecast ৳ 68,000/mo savings + carbon credit ROI</span>
         </button>
 
         <!-- Suggested Grounded Prompts Header & Bilingual Switcher -->
@@ -1165,7 +1170,7 @@
                 <div class="text-[10px] text-slate-400 font-semibold uppercase">Monthly Footprint</div>
                 <div class="flex items-center gap-2">
                   <span class="text-sm font-black text-white">34.2 tCO₂e</span>
-                  <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">↓ 32%</span>
+                  <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">↓ 15%</span>
                 </div>
                 <div class="text-[9.5px] text-slate-400 font-mono">SCOPE 1 + SCOPE 2</div>
               </div>
@@ -1255,7 +1260,7 @@
             </div>
 
             <!-- Form Fields (Matches Exact User Screenshot) -->
-            <form id="hardened-login-form" onsubmit="event.preventDefault(); simulatePasskeyDemoSignIn();" class="space-y-3 pt-1">
+            <form id="sandbox-login-form" onsubmit="event.preventDefault(); submitSandboxDemoSignIn();" class="space-y-3 pt-1">
               <div id="login-error-banner" class="hidden p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-medium flex items-center gap-2"></div>
               <!-- Role Select -->
               <div>
@@ -1289,11 +1294,11 @@
                 </div>
               </div>
 
-              <!-- Sandbox Access Key (Pre-filled for Demo) -->
+              <!--Sandbox Access Code (Pre-filled for Demo) -->
               <div>
-                <label class="block text-[11px] font-semibold text-slate-300 mb-1">Sandbox Access Key <span class="text-slate-500 font-normal">(Pre-filled for Demo)</span></label>
+                <label class="block text-[11px] font-semibold text-slate-300 mb-1">Demo Access Code <span class="text-slate-500 font-normal">(Pre-filled for Demo)</span></label>
                 <div class="relative">
-                  <input type="text" id="demo-login-passkey" value="PASSKEY-MGR-8899" placeholder="Enter demo token (if provided)" class="w-full pl-9 pr-3 py-2 rounded-xl bg-[#091a26] border border-slate-700 text-xs text-white font-mono placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+                  <input type="text" id="demo-login-passkey" value="DEMO-MGR-2026" placeholder="Enter demo code (if provided)" class="w-full pl-9 pr-3 py-2 rounded-xl bg-[#091a26] border border-slate-700 text-xs text-white font-mono placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
                   <svg aria-hidden="true" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                 </div>
               </div>
@@ -1810,8 +1815,8 @@
         name: 'Md. Fahad',
         role: 'Factory Manager',
         email: 'fahad.manager@rupshagarments.demo',
-        clearance: 'LEVEL-4 EXECUTIVE MANAGER',
-        passkey: 'PASSKEY-MGR-8899',
+        clearance: 'SANDBOX • OPERATIONS',
+        passkey: 'DEMO-MGR-2026',
         initials: 'MF',
         avatarUrl: ''
       },
@@ -5453,7 +5458,7 @@
     const SUGGESTED_PROMPTS = [
       { en: 'How do simulation changes affect our carbon credits?', bn: 'সিমুলেশন পরিবর্তন কীভাবে আমাদের কার্বন ক্রেডিট প্রভাবিত করে?' },
       { en: 'What is our carbon credit balance and how much BDT revenue can we generate?', bn: 'আমাদের কার্বন ক্রেডিট ব্যালেন্স কত এবং কত টাকা রাজস্ব আয় হতে পারে?' },
-      { en: 'Why did energy use rise this week?', bn: 'এই মাসে বিদ্যুৎ খরচ কেন বেড়েছে? কোন কোন মেশিনে বেশি বিদ্যুৎ খরচ হচ্ছে?' },
+      { en: 'Which machines drive the highest load this month, and how can we cut waste?', bn: 'এই মাসে কোন মেশিনগুলোতে সবচেয়ে বেশি বিদ্যুৎ খরচ হচ্ছে এবং কীভাবে অপচয় কমানো যায়?' },
       { en: 'Which machine wastes the most energy during night shift?', bn: 'নাইট শিফটে কোন মেশিনে সবচেয়ে বেশি বিদ্যুৎ অপচয় হচ্ছে?' },
       { en: 'What is next month’s bill estimate if we do nothing?', bn: 'আগামী মাসের বিল কত হবে?' },
       { en: 'Compare the three highest-impact recommendations.', bn: 'সবচেয়ে বেশি সাশ্রয়কারী ৩টি সুপারিশ তুলনা করুন।' },
@@ -5501,7 +5506,7 @@
       if (q.includes('4-mo') || q.includes('4 month')) {
         return `<strong>Night-Shift Waste Reduction &amp; ৳ 68,000/mo Savings Plan Ready <span class="text-emerald-400 inline-block align-middle ml-1">${AppIcons.checkCircle('w-4 h-4 inline-block')}</span></strong><br/>
         • <strong>Step 1 (Night-Shift Auto-Standby — REC-01):</strong> Fitted auto-idle relay on <code class="font-mono">MCH-SEW-03</code> (4.8 kW idle draw eliminated) &rarr; saves <strong>1,492 kWh &amp; ${formatBdt(18500)}/mo</strong> (Payback: 2.1 mo).<br/>
-        • <strong>Step 2 (Air Compressor Leak Seal — REC-02):</strong> Sealed 2.1 bar header leak on <code class="font-mono">COMP-01</code> (18.4 kW draw) &rarr; saves <strong>1,467 kWh &amp; ${formatBdt(18200)}/mo</strong> (Payback: 3.8 mo).<br/>
+        • <strong>Step 2 (Air Compressor Leak Seal — REC-02):</strong> Sealed 2.1 bar header leak on <code class="font-mono">COMP-01</code> (${formatNum((AppState.fleet.find(u => u.id === 'COMP-01') || { currentKw: 18.5 }).currentKw, 1)} kW draw) &rarr; saves <strong>1,468 kWh &amp; ${formatBdt(18200)}/mo</strong> (Payback: 3.8 mo).<br/>
         • <strong>Step 3 (Cutting Servo &amp; Boiler Heat Recovery — REC-03/04/05):</strong> Overhauled <code class="font-mono">MCH-CUT-02</code> (24.6 kW fault) + <code class="font-mono">BOIL-01</code> economizer &rarr; saves <strong>${formatBdt(31300)}/mo</strong>.<br/>
         • <strong>Total Verified Impact:</strong> <strong>${formatBdt(m.estimatedSavingsBdt)}/month</strong> (${formatBdt(m.estimatedSavingsBdt * 4)} over 4 months, ${formatBdt(m.estimatedSavingsBdt * 12)}/year) + <strong>${formatNum(m.totalRecSavedCo2, 2)} tCO₂e/mo</strong> carbon cut.`;
       }
@@ -5547,14 +5552,15 @@
       }
 
       if (q.includes('compressor') || q.includes('leak') || q.includes('কম্প্রেসার') || q.includes('লিক')) {
-        const comp = AppState.fleet.find(u => u.id === 'COMP-01') || { currentKw: 18.4, ratedKw: 30.0, tempC: 58.2, periodKwh: 10944, status: 'Running' };
+        const comp = AppState.fleet.find(u => u.id === 'COMP-01') || { currentKw: 18.4, ratedKw: 32.0, tempC: 62.3, periodKwh: 2950, status: 'Running' };
         const isFault = comp.status === 'Fault' || comp.currentKw > 24.0;
         const leakDeltaKw = Math.max(2.6, comp.currentKw - 15.8);
-        const monthlyLeakKwh = Math.round(leakDeltaKw * 120);
+        const activeHoursPerMonth = 540;
+        const monthlyLeakKwh = Math.round(leakDeltaKw * activeHoursPerMonth);
         const monthlyLeakBdt = Math.round(monthlyLeakKwh * m.effectiveTariff);
         return useBn
-          ? `<strong>[REASONING TRACE] কম্প্রেসার (<code class="font-mono">COMP-01</code>) লাইভ টেলিম্যাট্রি অডিট:</strong><br/>• <strong>সেন্সর রিডিং:</strong> লোড <strong>${formatNum(comp.currentKw, 1)} kW</strong> (${comp.status}), তাপমাত্রা <strong>${formatNum(comp.tempC, 1)}°C</strong>, পিরিয়ড ব্যবহার ${formatNum(comp.periodKwh)} kWh।<br/>• <strong>বিশ্লেষণ:</strong> ${isFault ? 'তীব্র এয়ার লিক ও হেডার প্রেশার ড্রপ (২.১+ বার) শনাক্ত হয়েছে!' : '২.১ বার হেডার প্রেশার ড্রপ পরিলক্ষিত হচ্ছে।'}<br/><strong>[AUTONOMOUS RECOMMENDATION &amp; ROI]</strong><br/>• আল্ট্রাসনিক লিক সিলিং (REC-02) সম্পন্ন করলে মাসে ~<strong>${formatBdt(Math.max(18200, monthlyLeakBdt))}</strong> (${formatNum(monthlyLeakKwh)} kWh) সাশ্রয় হবে।<br/><strong>[SAFETY GUARDRAIL]</strong> ন্যূনতম ৬.২ বার লাইন প্রেশার বজায় রেখে Confirmation Gate অনুমোদন সাপেক্ষে প্রেশার সেটপয়েন্ট সমন্বয় করুন।`
-          : `<strong>[REASONING TRACE] Air Compressor (<code class="font-mono">COMP-01</code>) Live Sensor Reasoning:</strong><br/>• <strong>Live Telemetry (<code class="font-mono">${AppState.activeScenario}</code>):</strong> <code class="font-mono">COMP-01</code> currently reads <strong>${formatNum(comp.currentKw, 1)} kW</strong> (Rated ${comp.ratedKw || 30} kW) • Temp <strong>${formatNum(comp.tempC, 1)}°C</strong> • Status: <strong>${comp.status}</strong> • Period: ${formatNum(comp.periodKwh)} kWh.<br/>• <strong>Root-Cause Inference:</strong> ${isFault ? `Abnormal +${formatNum(leakDeltaKw, 1)} kW air leak spike above 15.8 kW nominal load (~2.4 bar header pressure drop), adding ~${formatNum(monthlyLeakKwh)} kWh/mo avoidable waste.` : `Elevated 18.4 kW draw indicates ~2.1 bar header pressure drop across pneumatic manifolds.`}<br/><strong>[AUTONOMOUS RECOMMENDATION &amp; ROI]</strong><br/>• Dispatch ultrasonic leak sealing &amp; header trim (<code class="font-mono">REC-02</code>): avoids <strong>${formatNum(monthlyLeakKwh)} kWh/mo</strong> (<strong>${formatBdt(Math.max(18200, monthlyLeakBdt))}/month</strong> • CapEx ৳ 68,000 • Payback <strong>${formatNum(calcPaybackMonths(68000, Math.max(18200, monthlyLeakBdt)).value || 0, 1)} mo</strong>).<br/><strong>[SAFETY GUARDRAIL]</strong> Preserve &ge;6.2 bar floor so pneumatic cutting tools remain safe; execute under Confirmation Gate.`;
+          ? `<strong>[REASONING TRACE] কম্প্রেসার (<code class="font-mono">COMP-01</code>) লাইভ টেলিম্যাট্রি অডিট:</strong><br/>• <strong>সেন্সর রিডিং:</strong> লোড <strong>${formatNum(comp.currentKw, 1)} kW</strong> (${comp.status}), তাপমাত্রা <strong>${formatNum(comp.tempC, 1)}°C</strong>, পিরিয়ড ব্যবহার ${formatNum(comp.periodKwh)} kWh।<br/>• <strong>বিশ্লেষণ:</strong> ${isFault ? 'তীব্র এয়ার লিক ও হেডার প্রেশার ড্রপ (২.১+ বার) শনাক্ত হয়েছে' : '২.১ বার হেডার প্রেশার ড্রপ পরিলক্ষিত হচ্ছে'} (+${formatNum(leakDeltaKw, 1)} kW × ${activeHoursPerMonth} ঘণ্টা = ~${formatNum(monthlyLeakKwh)} kWh/মাস)।<br/><strong>[AUTONOMOUS RECOMMENDATION &amp; ROI]</strong><br/>• আল্ট্রাসনিক লিক সিলিং (REC-02) সম্পন্ন করলে মাসে ~<strong>${formatBdt(monthlyLeakBdt)}</strong> (${formatNum(monthlyLeakKwh)} kWh) সাশ্রয় হবে।<br/><strong>[SAFETY GUARDRAIL]</strong> ন্যূনতম ৬.২ বার লাইন প্রেশার বজায় রেখে Confirmation Gate অনুমোদন সাপেক্ষে প্রেশার সেটপয়েন্ট সমন্বয় করুন।`
+          : `<strong>[REASONING TRACE] Air Compressor (<code class="font-mono">COMP-01</code>) Live Sensor Reasoning:</strong><br/>• <strong>Live Telemetry (<code class="font-mono">${AppState.activeScenario}</code>):</strong> <code class="font-mono">COMP-01</code> currently reads <strong>${formatNum(comp.currentKw, 1)} kW</strong> (Rated ${comp.ratedKw || 30} kW) • Temp <strong>${formatNum(comp.tempC, 1)}°C</strong> • Status: <strong>${comp.status}</strong> • Period: ${formatNum(comp.periodKwh)} kWh.<br/>• <strong>Root-Cause Inference:</strong> ${isFault ? `Abnormal +${formatNum(leakDeltaKw, 1)} kW air leak spike above 15.8 kW nominal load (~2.4 bar header pressure drop) over ${activeHoursPerMonth} hrs/mo = ~${formatNum(monthlyLeakKwh)} kWh/mo avoidable waste.` : `Elevated ${formatNum(comp.currentKw, 1)} kW draw (+${formatNum(leakDeltaKw, 1)} kW above 15.8 kW nominal &times; ${activeHoursPerMonth} hrs/mo = ~${formatNum(monthlyLeakKwh)} kWh/mo) indicates ~2.1 bar header pressure drop across pneumatic manifolds.`}<br/><strong>[AUTONOMOUS RECOMMENDATION &amp; ROI]</strong><br/>• Dispatch ultrasonic leak sealing &amp; header trim (<code class="font-mono">REC-02</code>): avoids <strong>${formatNum(monthlyLeakKwh)} kWh/mo</strong> (<strong>${formatBdt(monthlyLeakBdt)}/month</strong> • CapEx ৳ 68,000 • Payback <strong>${formatNum(calcPaybackMonths(68000, monthlyLeakBdt).value || 0, 1)} mo</strong>).<br/><strong>[SAFETY GUARDRAIL]</strong> Preserve &ge;6.2 bar floor so pneumatic cutting tools remain safe; execute under Confirmation Gate.`;
       }
 
       if (q.includes('savings') || q.includes('68,000') || q.includes('68000') || q.includes('68k') || q.includes('সাশ্রয়')) {
@@ -5711,8 +5717,8 @@
           const isUserInit = msg.isDynamicInitial && msg.sender === 'user';
           const bodyHtml = isUserInit
             ? (AppState.language === 'bn'
-                ? 'এই মাসে বিদ্যুৎ খরচ কেন বেড়েছে? কোন কোন মেশিনে বেশি বিদ্যুৎ খরচ হচ্ছে?'
-                : 'Why did energy use rise this month, and which machines drive the highest load?')
+                ? 'এই মাসে কোন মেশিনগুলোতে সবচেয়ে বেশি বিদ্যুৎ খরচ হচ্ছে এবং কীভাবে অপচয় কমানো যায়?'
+                : 'Which machines drive the highest load this month, and how can we cut waste?')
             : (msg.isDynamicInitial ? buildGroundedDefaultAnswer(m) : msg.text);
           if (msg.sender === 'user') {
             return `
@@ -6056,7 +6062,12 @@
               providerTag = 'LIVE AGENT • GEMINI 2.5 FLASH';
             }
           }
-        } else if (typeof window !== 'undefined' && window.location && window.location.protocol !== 'file:') {
+        } else if (
+          typeof window !== 'undefined' &&
+          window.location &&
+          window.location.protocol !== 'file:' &&
+          (!/\.(github\.io|netlify\.app|vercel\.app|pages\.dev)$/i.test(window.location.hostname || '') || /^https?:\/\//i.test(cfg.backendEndpoint || ''))
+        ) {
           const endpoint = cfg.backendEndpoint || '/api/copilot';
           const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
           const timer = ctrl ? setTimeout(() => ctrl.abort(), 4500) : null;
@@ -6467,8 +6478,8 @@
 
     function verifyDemoTokenQuick() {
       const kInput = document.getElementById('demo-login-passkey');
-      const val = kInput ? kInput.value.trim() : 'PASSKEY-MGR-8899';
-      showToast('Cryptographic Token [' + val + '] Verified & Active.', 'success');
+      const val = kInput ? kInput.value.trim() : 'DEMO-MGR-2026';
+      showToast('Demo Access Code [' + val + '] Verified for Sandbox.', 'success');
     }
 
     function syncRoleFromDropdown(val) {
@@ -6935,7 +6946,7 @@
       } else if (msg.includes('Photo') || msg.includes('photo')) {
         iconHtml = AppIcons.camera('w-4 h-4 text-emerald-400 shrink-0');
         bg = 'bg-slate-900/95 border-emerald-500/40 text-emerald-100';
-      } else if (msg.includes('Token') || msg.includes('token') || msg.includes('Passkey')) {
+      } else if (msg.includes('Code') || msg.includes('Token') || msg.includes('token') || msg.includes('Sandbox')) {
         iconHtml = AppIcons.key('w-4 h-4 text-amber-400 shrink-0');
         bg = 'bg-slate-900/95 border-amber-500/40 text-amber-100';
       }
@@ -8971,7 +8982,7 @@
     }
 
     // ============================================================================
-    // HARDENED SECURITY GATE: ONLY FACTORY MANAGER & FACTORY OWNER CAN SIGN IN
+    // SANDBOX ACCESS CONTROL: FACTORY MANAGER & FACTORY OWNER ROLES
     // ============================================================================
     const AUTHORIZED_OPERATORS = {
       manager: {
@@ -8979,11 +8990,11 @@
         aliases: ['manager', 'manager_demo', 'fahad.manager@rupshagarments.demo', 'md. fahad', 'fahad', 'admin'],
         password: 'GFB-MGR-2026',
         altPassword: 'demo123',
-        passkey: 'PASSKEY-MGR-8899',
+        passkey: 'DEMO-MGR-2026',
         name: 'Md. Fahad',
-        role: 'Level-4 Operations Manager',
+        role: 'Factory Operations Manager',
         email: 'fahad.manager@rupshagarments.com',
-        clearance: 'LEVEL-4 OPERATIONAL CONTROL',
+        clearance: 'SANDBOX • OPERATIONS',
         initials: 'MF',
         selectVal: 'manager_demo'
       },
@@ -8992,11 +9003,11 @@
         aliases: ['owner', 'owner_demo', 'owner@rupshagarments.demo', 'alhaj tariqul islam', 'tariqul islam'],
         password: 'GFB-OWN-2026',
         altPassword: 'demo123',
-        passkey: 'PASSKEY-OWN-9900',
+        passkey: 'DEMO-OWN-2026',
         name: 'Alhaj Tariqul Islam',
         role: 'Factory Owner',
         email: 'owner@rupshagarments.com',
-        clearance: 'LEVEL-5 ROOT SECURITY',
+        clearance: 'SANDBOX • EXECUTIVE',
         initials: 'TI',
         selectVal: 'owner_demo'
       }
@@ -9070,7 +9081,7 @@
         if (sel) sel.value = 'manager_demo';
         if (uInput) uInput.value = 'manager_demo';
         if (pInput) pInput.value = 'demo123';
-        if (kInput) kInput.value = 'PASSKEY-MGR-8899';
+        if (kInput) kInput.value = 'DEMO-MGR-2026';
       } else { // Factory Owner
         if (cardMgr) cardMgr.className = "p-3 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 text-left transition relative group";
         if (cardOwn) cardOwn.className = "p-3 rounded-2xl bg-[#092219] border-2 border-emerald-500 text-left transition relative shadow-sm group";
@@ -9079,7 +9090,7 @@
         if (sel) sel.value = 'owner_demo';
         if (uInput) uInput.value = 'owner_demo';
         if (pInput) pInput.value = 'demo123';
-        if (kInput) kInput.value = 'PASSKEY-OWN-9900';
+        if (kInput) kInput.value = 'DEMO-OWN-2026';
       }
       if (errEl) errEl.classList.add('hidden');
     }
@@ -9191,7 +9202,7 @@
 
       const rawUser = uInput ? uInput.value : 'manager';
       const rawPass = pInput ? pInput.value.trim() : 'GFB-MGR-2026';
-      const rawKey = kInput ? kInput.value.trim() : 'PASSKEY-MGR-8899';
+      const rawKey = kInput ? kInput.value.trim() : 'DEMO-MGR-2026';
 
       const op = resolveAuthorizedOperator(rawUser);
       if (!op) {
@@ -9201,15 +9212,15 @@
         return;
       }
 
-      if (rawPass !== op.password) {
-        const msg = `Invalid Password for ${op.role}. Demo password is ${op.password}.`;
+      if (rawPass !== op.password && rawPass !== op.altPassword) {
+        const msg = `Invalid Password for ${op.role}. Demo password is ${op.altPassword || op.password}.`;
         if (errEl) { errEl.textContent = msg; errEl.classList.remove('hidden'); }
         showToast(msg, 'info');
         return;
       }
 
       if (rawKey && rawKey !== op.passkey) {
-        const msg = `Invalid Passkey Token for ${op.role}. Expected ${op.passkey}.`;
+        const msg = `Invalid Demo Access Code for ${op.role}. Expected ${op.passkey}.`;
         if (errEl) { errEl.textContent = msg; errEl.classList.remove('hidden'); }
         showToast(msg, 'info');
         return;
@@ -9225,13 +9236,13 @@
       completeAuthorizedSignIn(op, '1-Click Demo Access');
     }
 
-    function simulatePasskeyDemoSignIn() {
+    function submitSandboxDemoSignIn() {
       const uInput = document.getElementById('demo-login-email');
       const kInput = document.getElementById('demo-login-passkey');
       const errEl = document.getElementById('login-error-banner');
 
       const rawUser = uInput ? uInput.value.trim() : 'manager_demo';
-      const rawKey = kInput ? kInput.value.trim() : 'PASSKEY-MGR-8899';
+      const rawKey = kInput ? kInput.value.trim() : 'DEMO-MGR-2026';
 
       let op = resolveAuthorizedOperator(rawUser);
       if (!op) {
@@ -9342,42 +9353,42 @@
       // Strict role-based isolation: When Manager logs in, ONLY show Manager. When Owner/Admin logs in, ONLY show Owner/Admin.
       const roleClearanceHtml = isMgr ? `
         <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-xs">
-          <div class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Active Operator Clearance</div>
+          <div class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Active Sandbox Role</div>
           <div class="flex items-center gap-2 mt-1.5">
             <div class="w-full px-3.5 py-2.5 rounded-xl text-xs font-extrabold bg-emerald-600 text-white flex items-center justify-between shadow-xs">
               <span class="flex items-center gap-2">
                 <svg aria-hidden="true" class="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                 <span>Factory Manager (Operational Control)</span>
               </span>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/20 text-white font-black">LEVEL-4 ACTIVE</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/20 text-white font-black">SANDBOX-MGR</span>
             </div>
           </div>
           <div class="text-[10.5px] text-slate-500 dark:text-slate-400 mt-1.5 flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Session locked strictly to Factory Manager role</span>
+            <span>Demo session scoped to Factory Manager role</span>
           </div>
         </div>
       ` : `
         <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-xs">
-          <div class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Active Operator Clearance</div>
+          <div class="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider">Active Sandbox Role</div>
           <div class="flex items-center gap-2 mt-1.5">
             <div class="w-full px-3.5 py-2.5 rounded-xl text-xs font-extrabold bg-gradient-to-r from-emerald-600 to-teal-600 text-white flex items-center justify-between shadow-xs">
               <span class="flex items-center gap-2">
                 <svg aria-hidden="true" class="w-4 h-4 text-amber-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                <span>Factory Owner &amp; Executive Admin</span>
+                <span>Factory Owner &amp; Executive View</span>
               </span>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/20 text-white font-black">LEVEL-5 ROOT</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/20 text-white font-black">SANDBOX-OWN</span>
             </div>
           </div>
           <div class="text-[10.5px] text-slate-500 dark:text-slate-400 mt-1.5 flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Session locked strictly to Factory Owner / Admin role</span>
+            <span>Demo session scoped to Factory Owner role</span>
           </div>
         </div>
       `;
 
       openAppModal({
-        title: '<span class="inline-flex items-center gap-2">' + AppIcons.user('w-5 h-5 text-emerald-400') + ' Executive Operator Profile & Security Clearance</span>',
+        title: '<span class="inline-flex items-center gap-2">' + AppIcons.user('w-5 h-5 text-emerald-400') + ' Operator Profile &amp; Sandbox Role</span>',
         subtitle: 'Authorized Session • Upload Profile Photo • Sign Out & Lock',
         confirmLabel: 'Sign Out of Platform',
         cancelLabel: 'Done',
@@ -9398,7 +9409,7 @@
                   <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-400/40">${u.role}</span>
                 </div>
                 <div class="text-xs font-mono text-slate-500 dark:text-slate-400">${u.email}</div>
-                <div class="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">${u.clearance || 'LEVEL-4 EXECUTIVE'} • Passkey: ${u.passkey || 'PASSKEY-MGR-8899'}</div>
+                <div class="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">${u.clearance || 'SANDBOX • OPERATIONS'} • Demo Code: ${u.passkey || 'DEMO-MGR-2026'}</div>
 
                 <!-- Prominent Red Sign Out Button inside Profile Card (Matches Reference Image 2) -->
                 <div class="pt-2">
@@ -10072,7 +10083,7 @@
                   <div class="flex-1 text-center sm:text-left">
                     <div class="text-sm font-extrabold text-slate-900 dark:text-white">${AppState.currentUser.name} (${AppState.currentUser.role})</div>
                     <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono">${AppState.currentUser.email}</div>
-                    <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold mt-0.5">${AppState.currentUser.clearance || 'LEVEL-4 EXECUTIVE'} • Key: ${AppState.currentUser.passkey || 'PASSKEY-MGR-8899'}</div>
+                    <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold mt-0.5">${AppState.currentUser.clearance || 'SANDBOX • OPERATIONS'} • Code: ${AppState.currentUser.passkey || 'DEMO-MGR-2026'}</div>
                     <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-2">
                       <button type="button" onclick="triggerProfilePhotoInput()" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition flex items-center gap-1.5">${AppIcons.camera('w-3.5 h-3.5')} Upload Photo</button>
                       <button type="button" onclick="removeProfilePhoto()" class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-[11px] transition">Reset Photo</button>

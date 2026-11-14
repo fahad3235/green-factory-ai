@@ -100,16 +100,17 @@ def synthesize_telemetry_fallback(req: CopilotChatRequest) -> str:
 
     if "compressor" in q or "leak" in q or "comp-01" in q:
         comp_kw = float(comp.get("currentKw", 18.4))
-        comp_temp = float(comp.get("tempC", 58.2))
+        comp_temp = float(comp.get("tempC", 62.3))
         comp_status = str(comp.get("status", "Running"))
         leak_delta = max(2.6, comp_kw - 15.8)
-        leak_kwh = round(leak_delta * 120)
-        leak_bdt = max(18200, round(leak_kwh * float(tariff)))
+        active_hours_per_month = 540
+        leak_kwh = round(leak_delta * active_hours_per_month)
+        leak_bdt = round(leak_kwh * float(tariff))
         pb = calc_payback_months(68000, leak_bdt)
         return (
             f"[REASONING TRACE]\n"
             f"- Active Scenario: {scenario} | Fleet Load: {total_kw} kW ({total_kwh:,} kWh/mo)\n"
-            f"- COMP-01 Live Sensor: {comp_kw:.1f} kW ({comp_status}), Temp: {comp_temp:.1f}C, Delta above nominal (15.8 kW): +{leak_delta:.1f} kW (~{leak_kwh:,} kWh/mo loss)\n"
+            f"- COMP-01 Live Sensor: {comp_kw:.1f} kW ({comp_status}), Temp: {comp_temp:.1f}C, Delta above nominal (15.8 kW): +{leak_delta:.1f} kW x {active_hours_per_month} hrs/mo (~{leak_kwh:,} kWh/mo loss)\n"
             f"[AUTONOMOUS RECOMMENDATION & ROI]\n"
             f"- Action (REC-02): Ultrasonic air leak sealing & pressure setpoint trim saves ~{leak_bdt:,} BDT/mo ({leak_kwh:,} kWh/mo, {calc_scope2_tons(leak_kwh):.2f} tCO2e/mo). Est. CapEx 68,000 BDT, Payback {pb} mo.\n"
             f"[SAFETY GUARDRAIL]\n"

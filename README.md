@@ -16,8 +16,8 @@
 - **Standalone 3D EPMS Twin:** [https://fahad3235.github.io/green-factory-ai/digital-twin.html](https://fahad3235.github.io/green-factory-ai/digital-twin.html)
 - **Standalone Telemetry Simulator:** [https://fahad3235.github.io/green-factory-ai/simulation.html](https://fahad3235.github.io/green-factory-ai/simulation.html)
 - **Sandbox Operator Roles (`#/login`):**
-  - **Factory Operations Manager:** `GFB-MGR-2026` / Passkey `PASSKEY-MGR-8899` *(Sub-meter alerts, Manager Confirmation Gate approvals, ISO 10816-3 diagnostics)*
-  - **C-Suite Factory Owner:** `GFB-OWN-2026` / Passkey `PASSKEY-OWN-9900` *(Tariff economics, BERC Form S-12 compliance, Carbon Credit & ROI forecasts)*
+  - **Factory Operations Manager:** `GFB-MGR-2026` (or `demo123`) / Access Code `DEMO-MGR-2026` *(Sub-meter alerts, Manager Confirmation Gate approvals, ISO 10816-3 diagnostics)*
+  - **Factory Owner:** `GFB-OWN-2026` (or `demo123`) / Access Code `DEMO-OWN-2026` *(Tariff economics, BERC Form S-12 compliance, Carbon Credit & ROI forecasts)*
 - **1-Click Pitch Deck:** Press **P** anywhere in the app to open the 5-slide executive pitch modal.
 
 > **Digital Twin Sandbox & Data Transparency Notice:**  

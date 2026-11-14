@@ -35,7 +35,7 @@ All energy-to-emission conversions enforce strict **Scope 1 / Scope 2 separation
 
 ## 3. Judge Walkthrough (3 Clicks / 10 Seconds)
 
-1. **Enter Demo Sandbox:** On the landing portal, click **1-Click Enter as Manager** (`#btn-quick-enter-manager`) or **Enter as Owner** (`#btn-quick-enter-owner`) — or use sandbox credential presets (`GFB-MGR-2026` / `PASSKEY-MGR-8899`).
+1. **Enter Demo Sandbox:** On the landing portal, click **1-Click Enter as Manager** (`#btn-quick-enter-manager`) or **Enter as Owner** (`#btn-quick-enter-owner`) — or use sandbox credential presets (`manager_demo` / `demo123` / `DEMO-MGR-2026`).
 2. **Trigger Autonomous Workflow:** On the Dashboard **Business Impact** card (`মাসিক সাশ্রয় ৳ → বছরের সাশ্রয় → সম্ভাব্য কার্বন ক্রেডিট আয় → পে-ব্যাক মাস`), click **Peak Grid Tariffs** or **Night Shift Waste**. Observe the live alert creation, ROI breakdown, and automatic **Confirmation Gate** modal.
 3. **Inspect AI & Carbon Forecaster:**
    - Trigger **Compressor Air Leak** and ask the **Ask Green AI Copilot** drawer about `COMP-01` — inspect the structured `[REASONING TRACE]`, `[AUTONOMOUS RECOMMENDATION & ROI]`, and `[SAFETY GUARDRAIL]` blocks.

@@ -51,7 +51,7 @@ for (const mId of expectedMachines) {
 console.log('✓ PASS: All 18 fleet machines + BREAKER_CBX-305 EPMS asset verified');
 
 // 4. Verify all 8 suggested Copilot prompts and bilingual support (English & Bangla)
-assert.ok(html.includes('Why did energy use rise this week?'), 'Suggested prompt 1 present');
+assert.ok(html.includes('Which machines drive the highest load this month, and how can we cut waste?'), 'Suggested prompt 1 present');
 assert.ok(html.includes('Which machine wastes the most energy during night shift?'), 'Suggested prompt 2 present');
 assert.ok(html.includes('What is next month’s bill estimate if we do nothing?'), 'Suggested prompt 3 present');
 assert.ok(html.includes('Compare the three highest-impact recommendations.'), 'Suggested prompt 4 present');
@@ -59,7 +59,7 @@ assert.ok(html.includes('Show the assumptions behind this carbon estimate.'), 'S
 assert.ok(html.includes('What changed after the simulated intervention?'), 'Suggested prompt 6 present');
 assert.ok(html.includes('Explain this in Bangla.'), 'Suggested prompt 7 present');
 assert.ok(html.includes('Which data is live and which is simulated?'), 'Suggested prompt 8 present');
-assert.ok(html.includes('এই মাসে বিদ্যুৎ খরচ কেন বেড়েছে?'), 'Bangla Copilot prompt & response present');
+assert.ok(html.includes('এই মাসে কোন মেশিনগুলোতে সবচেয়ে বেশি বিদ্যুৎ খরচ হচ্ছে'), 'Bangla Copilot prompt & response present');
 console.log('✓ PASS: Bilingual English/Bangla AI Copilot & all 8 required suggested prompts verified');
 
 // 5. Verify 6 rule-based simulation agents in Agent Console
@@ -100,8 +100,8 @@ console.log('✓ PASS: Phase 2 Full-Website Enhancements verified');
 // 9. Verify Phase 3 Security Hardening, ZIP Removal, Manager/Owner Credentials, Profile Photo Upload, Sign Out & SVG Brand Icon
 assert.ok(!html.includes('download="green_factory_brain_ai_full_project.zip"'), 'No .ZIP download button should exist in preview/index.html');
 assert.ok(!html.includes('Return to Dashboard ✕'), 'No unauthenticated bypass button should exist on login portal');
-assert.ok(html.includes('GFB-MGR-2026') && html.includes('PASSKEY-MGR-8899'), 'Factory Manager demo password and passkey present');
-assert.ok(html.includes('GFB-OWN-2026') && html.includes('PASSKEY-OWN-9900'), 'Factory Owner demo password and passkey present');
+assert.ok(html.includes('GFB-MGR-2026') && html.includes('DEMO-MGR-2026') && html.includes('demo123'), 'Factory Manager demo password and access code present');
+assert.ok(html.includes('GFB-OWN-2026') && html.includes('DEMO-OWN-2026'), 'Factory Owner demo password and access code present');
 assert.ok(html.includes('Alhaj Tariqul Islam') && html.includes('Factory Owner'), 'Factory Owner persona present');
 assert.ok(!html.includes('Nusrat Jahan — Lead Energy'), 'Unauthorized non-Manager/Owner persona removed from login select');
 assert.ok(html.includes('function handleProfilePhotoUpload(') && html.includes('function openUserProfileModal('), 'Profile photo upload & modal functions present');
@@ -413,7 +413,7 @@ assert.ok(html.includes('FORM S-12') || html.includes('Form S-12 Compliance Shee
   AppState.language = 'en';
   quickEnter('manager');
   assert.equal(AppState.isLoggedIn, true, '1-Click Enter as Manager must authenticate sandbox session');
-  assert.equal(AppState.currentUser.role, 'Level-4 Operations Manager', '1-Click Manager session must bind Level-4 Operations Manager role');
+  assert.equal(AppState.currentUser.role, 'Factory Operations Manager', '1-Click Manager session must bind Factory Operations Manager role');
   const renderCopilotFn = vm.runInContext('renderCopilotDrawerContent', context);
   renderCopilotFn();
   assert.ok(getMockEl('copilot-messages').innerHTML.includes('[REASONING TRACE]'), 'Initial EN Copilot briefing must render clean English reasoning');

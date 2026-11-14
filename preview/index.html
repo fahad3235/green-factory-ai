@@ -2081,121 +2081,117 @@
       // 6 Autonomous Multi-Agent Pipeline Definitions (Section 19)
       agents: [
         {
-          id: 'AGT-ENERGY',
-          name: 'Energy Analyst Agent',
-          role: 'Autonomous Simulation Agent',
-          purpose: 'Scans 18 fleet machines for after-hours idle draw, overload thresholds, and kWh/unit anomalies.',
+          id: 'AGT-RECOMMEND',
+          name: 'Operations & Modernization AI',
+          role: 'Future Advisor 1/3 • Ops & Fleet',
+          purpose: 'Reviews all 18 machines, uptime, and thermal/idle bottlenecks to map 0-30d, 30-90d, and 90-180d equipment upgrades.',
           status: 'Completed',
-          lastRunId: 'RUN-EA-9041',
-          startedAt: '2026-10-18 04:58:02',
-          completedAt: '2026-10-18 04:58:04',
-          trigger: 'Scheduled Simulation Tick #14',
-          inputs: 'AppState.fleet (18 units), alertKwThreshold (22.0 kW), shiftSchedule',
-          outputSummary: 'Detected 4.8 kW night-shift idle draw on MCH-SEW-03 and 24.6 kW overload on MCH-CUT-02.',
-          requiresApproval: false,
+          lastRunId: 'RUN-FUT1-9041',
+          startedAt: '2026-10-18 05:01:15',
+          completedAt: '2026-10-18 05:01:18',
+          trigger: 'Overall Fleet & Maintenance Sync',
+          inputs: 'AppState.fleet (18 machines), alerts, recommendations',
+          outputSummary: 'Prioritized 3-horizon company upgrade roadmap across MCH-CUT-02, MCH-SEW-03, COMP-01, and IE4 VFD motor retrofits.',
+          requiresApproval: true,
           steps: [
-            '1. Read shared AppState.fleet (18 machines, 52,300 kWh total).',
-            '2. Validated timestamp freshness (05:04:19 BST) and non-negative kW/kWh fields.',
-            '3. Evaluated idle power rule: status=="Idle" && currentKw > 3.5 kW -> flagged MCH-SEW-03 (4.8 kW).',
-            '4. Evaluated thermal/overload rule: currentKw > 22.0 kW || tempC > 65°C -> flagged MCH-CUT-02 (24.6 kW, 68.4°C).',
-            '5. Wrote evidence pointer to Recommendation Agent and updated Dashboard anomaly strip.'
+            '1. Audited live fleet telemetry (18 machines, thermal & idle profiles).',
+            '2. Identified immediate zero/low-CapEx quick wins (MCH-SEW-03 auto-standby & COMP-01 seals).',
+            '3. Sequenced 90-180d capital upgrades (VFD drives, condensate recovery, predictive sensors).'
           ]
         },
         {
           id: 'AGT-FORECAST',
-          name: 'Forecast Agent',
-          role: 'Autonomous Simulation Agent',
-          purpose: 'Computes deterministic 1/3/6-month electricity bill and carbon scenario trajectories.',
+          name: 'Energy & Clean Power Strategist',
+          role: 'Future Advisor 2/3 • Energy & ROI',
+          purpose: 'Analyzes consumption, tariff windows, and 320 kWp solar + 150 kWh BESS readiness to cut future energy spend.',
           status: 'Completed',
-          lastRunId: 'RUN-FC-9042',
+          lastRunId: 'RUN-FUT2-9042',
           startedAt: '2026-10-18 04:59:10',
           completedAt: '2026-10-18 04:59:11',
-          trigger: 'Tariff & Scenario State Sync',
-          inputs: 'periodKwh (52,300), tariffBdtPerKwh (৳ 12.40), gridFactor (0.560 kg/kWh)',
-          outputSummary: 'No-Action next month bill: ৳ 6,48,520; Intervention scenario bill: ৳ 5,80,520 (±5% range).',
+          trigger: 'Tariff & Microgrid Forecast Sync',
+          inputs: 'periodKwh, tariffBdtPerKwh (৳ 12.40), AppState.microgrid (320 kWp / 150 kWh)',
+          outputSummary: 'Mapped peak-tariff load shifting (17:00-23:00), 320 kWp rooftop solar + BESS commissioning, and APFC tuning.',
           requiresApproval: false,
           steps: [
-            '1. Read current period consumption (52,300 kWh) and active tariff (৳ 12.40/kWh).',
-            '2. Calculated baseline monthly bill = 52,300 × 12.40 = ৳ 6,48,520.',
-            '3. Calculated intervention monthly bill = 6,48,520 - 68,000 = ৳ 5,80,520 (or ৳ 4,20,000 off-peak optimized scenario).',
-            '4. Labeled all outputs as ESTIMATE/FORECAST (Deterministic scenario estimate grounded in telemetry).'
+            '1. Evaluated monthly grid purchase vs. baseline and DPDC peak tariff multiplier.',
+            '2. Quantified bill sensitivity under Baseline vs. Night-Waste / Peak-Grid vs. Solar Surge.',
+            '3. Built 0-180d energy transition roadmap keeping BREAKER_CBX-305 CapEx quote-gated.'
           ]
         },
         {
           id: 'AGT-CARBON',
-          name: 'Carbon Accounting Agent',
-          role: 'Autonomous Simulation Agent',
-          purpose: 'Enforces GHG Protocol Scope 1 vs Scope 2 boundary separation and factor versioning.',
+          name: 'Carbon & Buyer Readiness AI',
+          role: 'Future Advisor 3/3 • ESG & CBAM',
+          purpose: 'Evaluates Scope 1 + 2 emissions, annual decarbonization trajectory, EU CBAM exposure, and international buyer compliance.',
           status: 'Completed',
-          lastRunId: 'RUN-CA-9043',
+          lastRunId: 'RUN-FUT3-9043',
           startedAt: '2026-10-18 05:00:00',
           completedAt: '2026-10-18 05:00:02',
-          trigger: 'Telemetry Reconciliation',
-          inputs: 'Grid kWh (52,300), Boiler Natural Gas (2,431 m³), DoE v2025.2 & IPCC factors',
-          outputSummary: 'Verified Scope 1 = 4.91 tCO₂e (14.4%) and Scope 2 = 29.29 tCO₂e (85.6%); Total = 34.20 tCO₂e.',
+          trigger: 'GHG Protocol & EU CBAM Sync',
+          inputs: 'DoE v2025.2 grid factor (0.560 kg/kWh), IPCC gas factor (2.020 kg/m³), CBAM rate',
+          outputSummary: 'Tracks annual CO₂e target gap, EU buyer ESG compliance tier, and illustrative MRV-pending carbon credit potential.',
           requiresApproval: false,
           steps: [
-            '1. Verified purchased electricity (52,300 kWh) is strictly assigned to Scope 2.',
-            '2. Computed Scope 2 = 52,300 × 0.560 / 1000 = 29.288 tCO₂e.',
-            '3. Computed Scope 1 stationary boiler combustion = 2,431 m³ × 2.020 / 1000 = 4.911 tCO₂e.',
-            '4. Combined Scope 1 + Scope 2 = 34.199 tCO₂e and attached SIMULATION REPORT watermark.'
-          ]
-        },
-        {
-          id: 'AGT-RECOMMEND',
-          name: 'Recommendation Agent',
-          role: 'Autonomous Simulation Agent',
-          purpose: 'Ranks candidate interventions by BDT impact, simple payback period, and confidence.',
-          status: 'Awaiting Approval',
-          lastRunId: 'RUN-RC-9044',
-          startedAt: '2026-10-18 05:01:15',
-          completedAt: '2026-10-18 05:01:18',
-          trigger: 'Anomaly Detection Signal',
-          inputs: 'Alerts ALT-01..03, Tariff ৳ 12.40, CapEx quotes',
-          outputSummary: 'Ranked 5 actions totaling ৳ 68,000/month savings potential; REC-01 & REC-03 awaiting human approval for simulation.',
-          requiresApproval: true,
-          steps: [
-            '1. Ingested anomaly signals from MCH-SEW-03, COMP-01, BOIL-01, LGT-ZN-01, and MCH-CUT-02.',
-            '2. Applied centralized calcPaybackMonths(cost, monthlySavings) with missing-cost guard on REC-05.',
-            '3. Paused at Human Approval Gate before mutating simulation machine parameters.'
+            '1. Reconciled Scope 1 stationary gas vs. Scope 2 purchased electricity strictly per GHG Protocol.',
+            '2. Evaluated annual CO₂e attainment against target and buyer compliance thresholds.',
+            '3. Flagged carbon credit projections as illustrative MRV-pending estimates pending verification.'
           ]
         },
         {
           id: 'AGT-SAVINGS',
-          name: 'Savings Verification Agent',
-          role: 'Autonomous Simulation Agent',
-          purpose: 'Audits pre-action baseline vs post-action telemetry over equal 720-hour windows.',
-          status: 'Completed',
-          lastRunId: 'RUN-SV-9045',
+          name: 'Money Saver AI (Demo Data)',
+          role: 'Cashflow Optimizer • Live Demo Data',
+          purpose: 'Calculates exact BDT (৳) monthly & annual cash savings directly from your live demo telemetry, tariff, and active fixes.',
+          status: 'Awaiting Approval',
+          lastRunId: 'RUN-MS-9044',
           startedAt: '2026-10-18 05:02:10',
           completedAt: '2026-10-18 05:02:12',
-          trigger: 'Post-Intervention Check',
-          inputs: 'AppState.savingsLedger (5 records), baselinePeriodHours (720h)',
-          outputSummary: 'Verified 720h window parity across SAV-101..105; flagged +1.2% production shift variance.',
+          trigger: 'Live Demo Data & Scenario Engine',
+          inputs: 'AppState.recommendations (REC-01..05), activeScenario, calcPaybackMonths()',
+          outputSummary: 'Identified ৳ 68,000/mo (৳ 8,16,000/yr) immediate baseline savings across REC-01..05 with REC-05 marked Quote Needed.',
+          requiresApproval: true,
+          steps: [
+            '1. Summed live actionable BDT savings across REC-01..REC-05 and active simulation scenario.',
+            '2. Computed transparent CapEx payback via calcPaybackMonths() (missing cost on REC-05 flagged).',
+            '3. Exposed 1-click Confirmation Gate triggers so manager approves every cashflow intervention.'
+          ]
+        },
+        {
+          id: 'AGT-ENERGY',
+          name: 'Fault Watchdog & Safety Guard',
+          role: 'Companion AI 1/2 • Safety Interlock',
+          purpose: 'Monitors live 18-machine faults, thermal spikes, pressure floors, and blocks unsafe autonomous equipment actions.',
+          status: 'Completed',
+          lastRunId: 'RUN-SG-9045',
+          startedAt: '2026-10-18 04:58:02',
+          completedAt: '2026-10-18 04:58:04',
+          trigger: 'Continuous Safety Interlock Tick',
+          inputs: 'AppState.fleet (18 units), AppState.alerts, 6.2 bar compressor floor',
+          outputSummary: 'Guarding MCH-CUT-02 (68.4°C Fault) & MCH-SEW-03 idle load; enforcing Human Confirmation Gate before any relay change.',
           requiresApproval: false,
           steps: [
-            '1. Checked baselineHours (720h) == postActionHours (720h) across all 5 ledger entries.',
-            '2. Reconciled total plan savings = ৳ 68,000/month (72% of ৳ 95,000 target) and 2.0+ tCO₂e avoided.',
-            '3. Enforced SIMULATION label — prevented any real-world certified/audited claim.'
+            '1. Scanned live fleet thresholds (>22.0 kW / >65.0°C) and open floor alerts.',
+            '2. Verified 6.2 bar pneumatic compressor floor and cutting SLA interlocks remain armed.',
+            '3. Routed all physical/simulated equipment actions strictly through Manager Approval Gate.'
           ]
         },
         {
           id: 'AGT-REPORT',
-          name: 'Report Agent',
-          role: 'Autonomous Simulation Agent',
-          purpose: 'Generates downloadable CSV and printable HTML sustainability & CarbonIQ disclosures.',
-          status: 'Idle',
-          lastRunId: 'RUN-RP-9040',
-          startedAt: '2026-10-18 04:30:00',
-          completedAt: '2026-10-18 04:30:03',
-          trigger: 'Manual / Scheduled Export',
-          inputs: 'AppState.reportsLibrary, CarbonIQ & Energy tables',
-          outputSummary: 'Prepared 6 structured reports with explicit methodology and assumption footers.',
+          name: 'Audit & Consensus Compiler',
+          role: 'Companion AI 2/2 • 720h Verifier',
+          purpose: 'Audits equal 720-hour pre/post parity and synthesizes all 5 agents into an export-ready buyer & owner briefing.',
+          status: 'Completed',
+          lastRunId: 'RUN-AC-9046',
+          startedAt: '2026-10-18 05:03:00',
+          completedAt: '2026-10-18 05:03:03',
+          trigger: 'Cross-Agent Consensus & Parity Audit',
+          inputs: 'AppState.savingsLedger (SAV-101..105), 720h windows, DoE v2025.2 methodology',
+          outputSummary: 'Verified 720h==720h parity across SAV-101..105 and compiled executive consensus across all 6 AI agents.',
           requiresApproval: false,
           steps: [
-            '1. Snapshot current AppState KPIs, tariff version, and emission factors.',
-            '2. Formatted CSV and print-ready report templates with SIMULATION watermarks.',
-            '3. Ready for on-demand user export.'
+            '1. Confirmed baselineHours (720h) == postActionHours (720h) across all verified records.',
+            '2. Aggregated Future Roadmaps (#1-#3), Money Saver (#4), and Safety Guard (#5).',
+            '3. Stamped SIMULATION watermark & DoE v2025.2 / IPCC provenance on all CSV/HTML exports.'
           ]
         }
       ],
@@ -5527,6 +5523,32 @@
           Try saying: <strong>Build a night-shift energy waste reduction and ৳ 68,000/mo savings plan</strong>, <strong>Diagnose COMP-01 Compressor Air Leak telemetry</strong>, or <strong>Run all 6 simulation agents</strong>.`;
       }
 
+      // 2B. 6-AI Future Advisors + Demo-Data Money Saver + Companions Unified Reasoning
+      if (q.includes('30/90/180') || q.includes('consensus') || q.includes('demo data') || q.includes('future') || q.includes('modernization') || q.includes('cbam') || q.includes('safety interlock') || q.includes('6-ai') || q.includes('all 6 simulation agents') || q.includes('save money') || q.includes('320 kwp') || q.includes('ভবিষ্যৎ') || q.includes('ডেমো ডেটা')) {
+        const profiles = typeof buildSixAgentLiveProfiles === 'function' ? buildSixAgentLiveProfiles(m) : null;
+        if (profiles) {
+          const pRec = profiles['AGT-RECOMMEND'];
+          const pFor = profiles['AGT-FORECAST'];
+          const pCar = profiles['AGT-CARBON'];
+          const pSav = profiles['AGT-SAVINGS'];
+          const pSaf = profiles['AGT-ENERGY'];
+          const pRep = profiles['AGT-REPORT'];
+          return useBn
+            ? `<strong>৬-এআই ফ্যাক্টরি ব্রেন — ভবিষ্যৎ উন্নয়ন ও ডেমো ডেটা সাশ্রয় পরিকল্পনা [SIMULATION]:</strong><br/>
+            • <strong>১. ফিউচার এআই (অপারেশন ও মেশিন):</strong> ${pRec.dataScanned} — ০-৩০ দিনে <code class="font-mono">COMP-01</code> ও <code class="font-mono">MCH-SEW-03</code> লিক/আইডল কমানো, ৩০-৯০ দিনে IE4 VFD ও বয়লার কনডেনসেট, ৯০-১৮০ দিনে প্রিডিক্টিভ সেন্সর।<br/>
+            • <strong>২. ফিউচার এআই (এনার্জি ও সোলার):</strong> পিক ট্যারিফ (১৭:০০-২৩:০০) শিফটিং + ৩২০ kWp সোলার ও ১৫০ kWh BESS কমিশনিং।<br/>
+            • <strong>৩. ফিউচার এআই (কার্বন ও EU CBAM):</strong> Scope 1+2 (${formatNum(m.totalCarbonTons, 2)} tCO₂e) ট্র্যাকিং ও ক্রেতাদের জন্য CBAM বিশ্লেষণ।<br/>
+            • <strong>৪. মানি সেভার এআই (ডেমো ডেটা নগদ সাশ্রয়):</strong> <strong>${formatBdt(pSav.liveMonthlySaveBdt)}/মাস</strong> (বছরে <strong>${formatBdt(pSav.liveAnnualSaveBdt)}</strong>, পে-ব্যাক ${pSav.paybackInfo.valid ? formatNum(pSav.paybackInfo.value, 1) + ' মাস' : 'Quote Needed'}) — <code class="font-mono">REC-05</code> ক্যাপেক্স কোটেশন প্রয়োজন হিসেবে চিহ্নিত।<br/>
+            • <strong>৫ ও ৬. সেফটি ও ৭২০ ঘণ্টা অডিট এআই:</strong> ${pSaf.liveOutput} | ${pRep.liveOutput}`
+            : `<strong>6-AI Factory Consensus — Future Company Roadmap &amp; Demo-Data Money Saver [SIMULATION]:</strong><br/>
+            • <strong>AI #1 (Future Ops &amp; Machines):</strong> ${pRec.horizons.map(h => `<em>${h.tag}:</em> ${h.text}`).join(' ')}<br/>
+            • <strong>AI #2 (Future Energy &amp; Clean Power):</strong> ${pFor.liveOutput} Next step: shift heavy cutting off 17:00-23:00 peak tariff and commission 320 kWp PV + 150 kWh BESS.<br/>
+            • <strong>AI #3 (Future Carbon &amp; EU CBAM):</strong> ${pCar.liveOutput}<br/>
+            • <strong>AI #4 (Money Saver on Live Demo Data):</strong> <strong>${formatBdt(pSav.liveMonthlySaveBdt)}/mo</strong> (<strong>${formatBdt(pSav.liveAnnualSaveBdt)}/yr</strong> retained, CapEx ${formatBdt(pSav.activeCapexBdt)}, payback <strong>${pSav.paybackInfo.valid ? formatNum(pSav.paybackInfo.value, 1) + ' mo' : 'Need Quote'}</strong>). Itemized: ${(pSav.recs || []).map(r => `${r.id} (${formatBdt(r.estSavedBdt)})`).join(', ')} — note REC-05 marks <em>Quote Needed</em>.<br/>
+            • <strong>AI #5 &amp; #6 (Safety Guard &amp; 720h Audit):</strong> ${pSaf.liveOutput} ${pRep.liveOutput}`;
+        }
+      }
+
       // 3. Post-Intervention Simulation Delta (Checked before generic 'simulated' keyword)
       if (q.includes('intervention') || q.includes('changed') || q.includes('পরিবর্তন')) {
         return useBn
@@ -5607,19 +5629,19 @@
       if (q.includes('agent') || q.includes('এজেন্ট') || q.includes('6 agents')) {
         return useBn
           ? `<strong>৬টি সিমুলেশন এআই এজেন্ট কনসোল স্থিতি [SIMULATION]:</strong><br/>
-          • <strong>AGT-ENERGY (Energy Monitor):</strong> সক্রিয় • ১৮টি মেশিনের লোড ট্র্যাক করছে।<br/>
-          • <strong>AGT-FORECAST (Predictive Load):</strong> সক্রিয় • আগামী ৭২০ ঘণ্টার পূর্বাভাস জেনারেট করেছে।<br/>
-          • <strong>AGT-CARBON (CarbonIQ):</strong> সক্রিয় • Scope 1 ও Scope 2 নির্গমন হিসাব করছে।<br/>
-          • <strong>AGT-RECOMMEND (Action Engine):</strong> সক্রিয় • ৫টি সমাধান প্রস্তাব করেছে।<br/>
-          • <strong>AGT-SAVINGS (Tariff Optimizer):</strong> সক্রিয় • ${formatBdt(m.estimatedSavingsBdt)} সাশ্রয় ভ্যালিডেট করেছে।<br/>
-          • <strong>AGT-REPORT (Compliance Auditor):</strong> সক্রিয় • ESG অডিট রিপোর্ট প্রস্তুত।`
+          • <strong>১. AGT-RECOMMEND (Future Advisor 1/3):</strong> ১৮টি মেশিনের ৩০/৯০/১৮০ দিনের আধুনিকীকরণ পরিকল্পনা।<br/>
+          • <strong>২. AGT-FORECAST (Future Advisor 2/3):</strong> মাসিক বিল (${formatBdt(m.currentBillBdt)}), পিক ট্যারিফ ও ৩২০ kWp সোলার কৌশল।<br/>
+          • <strong>৩. AGT-CARBON (Future Advisor 3/3):</strong> Scope 1+2 (${formatNum(m.totalCarbonTons, 2)} tCO₂e) ও EU CBAM/ক্রেতা প্রস্তুতি।<br/>
+          • <strong>৪. AGT-SAVINGS (Money Saver AI):</strong> লাইভ ডেমো ডেটা থেকে <strong>${formatBdt((m.businessImpact && m.businessImpact.monthlySavingsBdt) || m.estimatedSavingsBdt)}/মাস</strong> নগদ সাশ্রয় হিসাব করেছে।<br/>
+          • <strong>৫. AGT-ENERGY (Companion Safety Guard):</strong> রিয়েল-টাইম ফল্ট ও Confirmation Gate ইন্টারলক সক্রিয়।<br/>
+          • <strong>৬. AGT-REPORT (Companion 720h Audit):</strong> ৭২০ ঘণ্টা প্যারিটি ও সামগ্রিক কনসেনসাস ব্রিফ প্রস্তুত।`
           : `<strong>6 Autonomous Simulation Agents Status Report [SIMULATION]:</strong><br/>
-          • <strong>AGT-ENERGY (Real-Time Telemetry):</strong> Active • Polling 18 fleet machines every 3.5s.<br/>
-          • <strong>AGT-FORECAST (Predictive Demand):</strong> Active • Monthly bill estimated at ${formatBdt(m.currentBillBdt)}.<br/>
-          • <strong>AGT-CARBON (CarbonIQ Scope 1 &amp; 2):</strong> Active • Tracking ${formatNum(m.totalCarbonTons, 2)} tCO₂e emissions.<br/>
-          • <strong>AGT-RECOMMEND (Anomaly &amp; Prescriptive):</strong> Active • 5 ranked actions generated.<br/>
-          • <strong>AGT-SAVINGS (Tariff &amp; ROI Engine):</strong> Active • Quantified ${formatBdt(m.estimatedSavingsBdt)}/mo ROI.<br/>
-          • <strong>AGT-REPORT (Audit &amp; Compliance):</strong> Ready • CSV/PDF logs generated with zero telemetry drift.`;
+          • <strong>1. AGT-RECOMMEND (Future Advisor 1/3 — Ops &amp; Fleet):</strong> 30/90/180-day machine &amp; VFD modernization plan.<br/>
+          • <strong>2. AGT-FORECAST (Future Advisor 2/3 — Energy &amp; Clean Power):</strong> Monthly bill (${formatBdt(m.currentBillBdt)}), peak-tariff shift &amp; 320 kWp PV strategy.<br/>
+          • <strong>3. AGT-CARBON (Future Advisor 3/3 — Carbon &amp; EU Buyers):</strong> Scope 1+2 (${formatNum(m.totalCarbonTons, 2)} tCO₂e), buyer score &amp; CBAM plan.<br/>
+          • <strong>4. AGT-SAVINGS (Money Saver AI — Live Demo Data):</strong> Quantified <strong>${formatBdt((m.businessImpact && m.businessImpact.monthlySavingsBdt) || m.estimatedSavingsBdt)}/mo</strong> cash savings.<br/>
+          • <strong>5. AGT-ENERGY (Companion 1/2 — Fault &amp; Safety Guard):</strong> Guarding 18 units &amp; 6.2 bar floor + Confirmation Gate.<br/>
+          • <strong>6. AGT-REPORT (Companion 2/2 — 720h Audit &amp; Consensus):</strong> Verified 720h==720h parity &amp; buyer/owner export readiness.`;
       }
 
       if (q.includes('bill') || q.includes('do nothing') || q.includes('বিল')) {
@@ -9582,28 +9604,43 @@
     function runIndividualAgent(agentId) {
       const ag = AppState.agents.find(a => a.id === agentId);
       if (!ag) return;
+      const m = getDerivedMetrics();
+      const profiles = typeof buildSixAgentLiveProfiles === 'function' ? buildSixAgentLiveProfiles(m) : {};
+      const p = profiles[agentId];
       ag.lastRunId = 'RUN-' + agentId.replace('AGT-', '') + '-' + (9050 + Math.floor(Math.random() * 40));
       ag.completedAt = new Date().toISOString().replace('T', ' ').substring(0, 19);
       ag.status = 'Completed';
-      logActivity(ag.name, 'Manually executed ' + ag.lastRunId + ' across shared simulation state.');
+      if (p) {
+        ag.inputs = p.dataScanned;
+        ag.outputSummary = p.liveOutput;
+        ag.steps = p.steps;
+      }
+      logActivity(ag.name, 'Executed ' + ag.lastRunId + ': ' + ag.outputSummary);
       renderActiveView();
-      showToast(ag.name + ' executed successfully (' + ag.lastRunId + ').', 'success');
+      showToast(ag.name + ' updated from live demo data (' + ag.lastRunId + ').', 'success');
     }
 
     function runFullAgentWorkflow() {
       const m = getDerivedMetrics();
+      const profiles = typeof buildSixAgentLiveProfiles === 'function' ? buildSixAgentLiveProfiles(m) : {};
       AppState.agents.forEach((ag, idx) => {
         ag.lastRunId = 'RUN-SEQ-' + (9100 + idx);
         ag.completedAt = new Date().toISOString().replace('T', ' ').substring(0, 19);
-        if (ag.id !== 'AGT-RECOMMEND') ag.status = 'Completed';
+        if (profiles[ag.id]) {
+          ag.inputs = profiles[ag.id].dataScanned;
+          ag.outputSummary = profiles[ag.id].liveOutput;
+          ag.steps = profiles[ag.id].steps;
+        }
+        if (ag.id !== 'AGT-SAVINGS' && ag.id !== 'AGT-RECOMMEND') ag.status = 'Completed';
       });
-      logActivity('Agent Orchestrator', 'Executed full 6-agent sequential workflow.');
+      logActivity('Agent Orchestrator', 'Executed full 6-agent consensus workflow across ' + formatNum(m.totalPeriodKwh) + ' kWh.');
       renderActiveView();
       openAppModal({
         title: '6-Agent Sequential Workflow Executed',
-        subtitle: 'All 6 Autonomous Agents completed deterministic verification across ' + formatNum(m.totalPeriodKwh) + ' kWh shared state.',
-        confirmText: 'Acknowledge',
-        cancelText: '',
+        subtitle: '3 Future Advisors + 1 Demo-Data Money Saver + 2 Safety & Audit Companions synced across ' + formatNum(m.totalPeriodKwh) + ' kWh.',
+        bodyHtml: `<p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">All 6 agents inspected live facility telemetry (<strong>${formatNum(m.totalCurrentKw, 1)} kW</strong>, bill <strong>${formatBdt(m.currentBillBdt)}</strong>, Scope 1+2 <strong>${formatNum(m.totalCarbonTons, 2)} tCO₂e</strong>) and refreshed <strong>${formatBdt((m.businessImpact && m.businessImpact.monthlySavingsBdt) || m.estimatedSavingsBdt)}/mo</strong> in actionable savings.</p>`,
+        confirmLabel: 'Acknowledge',
+        cancelLabel: '',
         onConfirm: () => closeAppModal()
       });
     }
@@ -10218,21 +10255,357 @@
     }
 
     // ----------------------------------------------------------------------------
-    // VIEW 14: AI AGENT CONSOLE (6 Autonomous Pipeline Agents + Live 3D Orb Orchestrator)
+    // VIEW 14: AI AGENT CONSOLE (3 Future Advisors + 1 Demo-Data Money Saver + 2 Companions)
     // ----------------------------------------------------------------------------
+    function buildSixAgentLiveProfiles(m) {
+      const a = AppState.assumptions || {};
+      const fleet = AppState.fleet || [];
+      const recs = AppState.recommendations || [];
+      const alerts = AppState.alerts || [];
+      const ledger = AppState.savingsLedger || [];
+      const microgrid = AppState.microgrid || { solarKwp: 320, bessKwh: 150, dieselDisplacementPct: 45 };
+      const bi = (m && m.businessImpact) || {};
+      const cf = (m && m.carbonForecast) || {};
+      const tt = cf.targetTracker || {};
+      const bc = cf.buyerCompliance || {};
+      const cbam = cf.cbamSimulation || {};
+
+      const cut02 = fleet.find(u => u.id === 'MCH-CUT-02');
+      const sew03 = fleet.find(u => u.id === 'MCH-SEW-03');
+      const comp01 = fleet.find(u => u.id === 'COMP-01');
+      const boil01 = fleet.find(u => u.id === 'BOIL-01');
+      const openAlerts = alerts.filter(al => !al.acknowledged);
+
+      const pendingRecs = recs.filter(r => r.status !== 'Applied in simulation' && r.status !== 'Done' && r.status !== 'Dismissed');
+      const appliedRecs = recs.filter(r => r.status === 'Applied in simulation' || r.status === 'Done');
+      const basePendingBdt = pendingRecs.reduce((s, r) => s + (r.estSavedBdt || 0), 0);
+      const appliedBdt = appliedRecs.reduce((s, r) => s + (r.estSavedBdt || 0), 0);
+      const quotedCapexBdt = recs.reduce((s, r) => s + (typeof r.implementationCostBdt === 'number' ? r.implementationCostBdt : 0), 0);
+
+      const liveMonthlySaveBdt = bi.monthlySavingsBdt || m.estimatedSavingsBdt || basePendingBdt;
+      const liveAnnualSaveBdt = bi.annualSavingsBdt || (liveMonthlySaveBdt * 12);
+      const activeCapexBdt = typeof bi.actionCapexBdt === 'number' ? bi.actionCapexBdt : quotedCapexBdt;
+      const paybackInfo = calcPaybackMonths(activeCapexBdt, liveMonthlySaveBdt);
+      const scenKey = AppState.activeScenario || 'baseline';
+      const parityCount = ledger.filter(s => s.baselineHours === s.postActionHours).length;
+
+      return {
+        'AGT-RECOMMEND': {
+          group: 'future',
+          badge: 'FUTURE ADVISOR 1/3 • OPS & FLEET',
+          headline: 'Company Machine & Modernization Roadmap',
+          dataScanned: `${fleet.length} machines • ${formatNum(m.totalCurrentKw, 1)} kW • ${formatNum(m.availabilityPct, 1)}% uptime • ${formatNum(m.totalOutputPcs)} pcs`,
+          liveOutput: `Inspecting ${fleet.length} units (${formatNum(m.availabilityPct, 1)}% availability): immediate thermal/idle focus on MCH-CUT-02 (${cut02 ? formatNum(cut02.tempC, 1) + '°C' : '68.4°C'}) and MCH-SEW-03 (${sew03 ? formatNum(sew03.currentKw, 1) + ' kW' : '4.8 kW'}), followed by VFD motor & steam-trap modernization.`,
+          horizons: [
+            { tag: '0-30 Days', text: `Seal COMP-01 (${comp01 ? formatNum(comp01.currentKw, 1) + ' kW' : '18.4 kW'}) header couplings, enable 10-min auto-standby relay on MCH-SEW-03, and service MCH-CUT-02 vacuum filters.` },
+            { tag: '30-90 Days', text: `Install IE4 VFD servo drives on top sewing/cutting motors and tune BOIL-01 (${boil01 ? formatNum(boil01.tempC, 1) + '°C' : '88.6°C'}) condensate return.` },
+            { tag: '90-180 Days', text: `Deploy predictive thermal/vibration nodes across all ${fleet.length} units before expanding night-shift garment output.` }
+          ],
+          steps: [
+            `1. Inspected live load (${formatNum(m.totalCurrentKw, 1)} kW) & ${formatNum(m.availabilityPct, 1)}% uptime across ${fleet.length} machines.`,
+            `2. Prioritized 0-30d no/low-CapEx relief on MCH-CUT-02, MCH-SEW-03, and COMP-01.`,
+            `3. Built 90-180d VFD servo & preventive maintenance upgrade path.`
+          ],
+          route: 'machine-monitoring',
+          routeLabel: 'Inspect Fleet',
+          copilotPrompt: 'Based on all 18 machines in our live data, give me a step-by-step 30/90/180-day modernization plan to improve uptime and output.'
+        },
+        'AGT-FORECAST': {
+          group: 'future',
+          badge: 'FUTURE ADVISOR 2/3 • ENERGY & ROI',
+          headline: 'Energy Cost & Clean Power Strategy',
+          dataScanned: `${formatNum(m.totalPeriodKwh)} kWh (${m.energyDeltaPct > 0 ? '+' : ''}${formatNum(m.energyDeltaPct, 1)}%) • ৳ ${formatNum(m.effectiveTariff, 2)}/kWh • Bill ${formatBdt(m.currentBillBdt)}`,
+          liveOutput: `Monthly electricity bill sits at ${formatBdt(m.currentBillBdt)} (@ ৳ ${formatNum(m.effectiveTariff, 2)}/kWh, scenario: ${scenKey}). Peak shifting + ${microgrid.solarKwp} kWp solar / ${microgrid.bessKwh} kWh BESS can lock long-term tariff insulation.`,
+          horizons: [
+            { tag: '0-30 Days', text: `Move multi-ply heavy cutting off 17:00-23:00 peak window (avoiding 20% DPDC surge tariff) and cut after-hours zone ballast lighting.` },
+            { tag: '30-90 Days', text: `Commission ${microgrid.solarKwp} kWp rooftop PV + ${microgrid.bessKwh} kWh BESS microgrid (targeting ${microgrid.dieselDisplacementPct}% diesel & peak grid displacement).` },
+            { tag: '90-180 Days', text: `Collect electrical vendor quote to upgrade BREAKER_CBX-305 APFC capacitor stepping (0.89 &rarr; 0.96 PF) and trim kVA demand penalties.` }
+          ],
+          steps: [
+            `1. Evaluated ${formatNum(m.totalPeriodKwh)} kWh demand at effective tariff ৳ ${formatNum(m.effectiveTariff, 2)}/kWh.`,
+            `2. Benchmarked peak-tariff exposure and ${microgrid.solarKwp} kWp rooftop solar + ${microgrid.bessKwh} kWh BESS offset.`,
+            `3. Flagged REC-05 APFC upgrade as Quote Needed before committing CapEx.`
+          ],
+          route: 'energy-analytics',
+          routeLabel: 'Energy & Tariffs',
+          copilotPrompt: 'Analyze our overall kWh consumption, DPDC tariff exposure, and 320 kWp solar + BESS plan for the next 6 months.'
+        },
+        'AGT-CARBON': {
+          group: 'future',
+          badge: 'FUTURE ADVISOR 3/3 • ESG & BUYERS',
+          headline: 'Carbon, EU CBAM & Buyer Readiness',
+          dataScanned: `${formatNum(m.totalCarbonTons, 2)} tCO₂e (S1 ${formatNum(m.scope1Tons, 2)}t + S2 ${formatNum(m.scope2Tons, 2)}t) • Buyer Score ${formatNum(bc.complianceScore || m.sustainabilityScore, 0)}/100`,
+          liveOutput: `Scope 2 grid power (${formatNum(m.scope2Tons, 2)}t) drives ${formatNum(m.totalCarbonTons > 0 ? (m.scope2Tons / m.totalCarbonTons) * 100 : 0, 1)}% of emissions vs Scope 1 gas (${formatNum(m.scope1Tons, 2)}t). Target attainment: ${formatNum(tt.attainmentPct || 0, 1)}% (${bc.riskTier || 'On Watch'} buyer tier).`,
+          horizons: [
+            { tag: '0-30 Days', text: `Close ${formatNum(Math.max(0, tt.shortfallTons || 0), 1)} tCO₂e projected annual gap using DoE v2025.2 (0.560 kg/kWh) & IPCC Scope 1+2 audit logs.` },
+            { tag: '30-90 Days', text: `Publish gCO₂e/garment intensity & EU CBAM exposure analysis (${formatBdt(cbam.avoidedCbamLiabilityBdt || 0)}/yr avoided at $${cbam.cbamRateUsdPerTon || 85}/t) for European brand RFQs.` },
+            { tag: '90-180 Days', text: `Register third-party MRV baseline before monetizing illustrative carbon credits (${formatBdt(cf.annualPotentialCreditBdt || 0)}/yr ceiling; scenario only).` }
+          ],
+          steps: [
+            `1. Separated Scope 1 gas (${formatNum(m.scope1Tons, 2)} t) from Scope 2 grid electricity (${formatNum(m.scope2Tons, 2)} t).`,
+            `2. Checked annual CO₂e target tracking (${formatNum(tt.attainmentPct || 0, 1)}% attainment) & buyer compliance (${bc.riskTier || 'Monitor'}).`,
+            `3. Attached mandatory MRV-pending & conceptual price caveats to credit upside.`
+          ],
+          route: 'bill-carbon-forecast',
+          routeLabel: 'CarbonIQ & CBAM',
+          copilotPrompt: 'How can we improve our Scope 1+2 carbon footprint, buyer compliance score, and EU CBAM readiness using our live factory data?'
+        },
+        'AGT-SAVINGS': {
+          group: 'money',
+          badge: 'MONEY SAVER AI • LIVE DEMO DATA',
+          headline: 'How to Save Cash on Your Live Demo Data',
+          dataScanned: `${recs.length} active fixes • Scenario: ${scenKey} • Tariff ৳ ${formatNum(m.effectiveTariff, 2)}/kWh • ${appliedRecs.length} applied`,
+          liveOutput: `Save ${formatBdt(liveMonthlySaveBdt)}/mo (${formatBdt(liveAnnualSaveBdt)}/yr) on current demo data with ${formatBdt(activeCapexBdt)} quoted CapEx (${paybackInfo.valid ? formatNum(paybackInfo.value, 1) + ' mo payback' : 'Insufficient data'}). ${appliedRecs.length > 0 ? formatBdt(appliedBdt) + '/mo already applied in sim.' : 'Top immediate fix: REC-01 (৳ 18,500/mo).'}`,
+          liveMonthlySaveBdt,
+          liveAnnualSaveBdt,
+          activeCapexBdt,
+          paybackInfo,
+          appliedBdt,
+          appliedCount: appliedRecs.length,
+          recs,
+          steps: [
+            `1. Calculated ${formatBdt(liveMonthlySaveBdt)}/mo (${formatBdt(liveAnnualSaveBdt)}/yr) across live telemetry & ${scenKey} scenario.`,
+            `2. Ranked REC-01 (৳ 18,500/mo) and REC-04 (৳ 15,500/mo) as fastest-payback cash wins.`,
+            `3. Marked REC-05 (BREAKER_CBX-305, ৳ 13,000/mo) as Quote Needed until CapEx is entered.`
+          ],
+          route: 'ai-recommendations',
+          routeLabel: 'All 5 Cash Fixes',
+          copilotPrompt: 'Break down the exact BDT money savings, payback months, and fastest zero-risk actions I can take right now on my live demo data.'
+        },
+        'AGT-ENERGY': {
+          group: 'companion',
+          badge: 'COMPANION AI 1/2 • SAFETY GUARD',
+          headline: 'Fault Watchdog & Hardware Interlocks',
+          whyPicked: 'Recommended pick #1: protects live production uptime and enforces human sign-off before any equipment change.',
+          dataScanned: `${openAlerts.length} open alerts • MCH-CUT-02 ${cut02 ? formatNum(cut02.tempC, 1) + '°C' : 'OK'} • MCH-SEW-03 ${sew03 ? formatNum(sew03.currentKw, 1) + ' kW' : 'OK'}`,
+          liveOutput: `${openAlerts.length} open floor alert(s). Guarding MCH-CUT-02 (${cut02 ? cut02.status + ' / ' + formatNum(cut02.tempC, 1) + '°C' : 'OK'}), MCH-SEW-03 (${sew03 ? formatNum(sew03.currentKw, 1) + ' kW' : 'OK'}), and 6.2 bar compressor floor.`,
+          steps: [
+            `1. Checked thermal (>65°C) & overload (>22 kW) limits across ${fleet.length} active units.`,
+            `2. Locked 6.2 bar pneumatic compressor minimum floor to prevent cutter stalls.`,
+            `3. Enforced Confirmation Gate so no breaker or relay mutates without manager sign-off.`
+          ],
+          route: 'factory-operations',
+          routeLabel: 'Alerts & Watchlist',
+          copilotPrompt: 'Which machine faults or safety interlocks are active right now, and what should operators check before approving fixes?'
+        },
+        'AGT-REPORT': {
+          group: 'companion',
+          badge: 'COMPANION AI 2/2 • AUDIT & CONSENSUS',
+          headline: '720h Parity & Executive Consensus',
+          whyPicked: 'Recommended pick #2: proves 720h pre/post window fairness and fuses AIs #1-#5 into audit-ready buyer & owner reports.',
+          dataScanned: `${parityCount}/${ledger.length} 720h parity • ${formatNum(m.savingsTargetPct, 0)}% of ৳ 95,000 target • DoE v2025.2`,
+          liveOutput: `Verified ${parityCount}/${ledger.length} equal 720h==720h ledger windows (${formatNum(m.savingsTargetPct, 0)}% of ৳ 95,000/mo target). All AIs aligned on SIMULATION provenance and DoE v2025.2 factors.`,
+          steps: [
+            `1. Verified equal 720-hour baseline vs post-action parity across SAV-101..105.`,
+            `2. Combined Future Roadmaps (#1-#3), Money Saver (#4), and Safety Guard (#5).`,
+            `3. Prepared CSV & print-ready buyer/executive disclosures with transparent assumptions.`
+          ],
+          route: 'sustainability-reports',
+          routeLabel: 'Audit & Exports',
+          copilotPrompt: 'Synthesize a unified 6-AI executive briefing combining our future company roadmap, live BDT savings, safety gates, and 720h audit status.'
+        }
+      };
+    }
+
     function renderAgentConsoleView(m) {
       const agents = AppState.agents || [];
+      const profiles = buildSixAgentLiveProfiles(m);
+      const bi = (m && m.businessImpact) || {};
+      const liveMonthlySaveBdt = bi.monthlySavingsBdt || m.estimatedSavingsBdt || 0;
+      const scenKey = AppState.activeScenario || 'baseline';
+      const byId = {};
+      agents.forEach(ag => { byId[ag.id] = ag; });
+
+      const futureIds = ['AGT-RECOMMEND', 'AGT-FORECAST', 'AGT-CARBON'];
+      const futureCards = futureIds.map((id, idx) => {
+        const ag = byId[id] || { id, name: id, status: 'Completed', lastRunId: 'RUN-9040', trigger: 'Live Sync', requiresApproval: false };
+        const p = profiles[id];
+        const isApproval = ag.requiresApproval && ag.status === 'Awaiting Approval';
+        const badgeClass = isApproval
+          ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300'
+          : 'bg-[#dcfce7] text-[#15803d] dark:bg-emerald-950 dark:text-emerald-300 border border-[#bbf7d0]';
+
+        return `
+          <article class="bg-white dark:bg-slate-900 rounded-[22px] p-4 sm:p-5 border-[1.5px] border-[#ccebd7] dark:border-slate-800 shadow-xs flex flex-col justify-between space-y-3 hover:border-[#16a34a] transition">
+            <div class="space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <div class="mini-orb shrink-0"><div class="mini-eye"></div><div class="mini-eye"></div></div>
+                  <div class="min-w-0">
+                    <div class="text-[9.5px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">${p.badge}</div>
+                    <h3 class="text-sm font-extrabold text-[#0f3923] dark:text-white leading-tight">${idx + 1}. ${ag.name}</h3>
+                    <div class="text-[10px] text-[#16a34a] dark:text-emerald-400 font-mono font-bold">${ag.id} • ${ag.lastRunId}</div>
+                  </div>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ${badgeClass}">${ag.status}</span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-[#f4fbf7] dark:bg-slate-800/70 border border-[#d5f0df] dark:border-slate-700/60 space-y-1 text-[10.5px]">
+                <div class="font-mono text-[10px] text-emerald-800 dark:text-emerald-300 font-bold">Data Scanned: ${p.dataScanned}</div>
+                <p class="text-slate-700 dark:text-slate-200 leading-snug">${p.liveOutput}</p>
+              </div>
+
+              <div class="space-y-1.5">
+                <div class="text-[10px] font-extrabold text-[#1b5e37] dark:text-slate-300 uppercase tracking-wide">Future Action Plan (Based on Your Data):</div>
+                ${(p.horizons || []).map(h => `
+                  <div class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/50 text-[11px] leading-snug text-slate-700 dark:text-slate-200">
+                    <span class="inline-block px-1.5 py-0.5 rounded bg-emerald-600/15 text-emerald-800 dark:text-emerald-300 font-mono font-bold text-[9.5px] mr-1">${h.tag}</span>
+                    ${h.text}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-[#e5f5ec] dark:border-slate-800 flex flex-wrap items-center gap-2">
+              <button type="button" onclick="runIndividualAgent('${ag.id}')" class="flex-1 min-w-[120px] py-2 px-3 rounded-full bg-[#eafaf0] dark:bg-slate-800 hover:bg-[#15803d] text-[#134e2c] dark:text-slate-200 hover:text-white font-extrabold text-[11px] border border-[#86efac] dark:border-slate-700 transition inline-flex items-center justify-center gap-1">
+                ${AppIcons.bolt('w-3.5 h-3.5')} <span>Run AI</span>
+              </button>
+              <button type="button" onclick="navigateTo('${p.route}')" class="py-2 px-3 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[11px] transition">
+                ${p.routeLabel}
+              </button>
+              <button type="button" onclick="askCopilotDirect('${p.copilotPrompt.replace(/'/g, "\\'")}')" class="py-2 px-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition inline-flex items-center gap-1">
+                ${AppIcons.chat('w-3 h-3')} <span>Ask</span>
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      const moneyAg = byId['AGT-SAVINGS'] || { id: 'AGT-SAVINGS', name: 'Money Saver AI (Demo Data)', status: 'Awaiting Approval', lastRunId: 'RUN-MS-9044' };
+      const moneyP = profiles['AGT-SAVINGS'];
+      const moneyCard = `
+        <article class="bg-gradient-to-br from-[#f2fcf6] via-white to-[#ecfdf3] dark:from-emerald-950/50 dark:via-slate-900 dark:to-slate-900 rounded-[22px] p-4 sm:p-5 border-2 border-emerald-500/70 dark:border-emerald-500/60 shadow-[0_12px_30px_-10px_rgba(16,185,129,0.22)] flex flex-col justify-between space-y-3">
+          <div class="space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="mini-orb shrink-0"><div class="mini-eye"></div><div class="mini-eye"></div></div>
+                <div class="min-w-0">
+                  <div class="text-[9.5px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">${moneyP.badge}</div>
+                  <h3 class="text-sm font-extrabold text-[#0f3923] dark:text-white leading-tight">4. ${moneyAg.name}</h3>
+                  <div class="text-[10px] text-[#16a34a] dark:text-emerald-400 font-mono font-bold">${moneyAg.id} • ${moneyAg.lastRunId}</div>
+                </div>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 bg-emerald-600 text-white">${formatBdt(moneyP.liveMonthlySaveBdt)}/mo</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+              <div class="p-2 rounded-xl bg-emerald-600/10 dark:bg-emerald-950/70 border border-emerald-500/30">
+                <div class="text-[9.5px] font-bold uppercase text-emerald-800 dark:text-emerald-300">Monthly Save</div>
+                <div class="text-xs sm:text-sm font-extrabold text-emerald-700 dark:text-emerald-300 font-mono">${formatBdt(moneyP.liveMonthlySaveBdt)}</div>
+              </div>
+              <div class="p-2 rounded-xl bg-white dark:bg-slate-800/70 border border-emerald-500/25">
+                <div class="text-[9.5px] font-bold uppercase text-slate-500 dark:text-slate-400">12-Mo Retained</div>
+                <div class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white font-mono">${formatBdt(moneyP.liveAnnualSaveBdt)}</div>
+              </div>
+              <div class="p-2 rounded-xl bg-white dark:bg-slate-800/70 border border-emerald-500/25">
+                <div class="text-[9.5px] font-bold uppercase text-slate-500 dark:text-slate-400">Payback</div>
+                <div class="text-xs sm:text-sm font-extrabold text-indigo-700 dark:text-indigo-300 font-mono">${moneyP.paybackInfo.valid ? formatNum(moneyP.paybackInfo.value, 1) + ' mo' : 'Need Quote'}</div>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-[10px] font-extrabold text-[#1b5e37] dark:text-slate-300 uppercase">
+                <span>Itemized Demo-Data Savings (${scenKey})</span>
+                <span class="font-mono text-emerald-700 dark:text-emerald-400">${moneyP.appliedCount}/${(moneyP.recs || []).length} Applied</span>
+              </div>
+              <div class="space-y-1.5">
+                ${(moneyP.recs || []).map(r => {
+                  const pb = calcPaybackMonths(r.implementationCostBdt, r.estSavedBdt);
+                  const isApplied = r.status === 'Applied in simulation' || r.status === 'Done';
+                  return `
+                    <div class="p-2 rounded-xl bg-white/90 dark:bg-slate-800/70 border border-[#d5f0df] dark:border-slate-700/70 flex items-center justify-between gap-2 text-[10.5px]">
+                      <div class="min-w-0">
+                        <div class="font-bold text-slate-800 dark:text-white leading-tight">${r.id}: ${r.machineId}</div>
+                        <div class="text-[10px] text-slate-500 dark:text-slate-400">${pb.valid ? formatNum(pb.value, 1) + ' mo payback' : 'CapEx quote needed'} • ${isApplied ? 'Applied in Sim' : r.status}</div>
+                      </div>
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <span class="font-mono font-extrabold text-emerald-700 dark:text-emerald-300">${formatBdt(r.estSavedBdt)}</span>
+                        ${!isApplied && typeof r.implementationCostBdt === 'number'
+                          ? `<button type="button" onclick="applyRecommendationInSimulation('${r.id}')" class="px-2 py-0.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-[9.5px] font-extrabold transition">Gate</button>`
+                          : `<span class="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[9.5px] font-bold">${isApplied ? 'Done' : 'Quote'}</span>`}
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-emerald-500/20 flex flex-wrap items-center gap-2">
+            <button type="button" onclick="runIndividualAgent('${moneyAg.id}')" class="py-2 px-3 rounded-full bg-[#15803d] hover:bg-[#166534] text-white font-extrabold text-[11px] transition inline-flex items-center gap-1">
+              ${AppIcons.money('w-3.5 h-3.5')} <span>Run Money Scan</span>
+            </button>
+            <button type="button" onclick="selectDashboardScenario('night_idle')" class="py-2 px-3 rounded-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 dark:text-amber-300 border border-amber-500/35 font-extrabold text-[11px] transition">
+              Test Night Waste Gate
+            </button>
+            <button type="button" onclick="navigateTo('${moneyP.route}')" class="py-2 px-3 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[11px] transition">
+              ${moneyP.routeLabel}
+            </button>
+          </div>
+        </article>
+      `;
+
+      const companionIds = ['AGT-ENERGY', 'AGT-REPORT'];
+      const companionCards = companionIds.map((id, cIdx) => {
+        const ag = byId[id] || { id, name: id, status: 'Completed', lastRunId: 'RUN-9045', trigger: 'Live Sync' };
+        const p = profiles[id];
+        return `
+          <article class="bg-white dark:bg-slate-900 rounded-[22px] p-4 sm:p-5 border-[1.5px] border-[#ccebd7] dark:border-slate-800 shadow-xs flex flex-col justify-between space-y-3 hover:border-[#16a34a] transition">
+            <div class="space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <div class="mini-orb shrink-0"><div class="mini-eye"></div><div class="mini-eye"></div></div>
+                  <div class="min-w-0">
+                    <div class="text-[9.5px] font-extrabold uppercase tracking-wider text-teal-700 dark:text-teal-400">${p.badge}</div>
+                    <h3 class="text-sm font-extrabold text-[#0f3923] dark:text-white leading-tight">${cIdx + 5}. ${ag.name}</h3>
+                    <div class="text-[10px] text-[#16a34a] dark:text-emerald-400 font-mono font-bold">${ag.id} • ${ag.lastRunId}</div>
+                  </div>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 bg-[#dcfce7] text-[#15803d] dark:bg-emerald-950 dark:text-emerald-300 border border-[#bbf7d0]">${ag.status}</span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-teal-500/8 dark:bg-teal-950/30 border border-teal-500/25 text-[10.5px] text-teal-900 dark:text-teal-200 leading-snug">
+                <strong>Why This AI Matters:</strong> ${p.whyPicked}
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-[#f4fbf7] dark:bg-slate-800/60 border border-[#d5f0df] dark:border-slate-700/60 space-y-1 text-[10.5px]">
+                <div class="font-mono text-[10px] text-emerald-800 dark:text-emerald-300 font-bold">${p.dataScanned}</div>
+                <p class="text-slate-700 dark:text-slate-300 leading-snug">${p.liveOutput}</p>
+              </div>
+
+              <div class="pt-1">
+                <div class="text-[10px] font-extrabold text-[#1b5e37] dark:text-slate-400 uppercase mb-1">Active Checks &amp; Output:</div>
+                <ul class="text-[11px] text-slate-600 dark:text-slate-300 space-y-1 list-disc pl-4 leading-snug">
+                  ${(p.steps || []).map(st => `<li>${st}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-[#e5f5ec] dark:border-slate-800 flex flex-wrap items-center gap-2">
+              <button type="button" onclick="runIndividualAgent('${ag.id}')" class="flex-1 min-w-[115px] py-2 px-3 rounded-full bg-[#eafaf0] dark:bg-slate-800 hover:bg-[#15803d] text-[#134e2c] dark:text-slate-200 hover:text-white font-extrabold text-[11px] border border-[#86efac] dark:border-slate-700 transition inline-flex items-center justify-center gap-1">
+                ${AppIcons.shield('w-3.5 h-3.5')} <span>Run AI</span>
+              </button>
+              <button type="button" onclick="navigateTo('${p.route}')" class="py-2 px-3 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[11px] transition">
+                ${p.routeLabel}
+              </button>
+              <button type="button" onclick="askCopilotDirect('${p.copilotPrompt.replace(/'/g, "\\'")}')" class="py-2 px-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition inline-flex items-center gap-1">
+                ${AppIcons.chat('w-3 h-3')} <span>Ask</span>
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
 
       return `
         <div class="space-y-5">
-          <!-- Top Mint-Emerald Live Agent Orchestrator Card (Matches Reference Video & Image) -->
+          <!-- Top Mint-Emerald Live Agent Orchestrator Card -->
           <div class="rounded-[26px] border-[1.5px] border-[#b9e6c9] dark:border-emerald-500/40 bg-[#f4fbf7] dark:bg-slate-900 shadow-[0_14px_40px_-12px_rgba(22,163,74,0.16)] overflow-hidden">
             <div class="px-5 py-3.5 bg-[#eafaf0] dark:bg-emerald-950/80 border-b border-[#cdecd8] dark:border-emerald-500/25 flex flex-wrap items-center justify-between gap-3">
               <div class="flex items-center gap-2.5">
                 <span class="text-[17px] font-extrabold text-[#134e2c] dark:text-white tracking-tight">AI Agent Console &amp; Live Orchestrator</span>
                 ${renderDataBadge('ORCHESTRATOR')}
               </div>
-              <div class="flex items-center gap-3">
+              <div class="flex flex-wrap items-center gap-2.5">
                 <div class="flex items-center gap-1.5"><span class="status-dot"></span><span class="status-dot"></span><span class="status-dot"></span></div>
                 <span class="text-[11px] font-extrabold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-[#dcfce7] dark:bg-emerald-900 text-[#15803d] dark:text-emerald-300 border border-[#bbf7d0] dark:border-emerald-500/40">LIVE AGENT • 6 AGENTS</span>
                 <button type="button" onclick="runFullAgentWorkflow()" class="px-4 py-1.5 rounded-full bg-[#15803d] hover:bg-[#166534] text-white text-xs font-extrabold shadow-xs transition flex items-center gap-1.5">
@@ -10243,14 +10616,14 @@
 
             <div class="px-5 py-2 bg-[#effaf3] dark:bg-slate-950/80 border-b border-[#d5f0df] dark:border-emerald-500/20 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-[#1b5e37] dark:text-emerald-400">
               <div class="flex items-center gap-2">
-                <span class="text-emerald-500"><svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></svg></span>
-                <span>Bi-Directional Sync Active Across 18 Machines, Energy (${formatNum(m.totalPeriodKwh)} kWh), Bill (${formatBdt(m.currentBillBdt)}) &amp; CarbonIQ (${formatNum(m.totalCarbonTons, 2)} tCO₂e)</span>
+                <span class="text-emerald-500">${AppIcons.telemetry('w-4 h-4')}</span>
+                <span>Overall Company Snapshot: ${(AppState.fleet || []).length} Machines (${formatNum(m.totalCurrentKw, 1)} kW) • ${formatNum(m.totalPeriodKwh)} kWh • Bill ${formatBdt(m.currentBillBdt)} • ${formatNum(m.totalCarbonTons, 2)} tCO₂e</span>
               </div>
-              <span class="font-mono text-[11px] text-[#15803d] dark:text-emerald-300">Llama-3.3-70B / Gemini 2.5 Flash + Deterministic Rules</span>
+              <span class="font-mono text-[11px] text-[#15803d] dark:text-emerald-300">3 Future Advisors + 1 Demo Money Saver + 2 Safety &amp; Audit AIs</span>
             </div>
 
-            <div class="p-5 bg-white dark:bg-slate-900 flex flex-col lg:flex-row items-center justify-between gap-6">
-              <div class="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+            <div class="p-5 bg-white dark:bg-slate-900 flex flex-col 2xl:flex-row items-stretch 2xl:items-center justify-between gap-5">
+              <div class="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left min-w-0 flex-1">
                 <div class="orb-wrapper shrink-0" onclick="askCopilotDirect('Run all 6 simulation agents and provide a consensus report.')">
                   <div class="orb-glow"></div>
                   <div class="orb-sphere">
@@ -10258,82 +10631,91 @@
                     <div class="orb-eye"></div>
                   </div>
                 </div>
-                <div>
+                <div class="min-w-0 flex-1">
                   <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
-                    <h2 class="text-lg font-extrabold text-[#0f3923] dark:text-white">Copilot+ Multi-Agent Brain</h2>
+                    <h2 class="text-lg font-extrabold text-[#0f3923] dark:text-white">Copilot+ 6-AI Factory Board</h2>
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#dcfce7] text-[#15803d] border border-[#bbf7d0] uppercase">REAL-TIME TELEMETRY</span>
                   </div>
-                  <p class="text-xs text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-                    6 specialized simulation agents continuously execute the closed-loop <strong>Detect &rarr; Explain &rarr; Recommend &rarr; Act &rarr; Verify</strong> cycle across Rupsha Garments Ltd. (Seed #${AppState.simSeed}).
+                  <p class="text-xs text-slate-600 dark:text-slate-300 max-w-3xl leading-relaxed">
+                    <strong>3 Future Company Advisors</strong> analyze your overall factory telemetry to guide 30/90/180-day upgrades, <strong>1 Money Saver AI</strong> calculates exact BDT cash savings on live demo data, and <strong>2 Companion AIs</strong> enforce safety interlocks and 720h audit parity.
                   </p>
                   <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-3">
-                    <button type="button" onclick="askCopilotDirect('Run all 6 simulation agents and provide a consensus report.')" class="px-3 py-1 rounded-full border border-[#ccebd7] bg-[#f1faf4] hover:bg-[#dcfce7] text-xs font-bold text-[#14532d] transition">Quick-suggest · Consensus Audit</button>
-                    <button type="button" onclick="askCopilotDirect('Build a night-shift energy waste reduction and ৳ 68,000/mo savings plan')" class="px-3 py-1 rounded-full border border-[#ccebd7] bg-[#f1faf4] hover:bg-[#dcfce7] text-xs font-bold text-[#14532d] transition"><span class="inline-flex items-center gap-1.5"><span class="text-emerald-600">${AppIcons.target('w-3.5 h-3.5')}</span> 4-Mo Savings Plan</span></button>
+                    <button type="button" onclick="askCopilotDirect('Give me a unified 30/90/180-day company improvement plan and tell me how to save money on my live demo data.')" class="px-3 py-1 rounded-full border border-[#ccebd7] bg-[#f1faf4] hover:bg-[#dcfce7] text-xs font-bold text-[#14532d] transition">Future Growth + Cash Plan</button>
+                    <button type="button" onclick="askCopilotDirect('Run all 6 simulation agents and provide a consensus report.')" class="px-3 py-1 rounded-full border border-[#ccebd7] bg-[#f1faf4] hover:bg-[#dcfce7] text-xs font-bold text-[#14532d] transition"><span class="inline-flex items-center gap-1.5"><span class="text-emerald-600">${AppIcons.target('w-3.5 h-3.5')}</span> 6-AI Consensus</span></button>
                     <button type="button" onclick="toggleCopilotDrawer(true)" class="px-3 py-1 rounded-full bg-[#15803d] hover:bg-[#166534] text-xs font-bold text-white transition"><span class="inline-flex items-center gap-1.5">${AppIcons.chat('w-3.5 h-3.5 text-white')} Open Copilot Chat</span></button>
                   </div>
                 </div>
               </div>
 
-              <div class="grid grid-cols-2 gap-2.5 w-full lg:w-72 shrink-0">
+              <div class="grid grid-cols-2 gap-2.5 w-full 2xl:w-80 shrink-0">
                 <div class="p-3 rounded-2xl bg-[#f1faf4] dark:bg-slate-800 border border-[#ccebd7] dark:border-emerald-500/30">
-                  <div class="text-[10px] font-bold uppercase text-[#1b5e37] dark:text-slate-400">Active Agents</div>
-                  <div class="text-base font-extrabold text-[#0f3923] dark:text-emerald-400 font-mono">6 / 6 LIVE</div>
+                  <div class="text-[10px] font-bold uppercase text-[#1b5e37] dark:text-slate-400">Overall Uptime / Score</div>
+                  <div class="text-base font-extrabold text-[#0f3923] dark:text-emerald-400 font-mono">${formatNum(m.availabilityPct, 1)}% • ${formatNum(m.sustainabilityScore, 0)}/100</div>
                 </div>
                 <div class="p-3 rounded-2xl bg-[#f1faf4] dark:bg-slate-800 border border-[#ccebd7] dark:border-emerald-500/30">
-                  <div class="text-[10px] font-bold uppercase text-[#1b5e37] dark:text-slate-400">Avoidable Waste</div>
-                  <div class="text-base font-extrabold text-[#15803d] dark:text-emerald-400 font-mono">${formatBdt(m.estimatedSavingsBdt)}/mo</div>
+                  <div class="text-[10px] font-bold uppercase text-[#1b5e37] dark:text-slate-400">Demo Cash Recoverable</div>
+                  <div class="text-base font-extrabold text-[#15803d] dark:text-emerald-400 font-mono">${formatBdt(liveMonthlySaveBdt)}/mo</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- 6 Agent Cards Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            ${agents.map((ag, idx) => {
-              const isApproval = ag.requiresApproval && ag.status === 'Awaiting Approval';
-              const badgeClass = isApproval
-                ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300'
-                : 'bg-[#dcfce7] text-[#15803d] dark:bg-emerald-950 dark:text-emerald-300 border border-[#bbf7d0]';
-
-              return `
-                <div class="bg-white dark:bg-slate-900 rounded-[22px] p-4 sm:p-5 border-[1.5px] border-[#ccebd7] dark:border-slate-800 shadow-xs flex flex-col justify-between space-y-3 hover:border-[#16a34a] transition">
-                  <div>
-                    <div class="flex items-start justify-between gap-2 mb-2.5">
-                      <div class="flex items-center gap-2.5">
-                        <div class="mini-orb"><div class="mini-eye"></div><div class="mini-eye"></div></div>
-                        <div>
-                          <h3 class="text-xs font-extrabold text-[#0f3923] dark:text-white leading-tight">${idx + 1}. ${ag.name}</h3>
-                          <div class="text-[10px] text-[#16a34a] dark:text-emerald-400 font-mono font-bold">${ag.id}</div>
-                        </div>
-                      </div>
-                      <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shrink-0 ${badgeClass}">${ag.status}</span>
-                    </div>
-
-                    <p class="text-[11.5px] text-slate-600 dark:text-slate-300 leading-snug mb-2.5">${ag.purpose}</p>
-
-                    <div class="p-2.5 rounded-xl bg-[#f4fbf7] dark:bg-slate-800/60 border border-[#d5f0df] dark:border-slate-700/60 space-y-1 text-[10px] font-mono">
-                      <div><span class="text-slate-400">Trigger:</span> <span class="text-slate-700 dark:text-slate-300">${ag.trigger}</span></div>
-                      <div><span class="text-slate-400">Run ID:</span> <span class="text-[#15803d] dark:text-emerald-400 font-bold">${ag.lastRunId}</span></div>
-                      <div class="truncate"><span class="text-slate-400">Output:</span> <span class="text-slate-700 dark:text-slate-300">${ag.outputSummary}</span></div>
-                    </div>
-                  </div>
-
-                  <!-- Steps List -->
-                  <div class="pt-2 border-t border-[#e5f5ec] dark:border-slate-800">
-                    <div class="text-[10px] font-extrabold text-[#1b5e37] dark:text-slate-400 uppercase mb-1">Reasoning &amp; Execution Steps:</div>
-                    <ul class="text-[10.5px] text-slate-600 dark:text-slate-400 space-y-0.5 list-disc pl-3.5">
-                      ${(ag.steps || []).slice(0, 3).map(st => `<li class="truncate">${st}</li>`).join('')}
-                    </ul>
-                  </div>
-
-                  <!-- Action -->
-                  <button type="button" onclick="runIndividualAgent('${ag.id}')" class="w-full py-2 rounded-full bg-[#eafaf0] dark:bg-slate-800 hover:bg-[#15803d] text-[#134e2c] dark:text-slate-200 hover:text-white font-extrabold text-xs border border-[#86efac] dark:border-slate-700 transition">
-                    Run ${ag.name} Individually <span class="text-amber-400 inline-block align-middle ml-1">${AppIcons.bolt('w-3.5 h-3.5 inline-block')}</span>
-                  </button>
-                </div>
-              `;
-            }).join('')}
+          <!-- Overall Company Data Bar -->
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr)); gap: 0.75rem;">
+            <div class="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-[#ccebd7] dark:border-slate-800">
+              <div class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">Live Fleet Power</div>
+              <div class="text-sm font-extrabold font-mono text-slate-900 dark:text-white mt-0.5">${formatNum(m.totalCurrentKw, 1)} kW</div>
+            </div>
+            <div class="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-[#ccebd7] dark:border-slate-800">
+              <div class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">Monthly Usage</div>
+              <div class="text-sm font-extrabold font-mono text-slate-900 dark:text-white mt-0.5">${formatNum(m.totalPeriodKwh)} kWh</div>
+            </div>
+            <div class="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-[#ccebd7] dark:border-slate-800">
+              <div class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">Monthly Bill</div>
+              <div class="text-sm font-extrabold font-mono text-slate-900 dark:text-white mt-0.5">${formatBdt(m.currentBillBdt)}</div>
+            </div>
+            <div class="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-[#ccebd7] dark:border-slate-800">
+              <div class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">Scope 1 + 2 Carbon</div>
+              <div class="text-sm font-extrabold font-mono text-slate-900 dark:text-white mt-0.5">${formatNum(m.totalCarbonTons, 2)} tCO₂e</div>
+            </div>
+            <div class="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-[#ccebd7] dark:border-slate-800">
+              <div class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">Monthly Output</div>
+              <div class="text-sm font-extrabold font-mono text-slate-900 dark:text-white mt-0.5">${formatNum(m.totalOutputPcs)} pcs</div>
+            </div>
+            <div class="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700/60">
+              <div class="text-[10px] font-bold uppercase text-emerald-700 dark:text-emerald-300">Active Scenario</div>
+              <div class="text-sm font-extrabold font-mono text-emerald-800 dark:text-emerald-200 mt-0.5 truncate">${scenKey}</div>
+            </div>
           </div>
+
+          <!-- Group 1: 3 AI Future Company Improvement Advisors -->
+          <section class="space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-600/15 text-emerald-800 dark:text-emerald-300 text-[10.5px] font-extrabold uppercase tracking-wider">Group A • 3 Future Improvement Advisors</span>
+                <h3 class="text-sm font-extrabold text-[#0f3923] dark:text-white">What Your Company Should Do Next (Overall Data &rarr; 30/90/180-Day Plan)</h3>
+              </div>
+              <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Machines • Energy &amp; Solar • Carbon &amp; EU Buyers</span>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 285px), 1fr)); gap: 1rem;">
+              ${futureCards}
+            </div>
+          </section>
+
+          <!-- Group 2: 1 Live Demo-Data Money Saver + 2 Safety & Audit Companions -->
+          <section class="space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-300 text-[10.5px] font-extrabold uppercase tracking-wider">Group B • 1 Money-Saver AI + 2 Safety &amp; Audit Companions</span>
+                <h3 class="text-sm font-extrabold text-[#0f3923] dark:text-white">How to Save Money on Live Demo Data &amp; Guard Factory Safety</h3>
+              </div>
+              <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">All equipment changes require Manager Confirmation Gate</span>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 285px), 1fr)); gap: 1rem;">
+              ${moneyCard}
+              ${companionCards}
+            </div>
+          </section>
         </div>
       `;
     }

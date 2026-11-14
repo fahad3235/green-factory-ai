@@ -90,7 +90,7 @@ def synthesize_telemetry_fallback(req: CopilotChatRequest) -> str:
     scenario = str(t.get("activeScenario", "baseline"))
     total_kwh = t.get("totalPeriodKwh", 52300)
     total_kw = t.get("totalCurrentKw", 142.3)
-    bill_bdt = t.get("currentBillBdt", 648750)
+    bill_bdt = t.get("currentBillBdt", 648520)
     tariff = t.get("effectiveTariffBdtPerKwh", 12.40)
     total_co2 = t.get("totalCarbonTons", 34.20)
     assets = t.get("keyAssets", {}) or {}

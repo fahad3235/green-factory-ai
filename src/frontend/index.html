@@ -206,6 +206,20 @@
         scroll-behavior: auto !important;
       }
     }
+    @keyframes epmsBusFlow {
+      to { stroke-dashoffset: -28; }
+    }
+    .epms-bus-energized {
+      stroke-dasharray: 8 6;
+      animation: epmsBusFlow 1.25s linear infinite;
+    }
+    @keyframes epmsNodePulse {
+      0%, 100% { opacity: 0.96; }
+      50% { opacity: 0.55; }
+    }
+    .epms-node-pulse {
+      animation: epmsNodePulse 2.2s ease-in-out infinite;
+    }
     :focus-visible {
       outline: 2px solid #0284C7;
       outline-offset: 2px;
@@ -1807,6 +1821,34 @@
       simTickCount: 0,
       activeScenario: 'baseline',
       lastUpdateTimestamp: '2026-10-18 05:04:19 BST',
+
+      // Live Digital Twin & Simulation Sync Telemetry Cache
+      epmsTelemetry: {
+        activePowerKw: 1910.0,
+        apparentPowerKva: 2076.0,
+        powerFactor: 0.92,
+        voltageV: 400.4,
+        frequencyHz: 50.0,
+        thdPct: 2.8,
+        carbonKgHr: 1069.6,
+        scenario: 'baseline',
+        selectedAsset: 'BREAKER_CB8-300',
+        liveConnected: false,
+        lastUpdated: 'Seed #20261018'
+      },
+      simSyncMeta: {
+        lastSyncAt: 'Sync Ready',
+        liveConnected: false,
+        totalFactoryKw: 124.5,
+        solarOffsetKw: 0.0,
+        netGridKw: 124.5,
+        liveCarbonKgHr: 69.72,
+        tariff: 12.40,
+        outage: false,
+        wasteActive: false,
+        surgeActive: false,
+        faults: []
+      },
 
       // Current Operator Session (Strictly Restricted to Factory Manager & Factory Owner)
       isLoggedIn: false,
@@ -4981,19 +5023,574 @@
     // ----------------------------------------------------------------------------
     // VIEW 10: 3D MACHINE DIGITAL TWIN (EPMS) (Matches Reference Image 3 + Section 16)
     // ----------------------------------------------------------------------------
+    function getEpmsScenarioMeta(scenarioKey) {
+      const key = String(scenarioKey || 'baseline').toLowerCase();
+      const map = {
+        baseline: { slug: 'baseline', appKey: 'baseline', label: 'Baseline', mult: 1.00, pf: 0.92, thd: 2.8, volt: 400.4, tone: 'emerald' },
+        normal: { slug: 'baseline', appKey: 'baseline', label: 'Baseline', mult: 1.00, pf: 0.92, thd: 2.8, volt: 400.4, tone: 'emerald' },
+        night_waste: { slug: 'night_waste', appKey: 'night_idle', label: 'Night Waste', mult: 1.14, pf: 0.89, thd: 3.4, volt: 397.8, tone: 'amber' },
+        night_idle: { slug: 'night_waste', appKey: 'night_idle', label: 'Night Waste', mult: 1.14, pf: 0.89, thd: 3.4, volt: 397.8, tone: 'amber' },
+        waste: { slug: 'night_waste', appKey: 'night_idle', label: 'Night Waste', mult: 1.14, pf: 0.89, thd: 3.4, volt: 397.8, tone: 'amber' },
+        peak_tariff: { slug: 'peak_tariff', appKey: 'peak_grid', label: 'Peak Tariff', mult: 1.09, pf: 0.90, thd: 3.1, volt: 396.5, tone: 'rose' },
+        peak_grid: { slug: 'peak_tariff', appKey: 'peak_grid', label: 'Peak Tariff', mult: 1.09, pf: 0.90, thd: 3.1, volt: 396.5, tone: 'rose' },
+        tariff: { slug: 'peak_tariff', appKey: 'peak_grid', label: 'Peak Tariff', mult: 1.09, pf: 0.90, thd: 3.1, volt: 396.5, tone: 'rose' },
+        comp_leak: { slug: 'comp_leak', appKey: 'compressor_leak', label: 'Comp Leak', mult: 1.11, pf: 0.87, thd: 4.2, volt: 395.2, tone: 'amber' },
+        compressor_leak: { slug: 'comp_leak', appKey: 'compressor_leak', label: 'Comp Leak', mult: 1.11, pf: 0.87, thd: 4.2, volt: 395.2, tone: 'amber' },
+        breakdown: { slug: 'comp_leak', appKey: 'compressor_leak', label: 'Comp Leak', mult: 1.11, pf: 0.87, thd: 4.2, volt: 395.2, tone: 'amber' },
+        solar_surge: { slug: 'solar_surge', appKey: 'solar_surge', label: 'Solar Surge', mult: 0.80, pf: 0.95, thd: 2.2, volt: 401.8, tone: 'emerald' },
+        solar: { slug: 'solar_surge', appKey: 'solar_surge', label: 'Solar Surge', mult: 0.80, pf: 0.95, thd: 2.2, volt: 401.8, tone: 'emerald' },
+        outage: { slug: 'outage', appKey: 'grid_outage', label: 'Grid Outage', mult: 0.72, pf: 0.90, thd: 3.6, volt: 394.0, tone: 'rose' },
+        grid_outage: { slug: 'outage', appKey: 'grid_outage', label: 'Grid Outage', mult: 0.72, pf: 0.90, thd: 3.6, volt: 394.0, tone: 'rose' },
+        trip: { slug: 'trip', appKey: 'machine_overload', label: 'Breaker Trip', mult: 0.65, pf: 0.88, thd: 4.5, volt: 392.5, tone: 'rose' },
+        storm: { slug: 'storm', appKey: 'peak_grid', label: 'Grid Storm', mult: 1.06, pf: 0.89, thd: 3.3, volt: 395.8, tone: 'amber' }
+      };
+      return map[key] || { slug: 'baseline', appKey: 'baseline', label: 'Baseline', mult: 1.00, pf: 0.92, thd: 2.8, volt: 400.4, tone: 'emerald' };
+    }
+
+    function getEpmsTelemetrySnapshot(m) {
+      const t = (AppState && AppState.epmsTelemetry) || {};
+      const sc = getEpmsScenarioMeta(t.scenario || (AppState && AppState.activeScenario) || 'baseline');
+      const ef = (AppState && AppState.assumptions && AppState.assumptions.gridEmissionFactorKgPerKwh) || 0.560;
+      const baseKw = t.liveConnected && typeof t.activePowerKw === 'number'
+        ? t.activePowerKw
+        : Math.round(1910 * sc.mult);
+      const pf = t.liveConnected && typeof t.powerFactor === 'number' ? t.powerFactor : sc.pf;
+      const volt = t.liveConnected && typeof t.voltageV === 'number' ? t.voltageV : sc.volt;
+      const thd = t.liveConnected && typeof t.thdPct === 'number' ? t.thdPct : sc.thd;
+      const freq = typeof t.frequencyHz === 'number' ? t.frequencyHz : 50.0;
+      const kva = t.liveConnected && typeof t.apparentPowerKva === 'number'
+        ? t.apparentPowerKva
+        : Math.round(baseKw / Math.max(0.7, pf));
+      const carbonKgHr = Number((baseKw * ef).toFixed(1));
+      const selectedAsset = t.selectedAsset || (AppState && AppState.selectedMachineId) || 'BREAKER_CB8-300';
+      const fleetKw = (m && typeof m.totalCurrentKw === 'number') ? m.totalCurrentKw : 124.5;
+      return {
+        activePowerKw: baseKw,
+        apparentPowerKva: kva,
+        powerFactor: Number(pf.toFixed(2)),
+        voltageV: Number(volt.toFixed(1)),
+        thdPct: Number(thd.toFixed(1)),
+        frequencyHz: Number(freq.toFixed(2)),
+        carbonKgHr,
+        ef,
+        fleetKw,
+        scenario: sc,
+        selectedAsset,
+        liveConnected: !!t.liveConnected
+      };
+    }
+
+    function getEpmsFeederNodes(m, snap) {
+      const fleet = (AppState && Array.isArray(AppState.fleet)) ? AppState.fleet : [];
+      const findUnit = id => fleet.find(u => u.id === id);
+      const scSlug = snap.scenario.slug;
+      const calcAmps = (kw, pf) => Math.round((kw * 1000) / (Math.sqrt(3) * (snap.voltageV || 400) * Math.max(0.7, pf || 0.92)));
+      const ef = snap.ef || 0.560;
+
+      const uSew3 = findUnit('MCH-SEW-03');
+      const uCut2 = findUnit('MCH-CUT-02');
+      const uComp = findUnit('COMP-01');
+      const uBoil = findUnit('BOIL-01');
+      const uLgt = findUnit('LGT-ZN-01');
+
+      const sewKw = scSlug === 'night_waste' ? 68.4 : Number(((uSew3 ? uSew3.currentKw : 5.4) + 46.6 * snap.scenario.mult).toFixed(1));
+      const cutKw = scSlug === 'comp_leak' ? 35.8 : Number(((uCut2 ? uCut2.currentKw : 18.2) + 16.0 * snap.scenario.mult).toFixed(1));
+      const compKw = scSlug === 'comp_leak' ? 34.2 : Number((uComp ? uComp.currentKw : 16.8).toFixed(1));
+      const boilKw = Number((uBoil ? uBoil.currentKw : 28.0).toFixed(1));
+      const bessKw = scSlug === 'solar_surge' ? -320.0 : (scSlug === 'peak_tariff' ? -185.0 : 12.0);
+      const lgtKw = scSlug === 'night_waste' ? 24.6 : Number((uLgt ? uLgt.currentKw : 18.0).toFixed(1));
+
+      const rawNodes = [
+        {
+          id: 'BREAKER_CB8-300',
+          alias: 'BREAKER_CBX-305',
+          title: 'Substation CBX (CB8-300)',
+          shortName: 'CBX-305 / CB8-300',
+          feeder: 'HV/LV Main Incomer · 11kV/400V Bus',
+          cbCode: 'ACB-MAIN',
+          breakerState: scSlug === 'peak_tariff' ? 'PEAK LIMIT' : 'CLOSED',
+          statusTone: scSlug === 'peak_tariff' ? 'amber' : 'emerald',
+          kw: snap.activePowerKw,
+          pf: snap.powerFactor,
+          thd: snap.thdPct,
+          tempC: scSlug === 'peak_tariff' ? 54.6 : 44.2,
+          detail: 'Main 2,500 kVA Oil-Cooled Transformer Incomer & Modbus TCP NCP-01'
+        },
+        {
+          id: 'MCH-SEW-03',
+          alias: 'MCH-SEW-01',
+          title: 'Sewing Floor MCH-SEW-03',
+          shortName: 'Hall A: Sewing',
+          feeder: 'Feeder F1 · DB-SEW-01 (Lines 1-6)',
+          cbCode: 'MCCB-F1',
+          breakerState: scSlug === 'night_waste' ? 'IDLE WASTE' : 'CLOSED',
+          statusTone: scSlug === 'night_waste' ? 'amber' : 'emerald',
+          kw: sewKw,
+          pf: scSlug === 'night_waste' ? 0.84 : 0.93,
+          thd: scSlug === 'night_waste' ? 3.9 : 2.6,
+          tempC: uSew3 ? uSew3.tempC : 41.2,
+          detail: 'Juki DDL-9000C & Overlock lines with automated standby cutoff relay'
+        },
+        {
+          id: 'MCH-CUT-02',
+          alias: 'MCH-CUT-01',
+          title: 'Cutting MCH-CUT-02',
+          shortName: 'Hall C: Cutting',
+          feeder: 'Feeder F2 · DB-CUT-01 (Auto-Spread)',
+          cbCode: 'MCCB-F2',
+          breakerState: (uCut2 && uCut2.status === 'Fault') ? 'THERMAL TRIP' : 'CLOSED',
+          statusTone: (uCut2 && uCut2.status === 'Fault') ? 'rose' : 'emerald',
+          kw: cutKw,
+          pf: 0.91,
+          thd: 3.1,
+          tempC: uCut2 ? uCut2.tempC : 52.0,
+          detail: 'Lectra Gerber CNC Cutter & Vacuum Bed Suction Unit'
+        },
+        {
+          id: 'COMP-01',
+          alias: 'NCP_01',
+          title: 'Compressor COMP-01',
+          shortName: 'Utility Comp',
+          feeder: 'Feeder F3 · DB-UTL-01 (7.2 bar Ring)',
+          cbCode: 'MCCB-F3',
+          breakerState: (scSlug === 'comp_leak' || (uComp && uComp.status === 'Fault')) ? 'LEAK ALARM' : 'CLOSED',
+          statusTone: (scSlug === 'comp_leak' || (uComp && uComp.status === 'Fault')) ? 'rose' : 'sky',
+          kw: compKw,
+          pf: (scSlug === 'comp_leak') ? 0.85 : 0.89,
+          thd: (scSlug === 'comp_leak') ? 4.4 : 3.5,
+          tempC: (scSlug === 'comp_leak') ? 74.5 : (uComp ? uComp.tempC : 56.0),
+          detail: 'Atlas Copco VSD Screw Air Compressor feeding pneumatic cutter header'
+        },
+        {
+          id: 'BOIL-01',
+          alias: 'BOIL-01',
+          title: 'Utilities Boiler BOIL-01',
+          shortName: 'Steam Boiler',
+          feeder: 'Feeder F4 · DB-STM-01 (Finishing)',
+          cbCode: 'MCCB-F4',
+          breakerState: 'CLOSED',
+          statusTone: 'emerald',
+          kw: boilKw,
+          pf: 0.95,
+          thd: 2.1,
+          tempC: uBoil ? uBoil.tempC : 64.0,
+          detail: 'Steam & Press Ironing Manifold Heat Recovery Loop'
+        },
+        {
+          id: 'BESS_01',
+          alias: 'BESS_01',
+          title: 'BESS-01 & Solar Array',
+          shortName: 'BESS + Solar',
+          feeder: 'Bidirectional Tie CB · 320 kWp PV / 1.2 MWh',
+          cbCode: 'TIE-BESS',
+          breakerState: bessKw < 0 ? 'DISCHARGING' : 'FLOAT READY',
+          statusTone: 'emerald',
+          kw: Math.abs(bessKw),
+          signedKw: bessKw,
+          pf: 0.99,
+          thd: 1.8,
+          tempC: 31.4,
+          detail: scSlug === 'solar_surge' ? 'Rooftop PV + BESS-01 offsetting -320 kW peak grid draw' : 'BESS-01 SOC 88% • Standby peak-shaving & ATS ride-through'
+        },
+        {
+          id: 'LGT-ZN-01',
+          alias: 'MCH-FIN-01',
+          title: 'Lighting & HVAC Zone 1',
+          shortName: 'Lighting Zone',
+          feeder: 'Feeder F6 · DB-LGT-01 (LED + Chiller)',
+          cbCode: 'MCCB-F6',
+          breakerState: scSlug === 'night_waste' ? 'AFTER-HRS ON' : 'CLOSED',
+          statusTone: scSlug === 'night_waste' ? 'amber' : 'emerald',
+          kw: lgtKw,
+          pf: 0.94,
+          thd: 2.9,
+          tempC: uLgt ? uLgt.tempC : 34.0,
+          detail: 'High-bay LED scheduler & HVAC zone VFD supply'
+        }
+      ];
+
+      return rawNodes.map(n => ({
+        ...n,
+        amps: calcAmps(n.kw, n.pf),
+        carbonKgHr: Number((n.kw * ef).toFixed(1))
+      }));
+    }
+
+    function epmsSendMessageToIframe(msg) {
+      try {
+        const ifr = typeof document !== 'undefined' ? document.getElementById('epms-3d-iframe') : null;
+        if (ifr && ifr.contentWindow && typeof ifr.contentWindow.postMessage === 'function') {
+          ifr.contentWindow.postMessage(msg, '*');
+        }
+      } catch (e) {}
+    }
+
+    function focusDigitalTwinAsset(assetId) {
+      if (!assetId) return;
+      const t = AppState.epmsTelemetry || (AppState.epmsTelemetry = {});
+      t.selectedAsset = assetId;
+      AppState.selectedMachineId = assetId;
+      epmsSendMessageToIframe({ type: 'SELECT_ASSET', assetId: assetId });
+
+      if (AppState.epmsViewMode === '3d') {
+        updateEpmsCommandStripDom();
+      } else if (typeof renderActiveView === 'function') {
+        renderActiveView();
+      }
+      if (typeof showToast === 'function') {
+        showToast('Focused Digital Twin asset: ' + assetId, 'info');
+      }
+    }
+
+    function syncDigitalTwinScenario(scenarioSlug, pillLabel) {
+      const sc = getEpmsScenarioMeta(scenarioSlug);
+      const t = AppState.epmsTelemetry || (AppState.epmsTelemetry = {});
+      t.scenario = sc.slug;
+      if (!t.liveConnected) {
+        t.activePowerKw = Math.round(1910 * sc.mult);
+        t.powerFactor = sc.pf;
+        t.thdPct = sc.thd;
+        t.voltageV = sc.volt;
+        t.apparentPowerKva = Math.round(t.activePowerKw / Math.max(0.7, sc.pf));
+        const ef = (AppState.assumptions && AppState.assumptions.gridEmissionFactorKgPerKwh) || 0.560;
+        t.carbonKgHr = Number((t.activePowerKw * ef).toFixed(1));
+      }
+      epmsSendMessageToIframe({ type: 'SET_SCENARIO', scenario: sc.slug });
+      if (typeof applyScenarioState === 'function') {
+        applyScenarioState(sc.appKey, pillLabel || sc.label, { skipRender: true, skipAutoAlert: true });
+      }
+      if (AppState.epmsViewMode === '3d') {
+        updateEpmsCommandStripDom();
+      } else if (typeof renderActiveView === 'function') {
+        renderActiveView();
+      }
+      if (typeof showToast === 'function') {
+        showToast('Digital Twin scenario synced: ' + (pillLabel || sc.label), 'success');
+      }
+    }
+
+    function ingestEpmsTelemetry(data) {
+      if (!data || typeof data !== 'object') return;
+      const t = AppState.epmsTelemetry || (AppState.epmsTelemetry = {});
+      const toNum = (v, fb) => {
+        if (typeof v === 'number' && !Number.isNaN(v)) return v;
+        if (typeof v === 'string') {
+          const parsed = parseFloat(v.replace(/,/g, ''));
+          if (!Number.isNaN(parsed)) return parsed;
+        }
+        return fb;
+      };
+      const rawKw = data.activePowerKw !== undefined ? data.activePowerKw
+        : (data.activePower !== undefined ? data.activePower
+        : (data.kw !== undefined ? data.kw : data.loadKw));
+      const pKw = toNum(rawKw, t.activePowerKw || 1910);
+      const pfRaw = toNum(data.powerFactor !== undefined ? data.powerFactor : data.pf, t.powerFactor || 0.92);
+      const pf = Math.max(0.70, Math.min(1.0, pfRaw));
+      const rawKva = data.apparentPowerKva !== undefined ? data.apparentPowerKva : data.apparentPower;
+      const kva = toNum(rawKva, Number((pKw / pf).toFixed(0)));
+      const voltage = toNum(data.voltageV !== undefined ? data.voltageV : data.voltage, t.voltageV || 400.4);
+      const thd = toNum(data.thdPct !== undefined ? data.thdPct : data.thd, t.thdPct || 2.8);
+      const freq = toNum(data.frequencyHz !== undefined ? data.frequencyHz : data.frequency, t.frequencyHz || 50.0);
+      const ef = (AppState.assumptions && AppState.assumptions.gridEmissionFactorKgPerKwh) || 0.560;
+      const rawCarbon = data.carbonKgHr !== undefined ? data.carbonKgHr : data.carbonIntensityKgHr;
+      const carbonKgHr = toNum(rawCarbon, Number((pKw * ef).toFixed(1)));
+
+      t.activePowerKw = Number(pKw.toFixed(1));
+      t.apparentPowerKva = Math.round(kva);
+      t.powerFactor = Number(pf.toFixed(2));
+      t.voltageV = Number(voltage.toFixed(1));
+      t.thdPct = Number(thd.toFixed(1));
+      t.frequencyHz = Number(freq.toFixed(2));
+      t.carbonKgHr = Number(carbonKgHr.toFixed(1));
+      t.liveConnected = true;
+      t.lastUpdated = 'Live Telemetry';
+      if (data.scenario) t.scenario = getEpmsScenarioMeta(data.scenario).slug;
+      const incomingAsset = data.selectedAssetId || data.selectedAsset || data.assetId;
+      if (incomingAsset) {
+        t.selectedAsset = String(incomingAsset);
+        AppState.selectedMachineId = t.selectedAsset;
+      }
+
+      if (AppState.activeRoute === 'digital-twin') {
+        updateEpmsCommandStripDom();
+      }
+    }
+
+    function updateEpmsCommandStripDom() {
+      if (typeof document === 'undefined') return;
+      const m = typeof getDerivedMetrics === 'function' ? getDerivedMetrics() : {};
+      const snap = getEpmsTelemetrySnapshot(m);
+      const setTxt = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+      setTxt('epms-strip-kw', formatNum(snap.activePowerKw, 0) + ' kW');
+      setTxt('epms-strip-kva', formatNum(snap.apparentPowerKva, 0) + ' kVA • ' + (snap.liveConnected ? 'LIVE POSTMESSAGE' : 'SUB BUS'));
+      setTxt('epms-strip-carbon', formatNum(snap.carbonKgHr, 1) + ' kg CO2e/hr');
+      setTxt('epms-strip-vpf', formatNum(snap.voltageV, 1) + ' V • PF ' + formatNum(snap.powerFactor, 2));
+      setTxt('epms-strip-thd', formatNum(snap.frequencyHz, 2) + ' Hz • THD ' + formatNum(snap.thdPct, 1) + '%');
+      setTxt('epms-strip-scenario', 'SIMULATION: ' + snap.scenario.label.toUpperCase());
+      setTxt('epms-strip-selected', 'Focus: ' + snap.selectedAsset);
+
+      try {
+        const assetBtns = document.querySelectorAll('[data-epms-asset]');
+        if (assetBtns && typeof assetBtns.forEach === 'function') {
+          assetBtns.forEach(btn => {
+            const aid = btn.getAttribute && btn.getAttribute('data-epms-asset');
+            const isSel = aid === snap.selectedAsset;
+            btn.className = 'px-2.5 py-1.5 rounded-xl text-[11px] font-semibold border transition cursor-pointer whitespace-nowrap ' +
+              (isSel
+                ? 'bg-sky-600/35 text-sky-200 border-sky-400 shadow-xs'
+                : 'bg-slate-800/90 hover:bg-slate-700 text-slate-300 border-slate-700');
+          });
+        }
+        const scBtns = document.querySelectorAll('[data-epms-scenario]');
+        if (scBtns && typeof scBtns.forEach === 'function') {
+          scBtns.forEach(btn => {
+            const sid = btn.getAttribute && btn.getAttribute('data-epms-scenario');
+            const isSel = sid === snap.scenario.slug;
+            btn.className = 'px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition cursor-pointer whitespace-nowrap ' +
+              (isSel
+                ? 'bg-emerald-600 text-white border-emerald-400 shadow-xs'
+                : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-700');
+          });
+        }
+      } catch (e) {}
+    }
+
+    function renderEpmsCommandStripHtml(m) {
+      const snap = getEpmsTelemetrySnapshot(m);
+      const assetButtons = [
+        { id: 'BREAKER_CB8-300', label: 'Substation CBX' },
+        { id: 'MCH-CUT-02', label: 'Cutting MCH-CUT-02' },
+        { id: 'COMP-01', label: 'Compressor COMP-01' },
+        { id: 'MCH-SEW-03', label: 'Sewing MCH-SEW-03' }
+      ];
+      const scenarioPills = [
+        { slug: 'baseline', label: 'Baseline' },
+        { slug: 'night_waste', label: 'Night Waste' },
+        { slug: 'peak_tariff', label: 'Peak Tariff' },
+        { slug: 'comp_leak', label: 'Comp Leak' },
+        { slug: 'solar_surge', label: 'Solar Surge' }
+      ];
+      const toneMap = {
+        emerald: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40',
+        amber: 'bg-amber-500/20 text-amber-300 border-amber-400/40',
+        rose: 'bg-rose-500/20 text-rose-300 border-rose-400/40',
+        sky: 'bg-sky-500/20 text-sky-300 border-sky-400/40'
+      };
+      const scToneClass = toneMap[snap.scenario.tone] || toneMap.emerald;
+
+      return `
+        <div id="epms-command-strip" class="w-full rounded-2xl bg-slate-900/95 border border-sky-500/25 p-3 shadow-lg space-y-2.5 min-w-0">
+          <!-- Live Telemetry Metrics Row -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 min-w-0">
+            <div class="min-w-0 rounded-xl bg-slate-950/80 border border-slate-800 px-3 py-2">
+              <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400 truncate">Active Substation Feeder</div>
+              <div id="epms-strip-kw" class="text-sm sm:text-base font-extrabold text-sky-300 font-mono mt-0.5 truncate">${formatNum(snap.activePowerKw, 0)} kW</div>
+              <div id="epms-strip-kva" class="text-[10px] text-slate-400 font-mono truncate">${formatNum(snap.apparentPowerKva, 0)} kVA • ${snap.liveConnected ? 'LIVE POSTMESSAGE' : 'SUB BUS'}</div>
+            </div>
+
+            <div class="min-w-0 rounded-xl bg-slate-950/80 border border-slate-800 px-3 py-2">
+              <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400 truncate">Carbon Intensity Rate</div>
+              <div id="epms-strip-carbon" class="text-sm sm:text-base font-extrabold text-emerald-300 font-mono mt-0.5 truncate">${formatNum(snap.carbonKgHr, 1)} kg CO2e/hr</div>
+              <div class="text-[10px] text-slate-400 font-mono truncate">@ 0.560 kg CO2e/kWh (DoE Grid)</div>
+            </div>
+
+            <div class="min-w-0 rounded-xl bg-slate-950/80 border border-slate-800 px-3 py-2">
+              <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400 truncate">Voltage &amp; PF Health</div>
+              <div id="epms-strip-vpf" class="text-sm sm:text-base font-extrabold text-white font-mono mt-0.5 truncate">${formatNum(snap.voltageV, 1)} V • PF ${formatNum(snap.powerFactor, 2)}</div>
+              <div id="epms-strip-thd" class="text-[10px] text-slate-400 font-mono truncate">${formatNum(snap.frequencyHz, 2)} Hz • THD ${formatNum(snap.thdPct, 1)}%</div>
+            </div>
+
+            <div class="min-w-0 rounded-xl bg-slate-950/80 border border-slate-800 px-3 py-2 flex flex-col justify-between">
+              <div class="flex items-center justify-between gap-1.5">
+                <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Active Twin State</span>
+                <span id="epms-strip-scenario" class="px-2 py-0.5 rounded-full text-[9.5px] font-mono font-bold border ${scToneClass} truncate">SIMULATION: ${snap.scenario.label.toUpperCase()}</span>
+              </div>
+              <div id="epms-strip-selected" class="text-xs font-mono font-semibold text-sky-300 mt-1 truncate">Focus: ${snap.selectedAsset}</div>
+            </div>
+          </div>
+
+          <!-- Interactive Asset Focus & Scenario Sync Controls -->
+          <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5 pt-1 border-t border-slate-800/80 min-w-0">
+            <div class="flex items-center gap-1.5 flex-wrap min-w-0">
+              <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 mr-1">Focus Asset:</span>
+              ${assetButtons.map(b => {
+                const isSel = snap.selectedAsset === b.id;
+                return `<button type="button" data-epms-asset="${b.id}" onclick="focusDigitalTwinAsset('${b.id}')" class="px-2.5 py-1.5 rounded-xl text-[11px] font-semibold border transition cursor-pointer whitespace-nowrap ${isSel ? 'bg-sky-600/35 text-sky-200 border-sky-400 shadow-xs' : 'bg-slate-800/90 hover:bg-slate-700 text-slate-300 border-slate-700'}">${b.label}</button>`;
+              }).join('')}
+            </div>
+
+            <div class="flex items-center gap-1.5 flex-wrap min-w-0">
+              <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 mr-1">Scenario Sync:</span>
+              ${scenarioPills.map(p => {
+                const isSel = snap.scenario.slug === p.slug;
+                return `<button type="button" data-epms-scenario="${p.slug}" onclick="syncDigitalTwinScenario('${p.slug}', '${p.label}')" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition cursor-pointer whitespace-nowrap ${isSel ? 'bg-emerald-600 text-white border-emerald-400 shadow-xs' : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-700'}">${p.label}</button>`;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function renderEpms2dOrSldFallback(m) {
       const mode = (AppState && AppState.epmsViewMode) || '2d';
       const isSld = mode === 'sld';
+      const snap = getEpmsTelemetrySnapshot(m);
+      const nodes = getEpmsFeederNodes(m, snap);
+      const activeId = snap.selectedAsset || 'BREAKER_CB8-300';
+      const focusedNode = nodes.find(n => n.id === activeId || n.alias === activeId) || nodes[0];
+
+      const strokeFor = tone => tone === 'rose' ? '#ef4444' : (tone === 'amber' ? '#f59e0b' : (tone === 'sky' ? '#38bdf8' : '#10b981'));
+      const pillFor = tone => tone === 'rose'
+        ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+        : tone === 'amber'
+          ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+          : tone === 'sky'
+            ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+            : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+
+      const diagramSvg = isSld ? `
+        <!-- IEEE Std 3002.2 / ANSI Single-Line Diagram -->
+        <svg role="img" aria-label="EPMS IEEE 3002.2 Single Line Diagram and Breaker Matrix" viewBox="0 0 880 390" class="w-full h-auto max-w-full block select-none">
+          <defs>
+            <pattern id="sldGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+              <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#0f1f33" stroke-width="0.8"/>
+            </pattern>
+          </defs>
+          <rect x="0" y="0" width="880" height="390" rx="10" fill="#040811"/>
+          <rect x="0" y="0" width="880" height="390" rx="10" fill="url(#sldGrid)"/>
+
+          <!-- HV Incomer: 11kV DPDC Grid + Step-down Transformer TR-01 -->
+          <text x="18" y="24" fill="#7dd3fc" font-size="10" font-family="monospace" font-weight="bold">IEEE 3002.2 SINGLE-LINE DIAGRAM • 11kV / 400V 50Hz</text>
+          <rect x="220" y="16" width="120" height="22" rx="4" fill="#0c192c" stroke="#38bdf8" stroke-width="1.2"/>
+          <text x="280" y="31" text-anchor="middle" fill="#e0f2fe" font-size="9.5" font-weight="bold">DPDC 11kV GRID</text>
+          <line x1="280" y1="38" x2="280" y2="158" stroke="#38bdf8" stroke-width="3" class="epms-bus-energized"/>
+          <circle cx="280" cy="72" r="13" fill="#071324" stroke="#38bdf8" stroke-width="2"/>
+          <circle cx="280" cy="90" r="13" fill="#071324" stroke="#38bdf8" stroke-width="2"/>
+          <text x="302" y="79" fill="#7dd3fc" font-size="10" font-weight="bold">TR-01 (2,500 kVA Dyn11)</text>
+          <text x="302" y="93" fill="#94a3b8" font-size="9" font-family="monospace">${formatNum(snap.activePowerKw, 0)} kW • ${formatNum(snap.apparentPowerKva, 0)} kVA</text>
+
+          <!-- Main ACB Breaker Symbol (BREAKER_CB8-300 / CBX-305) -->
+          <g class="cursor-pointer" onclick="focusDigitalTwinAsset('BREAKER_CB8-300')">
+            <rect x="242" y="112" width="76" height="34" rx="5" fill="${focusedNode.id === 'BREAKER_CB8-300' ? '#082f49' : '#0f172a'}" stroke="${focusedNode.id === 'BREAKER_CB8-300' ? '#38bdf8' : '#10b981'}" stroke-width="2"/>
+            <text x="280" y="126" text-anchor="middle" fill="#ffffff" font-size="8.5" font-weight="bold">CB8-300 / CBX</text>
+            <text x="280" y="139" text-anchor="middle" fill="#34d399" font-size="8" font-family="monospace">[X] CLOSED</text>
+          </g>
+
+          <!-- Microgrid Tie: GEN-01 + BESS-01 + 320 kWp PV -->
+          <rect x="540" y="16" width="210" height="22" rx="4" fill="#052e16" stroke="#22c55e" stroke-width="1.2"/>
+          <text x="645" y="31" text-anchor="middle" fill="#86efac" font-size="9.5" font-weight="bold">GEN-01 + BESS-01 (1.2 MWh) + PV 320 kWp</text>
+          <line x1="645" y1="38" x2="645" y2="158" stroke="#22c55e" stroke-width="3" class="epms-bus-energized"/>
+          <g class="cursor-pointer" onclick="focusDigitalTwinAsset('BESS_01')">
+            <rect x="598" y="96" width="94" height="36" rx="5" fill="${focusedNode.id === 'BESS_01' ? '#064e3b' : '#052e16'}" stroke="#22c55e" stroke-width="${focusedNode.id === 'BESS_01' ? '2.5' : '1.5'}"/>
+            <text x="645" y="111" text-anchor="middle" fill="#bbf7d0" font-size="8.5" font-weight="bold">TIE-BESS BREAKER</text>
+            <text x="645" y="124" text-anchor="middle" fill="#4ade80" font-size="8" font-family="monospace">${nodes[5].breakerState}</text>
+          </g>
+
+          <!-- 400V Energized Main Busbar -->
+          <line x1="34" y1="158" x2="846" y2="158" stroke="#0284c7" stroke-width="6"/>
+          <line x1="34" y1="158" x2="846" y2="158" stroke="#7dd3fc" stroke-width="2.5" class="epms-bus-energized"/>
+          <rect x="330" y="146" width="220" height="20" rx="10" fill="#082f49" stroke="#38bdf8" stroke-width="1.2"/>
+          <text x="440" y="159" text-anchor="middle" fill="#e0f2fe" font-size="9" font-family="monospace" font-weight="bold">400V MAIN BUS • ${formatNum(snap.voltageV, 1)}V • PF ${formatNum(snap.powerFactor, 2)}</text>
+
+          <!-- 6 Distribution Feeders with ANSI Breaker Symbols & Live CT Telemetry -->
+          ${[
+            { node: nodes[1], x: 85 },
+            { node: nodes[2], x: 225 },
+            { node: nodes[3], x: 365 },
+            { node: nodes[4], x: 505 },
+            { node: nodes[5], x: 645 },
+            { node: nodes[6], x: 785 }
+          ].map(item => {
+            const n = item.node;
+            const col = strokeFor(n.statusTone);
+            const isSel = focusedNode.id === n.id || focusedNode.alias === n.id;
+            return `
+              <g class="cursor-pointer" onclick="focusDigitalTwinAsset('${n.id}')">
+                <line x1="${item.x}" y1="158" x2="${item.x}" y2="246" stroke="${col}" stroke-width="2.5" class="epms-bus-energized"/>
+                <!-- ANSI Drawout Breaker Box -->
+                <rect x="${item.x - 16}" y="182" width="32" height="24" rx="4" fill="#091526" stroke="${col}" stroke-width="1.8"/>
+                <line x1="${item.x - 9}" y1="187" x2="${item.x + 9}" y2="201" stroke="${col}" stroke-width="1.6"/>
+                <line x1="${item.x + 9}" y1="187" x2="${item.x - 9}" y2="201" stroke="${col}" stroke-width="1.6"/>
+                <text x="${item.x + 21}" y="197" fill="#94a3b8" font-size="8" font-family="monospace">${n.cbCode}</text>
+                <!-- CT Metering Ring -->
+                <circle cx="${item.x}" cy="224" r="7" fill="none" stroke="#7dd3fc" stroke-width="1.5"/>
+                <!-- Load Telemetry Card -->
+                <rect x="${item.x - 58}" y="246" width="116" height="114" rx="8" fill="${isSel ? '#082f49' : '#0b1422'}" stroke="${isSel ? '#38bdf8' : col}" stroke-width="${isSel ? '2.5' : '1.5'}"/>
+                <text x="${item.x}" y="266" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="bold">${n.shortName}</text>
+                <text x="${item.x}" y="281" text-anchor="middle" fill="#7dd3fc" font-size="8.5" font-family="monospace">${n.id}</text>
+                <text x="${item.x}" y="302" text-anchor="middle" fill="${col}" font-size="11.5" font-family="monospace" font-weight="bold">${formatNum(n.kw, 1)} kW</text>
+                <text x="${item.x}" y="319" text-anchor="middle" fill="#cbd5e1" font-size="8.5" font-family="monospace">${n.amps} A • PF ${formatNum(n.pf, 2)}</text>
+                <text x="${item.x}" y="334" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-family="monospace">THD ${formatNum(n.thd, 1)}% • ${formatNum(n.tempC, 0)}°C</text>
+                <rect x="${item.x - 44}" y="341" width="88" height="13" rx="6" fill="#04121d" stroke="${col}" stroke-width="0.9"/>
+                <text x="${item.x}" y="350.5" text-anchor="middle" fill="${col}" font-size="7.5" font-family="monospace" font-weight="bold">${n.breakerState}</text>
+              </g>
+            `;
+          }).join('')}
+        </svg>
+      ` : `
+        <!-- 2D Isometric Neural Factory Topology & Busbar Layout -->
+        <svg role="img" aria-label="EPMS 2D Isometric Factory Floor Topology and NCP Feeder Matrix" viewBox="0 0 880 390" class="w-full h-auto max-w-full block select-none">
+          <defs>
+            <linearGradient id="isoFloorGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#071220"/>
+              <stop offset="100%" stop-color="#0b1a2d"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="880" height="390" rx="10" fill="#040811"/>
+          <!-- Isometric Factory Floor Slab -->
+          <polygon points="440,34 845,175 440,362 35,175" fill="url(#isoFloorGrad)" stroke="#1e3a5f" stroke-width="2"/>
+          <polygon points="35,175 440,362 440,378 35,191" fill="#071324" stroke="#1e3a5f" stroke-width="1"/>
+          <polygon points="845,175 440,362 440,378 845,191" fill="#050e1c" stroke="#1e3a5f" stroke-width="1"/>
+
+          <!-- Isometric Floor Grid Lines -->
+          <line x1="238" y1="104" x2="642" y2="269" stroke="#132944" stroke-width="1" stroke-dasharray="4 4"/>
+          <line x1="642" y1="104" x2="238" y2="269" stroke="#132944" stroke-width="1" stroke-dasharray="4 4"/>
+
+          <!-- Energized Neural Busbar Ring (Animated) -->
+          <polyline points="200,130 440,86 675,135 675,235 440,292 200,235 200,130" fill="none" stroke="#0ea5e9" stroke-width="3" class="epms-bus-energized"/>
+
+          <!-- Isometric Zone Cards (Top: Substation CBX-305 / CB8-300, Left: Sewing + Cutting, Right: Compressor + Boiler, Bottom: BESS + Lighting) -->
+          ${[
+            { node: nodes[0], cx: 440, cy: 84, w: 170, h: 62 },
+            { node: nodes[1], cx: 195, cy: 145, w: 156, h: 62 },
+            { node: nodes[2], cx: 195, cy: 235, w: 156, h: 62 },
+            { node: nodes[3], cx: 685, cy: 145, w: 156, h: 62 },
+            { node: nodes[4], cx: 685, cy: 235, w: 156, h: 62 },
+            { node: nodes[5], cx: 440, cy: 205, w: 162, h: 60 },
+            { node: nodes[6], cx: 440, cy: 298, w: 164, h: 58 }
+          ].map(box => {
+            const n = box.node;
+            const col = strokeFor(n.statusTone);
+            const isSel = focusedNode.id === n.id || focusedNode.alias === n.id;
+            const x = box.cx - box.w / 2;
+            const y = box.cy - box.h / 2;
+            return `
+              <g class="cursor-pointer" onclick="focusDigitalTwinAsset('${n.id}')">
+                <rect x="${x + 4}" y="${y + 5}" width="${box.w}" height="${box.h}" rx="9" fill="#020617" opacity="0.75"/>
+                <rect x="${x}" y="${y}" width="${box.w}" height="${box.h}" rx="9" fill="${isSel ? '#082f49' : '#0d1b2e'}" stroke="${isSel ? '#38bdf8' : col}" stroke-width="${isSel ? '2.5' : '1.6'}"/>
+                <circle cx="${x + 12}" cy="${y + 15}" r="4" fill="${col}" class="epms-node-pulse"/>
+                <text x="${x + 22}" y="${y + 18}" fill="#ffffff" font-size="10" font-weight="bold">${n.shortName}</text>
+                <text x="${x + 12}" y="${y + 34}" fill="${col}" font-size="10.5" font-family="monospace" font-weight="bold">${formatNum(n.kw, 1)} kW • PF ${formatNum(n.pf, 2)}</text>
+                <text x="${x + 12}" y="${y + 49}" fill="#94a3b8" font-size="8.5" font-family="monospace">${n.cbCode} [${n.breakerState}] • THD ${formatNum(n.thd, 1)}%</text>
+              </g>
+            `;
+          }).join('')}
+        </svg>
+      `;
+
       return `
-        <div class="w-full flex flex-col space-y-3">
+        <div class="w-full flex flex-col space-y-3 min-w-0">
           <!-- EPMS Fallback Mode Switcher & Header Bar -->
-          <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-900 border border-sky-500/30 text-white shadow-xl">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-sky-600 flex items-center justify-center text-white text-base font-bold shadow-md shadow-emerald-500/30">
+          <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-900 border border-sky-500/30 text-white shadow-xl min-w-0">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-sky-600 flex items-center justify-center text-white text-base font-bold shadow-md shadow-emerald-500/30 shrink-0">
                 <svg aria-hidden="true" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
               </div>
-              <div>
-                <div class="flex items-center gap-2">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
                   <h1 class="text-sm font-extrabold tracking-tight">EPMS — ${isSld ? 'Single-Line Diagram (SLD) Topology' : '2D Isometric Neural Busbar Fallback'}</h1>
                   <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
@@ -5001,10 +5598,10 @@
                   </span>
                   <span class="badge-sim px-2 py-0.5 rounded text-[10px] font-mono">${mode.toUpperCase()} VIEW</span>
                 </div>
-                <p class="text-[11px] text-slate-400">Deterministic fallback schematic for 11kV/400V distribution, BESS peak-shaving &amp; active feeder telemetry.</p>
+                <p class="text-[11px] text-slate-400">Deterministic engineering schematic for 11kV/400V distribution, BESS peak-shaving &amp; active feeder telemetry.</p>
               </div>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <div class="inline-flex rounded-xl bg-slate-800 p-0.5 border border-slate-700">
                 <button type="button" onclick="setEpmsViewMode('3d')" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition">3D WebGL</button>
                 <button type="button" onclick="setEpmsViewMode('2d')" class="px-3 py-1 rounded-lg text-xs font-semibold ${mode === '2d' ? 'bg-emerald-600 text-white' : 'text-slate-300 hover:text-white'} transition">2D Isometric</button>
@@ -5016,103 +5613,94 @@
             </div>
           </div>
 
-          <!-- Fallback Schematic Card -->
-          <div class="card p-4 rounded-2xl bg-[#070d14] border border-slate-800 shadow-2xl">
-            <div class="flex flex-wrap items-center justify-between border-b border-slate-800/80 pb-3 mb-3 gap-2">
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-bold text-white uppercase tracking-wider">Feeder Matrix &amp; Busbar Topology</span>
+          ${renderEpmsCommandStripHtml(m)}
+
+          <!-- Interactive Engineering Schematic Card -->
+          <div class="card p-3 sm:p-4 rounded-2xl bg-[#070d14] border border-slate-800 shadow-2xl min-w-0 space-y-3">
+            <div class="flex flex-wrap items-center justify-between border-b border-slate-800/80 pb-2.5 gap-2">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-bold text-white uppercase tracking-wider">${isSld ? 'IEEE 3002.2 Breaker &amp; Feeder SLD' : '2D Isometric Busbar &amp; Zone Matrix'}</span>
                 <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">NCP-01 BUS TIED • ACTIVE</span>
               </div>
               <div class="text-[11px] text-slate-400 font-mono">
-                Total Plant Draw: <strong class="text-emerald-400 font-bold">${formatNum((m && m.totalCurrentKw) || 124.5, 1)} kW</strong> | Power Factor: <strong class="text-sky-400 font-bold">${formatNum((m && m.powerFactor) || 0.94, 2)}</strong>
+                Substation Draw: <strong class="text-emerald-400 font-bold">${formatNum(snap.activePowerKw, 0)} kW</strong> | Fleet Sum: <strong class="text-sky-400 font-bold">${formatNum(snap.fleetKw, 1)} kW</strong> | PF: <strong class="text-sky-300 font-bold">${formatNum(snap.powerFactor, 2)}</strong>
               </div>
             </div>
 
-            <!-- SVG Schematic matching IEEE 3002.2 single-line feeder architecture -->
-            <div class="w-full overflow-x-auto rounded-xl bg-[#04070d] border border-slate-800/90 p-3">
-              <svg role="img" aria-label="EPMS Single Line Diagram and NCP Feeder Matrix" viewBox="0 0 820 285" class="w-full min-w-[720px] h-auto">
-                <line x1="280" y1="12" x2="280" y2="85" stroke="#38bdf8" stroke-width="3"/>
-                <circle cx="280" cy="48" r="14" fill="#0c192c" stroke="#38bdf8" stroke-width="2"/>
-                <text x="300" y="52" fill="#7dd3fc" font-size="10" font-weight="bold">TR-01 (2,500 kVA Grid Feeder)</text>
-                <line x1="560" y1="12" x2="560" y2="85" stroke="#eab308" stroke-width="3" stroke-dasharray="4 2"/>
-                <circle cx="560" cy="48" r="14" fill="#2a1f08" stroke="#eab308" stroke-width="2"/>
-                <text x="580" y="52" fill="#fde047" font-size="10" font-weight="bold">GEN-01 (2,000 kVA) + BESS-01 (1.2 MWh)</text>
-                <line x1="30" y1="85" x2="790" y2="85" stroke="#0ea5e9" stroke-width="4"/>
-
-                <!-- Feeder Hall A -->
-                <g class="cursor-pointer" onclick="selectDigitalTwinAsset('MCH-SEW-01')">
-                  <line x1="75" y1="85" x2="75" y2="160" stroke="#10b981" stroke-width="2.5"/>
-                  <rect x="28" y="160" width="94" height="74" rx="6" fill="#0f172a" stroke="#10b981" stroke-width="1.5"/>
-                  <text x="75" y="180" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">Hall A: Sewing</text>
-                  <text x="75" y="198" text-anchor="middle" fill="#38bdf8" font-size="9">Line 1-4 • 52 kW</text>
-                  <text x="75" y="216" text-anchor="middle" fill="#10b981" font-size="8">FEEDER NORMAL</text>
-                </g>
-
-                <!-- Feeder Hall C -->
-                <g class="cursor-pointer" onclick="selectDigitalTwinAsset('MCH-CUT-01')">
-                  <line x1="180" y1="85" x2="180" y2="160" stroke="#10b981" stroke-width="2.5"/>
-                  <rect x="133" y="160" width="94" height="74" rx="6" fill="#0f172a" stroke="#10b981" stroke-width="1.5"/>
-                  <text x="180" y="180" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">Hall C: Cutting</text>
-                  <text x="180" y="198" text-anchor="middle" fill="#38bdf8" font-size="9">Auto-Spread • 34 kW</text>
-                  <text x="180" y="216" text-anchor="middle" fill="#10b981" font-size="8">FEEDER NORMAL</text>
-                </g>
-
-                <!-- Breaker CBX-305 (Hall D) -->
-                <g class="cursor-pointer" onclick="selectDigitalTwinAsset('BREAKER_CBX-305')">
-                  <line x1="290" y1="85" x2="290" y2="160" stroke="#0ea5e9" stroke-width="2.5"/>
-                  <rect x="238" y="160" width="104" height="74" rx="6" fill="#082f49" stroke="#0ea5e9" stroke-width="2"/>
-                  <text x="290" y="180" text-anchor="middle" fill="#7dd3fc" font-size="10" font-weight="bold">BREAKER_CBX-305</text>
-                  <text x="290" y="198" text-anchor="middle" fill="#38bdf8" font-size="9">EPMS Critical Sub</text>
-                  <text x="290" y="216" text-anchor="middle" fill="#34d399" font-size="8">MONITORED ASSET</text>
-                </g>
-
-                <!-- NCP-01 Master Controller -->
-                <g class="cursor-pointer" onclick="selectDigitalTwinAsset('COMP-01')">
-                  <line x1="405" y1="85" x2="405" y2="160" stroke="#38bdf8" stroke-width="2.5"/>
-                  <rect x="353" y="160" width="104" height="74" rx="6" fill="#0b192c" stroke="#38bdf8" stroke-width="1.5"/>
-                  <text x="405" y="180" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">NCP-01 Master</text>
-                  <text x="405" y="198" text-anchor="middle" fill="#94a3b8" font-size="9">Modbus TCP/IP</text>
-                  <text x="405" y="216" text-anchor="middle" fill="#34d399" font-size="8">ATS INTERLOCKED</text>
-                </g>
-
-                <!-- Hall F Finishing & Steam -->
-                <g class="cursor-pointer" onclick="selectDigitalTwinAsset('BOIL-01')">
-                  <line x1="515" y1="85" x2="515" y2="160" stroke="#10b981" stroke-width="2.5"/>
-                  <rect x="468" y="160" width="94" height="74" rx="6" fill="#0f172a" stroke="#10b981" stroke-width="1.5"/>
-                  <text x="515" y="180" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">Utilities: Boiler</text>
-                  <text x="515" y="198" text-anchor="middle" fill="#38bdf8" font-size="9">Gas/Electric • 28 kW</text>
-                  <text x="515" y="216" text-anchor="middle" fill="#10b981" font-size="8">FEEDER NORMAL</text>
-                </g>
-
-                <!-- BESS-01 Battery Yard -->
-                <g class="cursor-pointer" onclick="selectDigitalTwinAsset('BESS_01')">
-                  <line x1="625" y1="85" x2="625" y2="160" stroke="#22c55e" stroke-width="2.5"/>
-                  <rect x="578" y="160" width="94" height="74" rx="6" fill="#052e16" stroke="#22c55e" stroke-width="1.5"/>
-                  <text x="625" y="180" text-anchor="middle" fill="#86efac" font-size="10" font-weight="bold">BESS-01 Storage</text>
-                  <text x="625" y="198" text-anchor="middle" fill="#4ade80" font-size="9">Peak Shave • 88%</text>
-                  <text x="625" y="216" text-anchor="middle" fill="#86efac" font-size="8">DISPATCH READY</text>
-                </g>
-
-                <!-- HVAC & Lighting Zone -->
-                <g class="cursor-pointer" onclick="selectDigitalTwinAsset('LGT-ZN-01')">
-                  <line x1="735" y1="85" x2="735" y2="160" stroke="#f59e0b" stroke-width="2.5"/>
-                  <rect x="688" y="160" width="94" height="74" rx="6" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5"/>
-                  <text x="735" y="180" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">Lighting Zone 1</text>
-                  <text x="735" y="198" text-anchor="middle" fill="#f59e0b" font-size="9">Factory Hall • 18 kW</text>
-                  <text x="735" y="216" text-anchor="middle" fill="#fbbf24" font-size="8">SMART SCHEDULER</text>
-                </g>
-              </svg>
+            <!-- Responsive Engineering Diagram SVG -->
+            <div class="w-full rounded-xl bg-[#04070d] border border-slate-800/90 p-2 sm:p-3 overflow-hidden">
+              ${diagramSvg}
             </div>
 
-            <!-- Asset Inspection Drawer when clicked -->
-            <div class="mt-3 p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between text-xs">
-              <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-                <span class="text-slate-300">Active Selected Asset: <strong class="text-white">${(AppState && AppState.selectedMachineId) || 'BREAKER_CBX-305'}</strong></span>
+            <!-- Clickable Feeder Telemetry Matrix (High-Contrast Mobile & Desktop Grid) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 min-w-0">
+              ${nodes.slice(1).map(n => {
+                const isSel = focusedNode.id === n.id || focusedNode.alias === n.id;
+                return `
+                  <button type="button" onclick="focusDigitalTwinAsset('${n.id}')" class="min-w-0 text-left p-2.5 rounded-xl border transition cursor-pointer ${isSel ? 'bg-sky-950/70 border-sky-400 ring-1 ring-sky-400/50' : 'bg-slate-900/90 border-slate-800 hover:border-slate-600'}">
+                    <div class="flex items-center justify-between gap-1">
+                      <span class="text-[10px] font-mono font-bold text-slate-300">${n.cbCode}</span>
+                      <span class="px-1.5 py-0.5 rounded text-[8.5px] font-mono font-semibold border ${pillFor(n.statusTone)}">${n.breakerState}</span>
+                    </div>
+                    <div class="text-xs font-bold text-white mt-1 truncate">${n.shortName}</div>
+                    <div class="text-[11px] font-mono text-sky-300 font-semibold mt-0.5">${formatNum(n.kw, 1)} kW</div>
+                    <div class="text-[9.5px] font-mono text-slate-400">PF ${formatNum(n.pf, 2)} • THD ${formatNum(n.thd, 1)}%</div>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+
+            <!-- Interactive Node Telemetry Inspector Drawer -->
+            <div id="epms-node-inspector" class="p-3.5 rounded-xl bg-slate-900/90 border border-sky-500/30 space-y-3 min-w-0">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>
+                  <div class="min-w-0">
+                    <div class="text-xs font-extrabold text-white truncate">Node Telemetry Inspector: ${focusedNode.title} (${focusedNode.id})</div>
+                    <div class="text-[10.5px] text-slate-400 font-mono truncate">${focusedNode.feeder} • ${focusedNode.detail}</div>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border ${pillFor(focusedNode.statusTone)}">${focusedNode.cbCode}: ${focusedNode.breakerState}</span>
               </div>
-              <button type="button" onclick="setEpmsViewMode('3d')" class="px-3 py-1 rounded-lg bg-sky-600/30 text-sky-300 border border-sky-500/30 hover:bg-sky-600/50 transition">
-                Return to 3D WebGL Engine →
-              </button>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-xs font-mono min-w-0">
+                <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 min-w-0">
+                  <div class="text-[9.5px] text-slate-400">Active Power</div>
+                  <div class="font-bold text-sky-300 mt-0.5">${formatNum(focusedNode.kw, 1)} kW</div>
+                </div>
+                <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 min-w-0">
+                  <div class="text-[9.5px] text-slate-400">Line Current</div>
+                  <div class="font-bold text-white mt-0.5">${formatNum(focusedNode.amps, 0)} A</div>
+                </div>
+                <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 min-w-0">
+                  <div class="text-[9.5px] text-slate-400">Power Factor</div>
+                  <div class="font-bold text-emerald-300 mt-0.5">${formatNum(focusedNode.pf, 2)}</div>
+                </div>
+                <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 min-w-0">
+                  <div class="text-[9.5px] text-slate-400">Harmonic THD</div>
+                  <div class="font-bold text-amber-300 mt-0.5">${formatNum(focusedNode.thd, 1)}%</div>
+                </div>
+                <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 min-w-0">
+                  <div class="text-[9.5px] text-slate-400">Core Temp</div>
+                  <div class="font-bold text-slate-200 mt-0.5">${formatNum(focusedNode.tempC, 1)}°C</div>
+                </div>
+                <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 min-w-0">
+                  <div class="text-[9.5px] text-slate-400">Carbon Rate</div>
+                  <div class="font-bold text-teal-300 mt-0.5">${formatNum(focusedNode.carbonKgHr, 1)} kg/hr</div>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800/80 text-xs">
+                <div class="text-[11px] text-slate-300">Active Selected Asset: <strong class="text-white font-mono">${focusedNode.id}</strong></div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <button type="button" onclick="inspectMachineDetail('${focusedNode.id === 'BREAKER_CB8-300' ? 'BREAKER_CBX-305' : focusedNode.id}')" class="px-3 py-1 rounded-lg bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 transition font-semibold">
+                    Inspect Telemetry Modal
+                  </button>
+                  <button type="button" onclick="setEpmsViewMode('3d')" class="px-3 py-1 rounded-lg bg-sky-600/30 text-sky-300 border border-sky-500/30 hover:bg-sky-600/50 transition font-semibold">
+                    Return to 3D WebGL Engine →
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -5125,14 +5713,14 @@
       }
       return `
         <!-- EPMS 3D DIGITAL TWIN (Interactive Three.js WebGL Simulation) -->
-        <div class="w-full flex flex-col space-y-2">
-          <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-900 border border-sky-500/30 text-white shadow-xl">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-400 to-emerald-500 flex items-center justify-center text-white text-base font-bold shadow-md shadow-sky-500/30">
+        <div class="w-full flex flex-col space-y-2.5 min-w-0">
+          <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-900 border border-sky-500/30 text-white shadow-xl min-w-0">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-400 to-emerald-500 flex items-center justify-center text-white text-base font-bold shadow-md shadow-sky-500/30 shrink-0">
                 <svg aria-hidden="true" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
               </div>
-              <div>
-                <div class="flex items-center gap-2">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
                   <h1 class="text-sm font-extrabold tracking-tight">EPMS — Green AI Digital Twin</h1>
                   <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -5143,7 +5731,7 @@
                 <p class="text-[11px] text-slate-400">Interactive 3D facility twin, power transitions, neural busbar topology &amp; IEEE 3002.2 single-line diagram.</p>
               </div>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <div class="inline-flex rounded-xl bg-slate-800 p-0.5 border border-slate-700">
                 <button type="button" onclick="setEpmsViewMode('3d')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-600 text-white shadow-xs">3D WebGL</button>
                 <button type="button" onclick="setEpmsViewMode('2d')" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition">2D Isometric</button>
@@ -5152,14 +5740,16 @@
               <a href="digital-twin.html" target="_blank" class="px-3 py-1.5 rounded-xl bg-sky-600/30 hover:bg-sky-600/50 text-sky-300 border border-sky-500/40 text-xs font-semibold transition flex items-center gap-1.5" title="Open Dedicated Standalone 3D View">
                 <span>Open Dedicated Window ↗</span>
               </a>
-              <button type="button" onclick="const f = document.getElementById('epms-3d-iframe'); if (f.requestFullscreen) f.requestFullscreen(); else if (f.webkitRequestFullscreen) f.webkitRequestFullscreen();" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition">
+              <button type="button" onclick="const f = typeof document !== 'undefined' ? document.getElementById('epms-3d-iframe') : null; if (f && f.requestFullscreen) f.requestFullscreen(); else if (f && f.webkitRequestFullscreen) f.webkitRequestFullscreen();" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition">
                 <span class="inline-flex items-center gap-1.5">${AppIcons.expand('w-3.5 h-3.5')} Fullscreen</span>
               </button>
             </div>
           </div>
 
+          ${renderEpmsCommandStripHtml(m)}
+
           <!-- Interactive 3D WebGL Digital Twin Iframe -->
-          <div class="w-full rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-[#0b0f15]" style="height: calc(100vh - 170px); min-height: 780px;">
+          <div class="w-full rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-[#0b0f15] h-[64vh] min-h-[420px] lg:min-h-[680px]">
             <iframe id="epms-3d-iframe" src="digital-twin.html" class="w-full h-full border-0 select-none" allow="fullscreen; autoplay"></iframe>
           </div>
         </div>
@@ -5424,8 +6014,7 @@
     }
 
     function selectDigitalTwinAsset(assetId) {
-      AppState.selectedMachineId = assetId;
-      renderActiveView();
+      focusDigitalTwinAsset(assetId);
     }
 
     function setEpmsViewMode(mode) {
@@ -6446,13 +7035,18 @@
 
     function broadcastActionToSimulation(actionObj) {
       try {
-        if (typeof BroadcastChannel !== 'undefined') {
+        const payload = (actionObj && typeof actionObj === 'object')
+          ? Object.assign({}, actionObj, {
+              cmdId: actionObj.cmdId || ('gfb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7))
+            })
+          : actionObj;
+        if (typeof BroadcastChannel !== 'undefined' && typeof window !== 'undefined') {
           if (!window._gfbChannel) window._gfbChannel = new BroadcastChannel('gfb_simulation_sync');
-          window._gfbChannel.postMessage(actionObj);
+          window._gfbChannel.postMessage(payload);
         }
-        const ifr = document.getElementById('sim-engine-iframe');
-        if (ifr && ifr.contentWindow) {
-          ifr.contentWindow.postMessage(actionObj, '*');
+        const ifr = typeof document !== 'undefined' ? document.getElementById('sim-engine-iframe') : null;
+        if (ifr && ifr.contentWindow && typeof ifr.contentWindow.postMessage === 'function') {
+          ifr.contentWindow.postMessage(payload, '*');
         }
       } catch(e){}
     }
@@ -6473,12 +7067,12 @@
 
     function toggleSimulationPlay() {
       AppState.simRunning = !AppState.simRunning;
-      const icon = document.getElementById('demo-play-icon') || document.getElementById('sim-play-icon');
-      const txt = document.getElementById('demo-play-text') || document.getElementById('sim-play-text');
+      const icon = typeof document !== 'undefined' ? (document.getElementById('demo-play-icon') || document.getElementById('sim-play-icon')) : null;
+      const txt = typeof document !== 'undefined' ? (document.getElementById('demo-play-text') || document.getElementById('sim-play-text')) : null;
       if (icon) icon.innerHTML = AppState.simRunning ? '<svg aria-hidden="true" class="w-3 h-3 inline-block" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>' : '<svg aria-hidden="true" class="w-3 h-3 inline-block" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>';
       if (txt) txt.textContent = AppState.simRunning ? 'Running' : 'Play';
       
-      const btn = document.getElementById('btn-demo-play') || document.getElementById('btn-sim-toggle');
+      const btn = typeof document !== 'undefined' ? (document.getElementById('btn-demo-play') || document.getElementById('btn-sim-toggle')) : null;
       if (btn) {
         if (AppState.simRunning) {
           btn.className = "px-2.5 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs transition flex items-center gap-1";
@@ -6487,7 +7081,10 @@
         }
       }
       startOrUpdateSimulationTimer();
-      broadcastActionToSimulation({ action: 'togglePlay' });
+      if ((AppState.activeRoute === 'simulation' || AppState.activeRoute === 'simulation-control') && typeof updateSimulationLiveDom === 'function') {
+        updateSimulationLiveDom();
+      }
+      broadcastActionToSimulation({ action: 'togglePlay', running: AppState.simRunning });
       showToast(AppState.simRunning ? 'Simulation running with live deterministic telemetry.' : 'Simulation paused.', 'info');
     }
 
@@ -6762,7 +7359,8 @@
         'Confirmation Gate (' + AppState.currentUser.name + ')',
         'Approved autonomous mitigation for ' + (pb ? pb.alertTitle : scenarioKey) + ' in simulation.'
       );
-      broadcastActionToSimulation({ action: 'applyFix', id: 'f1', source: 'confirmation_gate' });
+      const gateFixId = (scenarioKey === 'peak_grid' || scenarioKey === 'tariff_change') ? 'f3' : 'f1';
+      broadcastActionToSimulation({ action: 'applyFix', id: gateFixId, fixId: gateFixId, source: 'confirmation_gate' });
       renderActiveView();
       showToast('Manager approved autonomous mitigation. Telemetry & ROI updated in simulation.', 'success');
     }
@@ -6793,6 +7391,15 @@
       } else if (scenarioKey === 'compressor_leak') {
         const comp = AppState.fleet.find(u => u.id === 'COMP-01');
         if (comp) { comp.currentKw = 31.2; comp.periodKwh += 1850; comp.tempC = 74.5; comp.status = 'Fault'; }
+      } else if (scenarioKey === 'grid_outage') {
+        AppState.fleet.forEach(u => {
+          if (u.dept === 'Finishing' || u.id === 'BOIL-01') {
+            u.status = 'Idle';
+            u.currentKw = Number((u.currentKw * 0.25).toFixed(1));
+          } else if (u.status === 'Running') {
+            u.currentKw = Number((u.currentKw * 0.88).toFixed(1));
+          }
+        });
       } else if (scenarioKey === 'machine_overload') {
         const cut = AppState.fleet.find(u => u.id === 'MCH-CUT-02');
         if (cut) { cut.currentKw = 28.4; cut.periodKwh += 1200; cut.tempC = 78.2; cut.status = 'Fault'; }
@@ -6852,20 +7459,21 @@
       const simMap = {
         night_idle: 'waste',
         production_surge: 'surge',
-        compressor_leak: 'breakdown',
+        compressor_leak: 'comp_leak',
         machine_overload: 'breakdown',
         peak_grid: 'tariff',
         tariff_change: 'tariff',
         solar_surge: 'solar',
+        grid_outage: 'outage',
         baseline: 'normal'
       };
-      if (simMap[scenarioKey]) {
+      if (simMap[scenarioKey] && !opts.skipBroadcast) {
         broadcastActionToSimulation({ action: 'setScenario', scenario: simMap[scenarioKey] });
       }
 
       logActivity('Operator (' + AppState.currentUser.name + ')', 'Activated simulation scenario: ' + (label || scenarioKey));
-      if (typeof renderActiveView === 'function') renderActiveView();
-      if (typeof showToast === 'function') showToast('Scenario applied: ' + (label || scenarioKey), 'success');
+      if (!opts.skipRender && typeof renderActiveView === 'function') renderActiveView();
+      if (!opts.skipToast && typeof showToast === 'function') showToast('Scenario applied: ' + (label || scenarioKey), 'success');
       return createdAlertId;
     }
 
@@ -6972,6 +7580,11 @@
         iconHtml = AppIcons.key('w-4 h-4 text-amber-400 shrink-0');
         bg = 'bg-slate-900/95 border-amber-500/40 text-amber-100';
       }
+
+      const nowTs = Date.now();
+      if (box._lastToastKey === cleanMsg && (nowTs - (box._lastToastAt || 0)) < 350) return;
+      box._lastToastKey = cleanMsg;
+      box._lastToastAt = nowTs;
 
       const el = document.createElement('div');
       el.className = `pointer-events-auto px-3.5 py-2.5 rounded-xl border shadow-xl text-xs flex items-center gap-2.5 backdrop-blur-md ${bg}`;
@@ -9909,19 +10522,247 @@
     // ----------------------------------------------------------------------------
     // VIEW 12: SIMULATION CONTROL CENTER (Live Canonical Engine & Scenarios)
     // ----------------------------------------------------------------------------
+    const SIMULATION_IMPACT_MATRIX = [
+      {
+        id: 'baseline',
+        title: 'Baseline',
+        simScenario: 'normal',
+        fixId: 'f1',
+        recId: 'REC-01',
+        kwDelta: '0.0 kW (124.5 kW nominal)',
+        bdtDelta: '৳ 0 / mo nominal',
+        co2Delta: '0.00 tCO2e / mo',
+        gate: 'Baseline Guardrail (Seed #20261018)',
+        tone: 'emerald',
+        actionLabel: 'Verify Nominal'
+      },
+      {
+        id: 'night_idle',
+        title: 'Night Shift Waste',
+        simScenario: 'waste',
+        fixId: 'f1',
+        recId: 'REC-01',
+        kwDelta: '+16.8 kW (+14% Sewing idle)',
+        bdtDelta: '+৳ 18,450 / mo loss',
+        co2Delta: '+0.84 tCO2e / mo',
+        gate: 'AGT-ENERGY -> Night Standby Cutoff (REC-01)',
+        tone: 'amber',
+        actionLabel: 'Apply Fix f1'
+      },
+      {
+        id: 'peak_grid',
+        title: 'Peak Grid Tariff',
+        simScenario: 'tariff',
+        fixId: 'f3',
+        recId: 'REC-03',
+        kwDelta: '+11.2 kW (utility peak draw)',
+        bdtDelta: '+৳ 129,600 / mo (৳ 14.88/kWh)',
+        co2Delta: '+0.62 tCO2e / mo',
+        gate: 'AGT-FORECAST -> Chiller & Solar Buffer (REC-03)',
+        tone: 'rose',
+        actionLabel: 'Apply Fix f3'
+      },
+      {
+        id: 'compressor_leak',
+        title: 'Compressor Air Leak',
+        simScenario: 'comp_leak',
+        fixId: 'f1',
+        recId: 'REC-01',
+        kwDelta: '+18.5 kW (COMP-01 31.2 kW)',
+        bdtDelta: '+৳ 94,200 / mo air waste',
+        co2Delta: '+3.18 tCO2e / mo',
+        gate: 'AGT-RECOMMEND -> Acoustic Seal + Trim (REC-01)',
+        tone: 'amber',
+        actionLabel: 'Apply Fix f1'
+      },
+      {
+        id: 'solar_surge',
+        title: 'Solar Surge',
+        simScenario: 'solar',
+        fixId: 'f3',
+        recId: 'REC-03',
+        kwDelta: '-24.9 kW (-20% net grid)',
+        bdtDelta: '-৳ 129,704 / mo saved',
+        co2Delta: '-5.86 tCO2e / mo offset',
+        gate: 'Microgrid PV + BESS-01 Clean Dispatch',
+        tone: 'emerald',
+        actionLabel: 'Boost BESS + PV'
+      },
+      {
+        id: 'grid_outage',
+        title: 'Grid Outage',
+        simScenario: 'outage',
+        fixId: 'f2',
+        recId: 'REC-02',
+        kwDelta: '-124.5 kW Grid / ATS Backup',
+        bdtDelta: '+৳ 168,400 / mo diesel risk',
+        co2Delta: '+4.12 tCO2e / mo backup',
+        gate: 'BESS-01 + GEN-01 Islanding Load Shed',
+        tone: 'rose',
+        actionLabel: 'Shed Load f2'
+      }
+    ];
+
+    function updateSimulationLiveDom(payload) {
+      if (typeof document === 'undefined') return;
+      const m = typeof getDerivedMetrics === 'function' ? getDerivedMetrics() : {};
+      const sm = (AppState && AppState.simSyncMeta) || {};
+      const ef = (AppState && AppState.assumptions && AppState.assumptions.gridEmissionFactorKgPerKwh) || 0.560;
+      const demandKw = typeof sm.totalFactoryKw === 'number' && sm.liveConnected ? sm.totalFactoryKw : (m.totalCurrentKw || 124.5);
+      const solarKw = typeof sm.solarOffsetKw === 'number' && sm.liveConnected
+        ? sm.solarOffsetKw
+        : (AppState.activeScenario === 'solar_surge' ? Number((demandKw * 0.25).toFixed(1)) : 0);
+      const netKw = typeof sm.netGridKw === 'number' && sm.liveConnected
+        ? sm.netGridKw
+        : Math.max(0, Number((demandKw - solarKw).toFixed(1)));
+      const carbonRate = (sm.liveConnected && typeof sm.liveCarbonKgHr === 'number')
+        ? Number(sm.liveCarbonKgHr.toFixed(1))
+        : Number((netKw * ef).toFixed(1));
+
+      const setTxt = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+      const elSub = document.getElementById('sim-kpi-substation');
+      if (elSub) elSub.textContent = `${formatNum((m.totalCurrentKw || 124.5) * 10.2 + 20, 0)} kW`;
+      setTxt('sim-kpi-fleet-power', `${formatNum(m.totalCurrentKw || 124.5, 1)} kW`);
+      setTxt('sim-kpi-avail', `${formatNum(m.availabilityPct || 94.4, 1)}%`);
+      setTxt('sim-kpi-clock', `Tick #${AppState.simTickCount || 0}`);
+      if (payload && payload.clock) setTxt('sim-kpi-clock-time', payload.clock);
+      setTxt('sim-kpi-savings', `৳ ${formatNum(m.estimatedSavingsBdt || 0, 0)}`);
+      const elCarb = document.getElementById('sim-kpi-carbon');
+      if (elCarb) {
+        elCarb.innerHTML = `<span class="text-teal-500 inline-block align-middle mr-1">${AppIcons.leaf('w-3.5 h-3.5 inline-block')}</span>+${formatNum(m.simPotentialCredits || m.totalRecSavedCo2 || 0, 2)} t`;
+      }
+      setTxt('sim-active-scenario-badge', (AppState.activeScenario || 'baseline').toUpperCase());
+
+      // Bidirectional Telemetry Sync Strip DOM updates (zero iframe reload)
+      setTxt('sim-sync-status-badge', sm.liveConnected ? '2-WAY SYNC LIVE' : 'SYNC READY');
+      setTxt('sim-sync-last-at', (payload && payload.clock) || sm.lastSyncAt || 'Live Channel');
+      setTxt('sim-sync-demand-kw', `${formatNum(demandKw, 1)} kW`);
+      setTxt('sim-sync-solar-kw', `${solarKw > 0 ? '-' : ''}${formatNum(solarKw, 1)} kW`);
+      setTxt('sim-sync-net-kw', `${formatNum(netKw, 1)} kW`);
+      setTxt('sim-sync-avoided-kwh', `${formatNum(AppState.simAvoidedKwh || 0, 1)} kWh`);
+      setTxt('sim-sync-carbon-rate', `${formatNum(carbonRate, 1)} kg CO2e/hr`);
+
+      const elStatusPill = document.getElementById('sim-engine-status-pill');
+      const elStatusDot = document.getElementById('sim-engine-status-dot');
+      const elStatusText = document.getElementById('sim-engine-status-text');
+      if (elStatusPill) {
+        elStatusPill.className = `inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold ${AppState.simRunning ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-amber-500/20 text-amber-300 border border-amber-400/30'}`;
+      }
+      if (elStatusDot) {
+        elStatusDot.className = `w-1.5 h-1.5 rounded-full ${AppState.simRunning ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`;
+      }
+      if (elStatusText) {
+        elStatusText.textContent = AppState.simRunning ? 'ENGINE RUNNING (LIVE)' : 'ENGINE PAUSED';
+      }
+      const elCenterToggle = document.getElementById('sim-center-btn-toggle');
+      if (elCenterToggle) {
+        elCenterToggle.className = `px-3.5 py-1.5 rounded-xl font-bold transition shadow-xs ${AppState.simRunning ? 'bg-amber-600 hover:bg-amber-500 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}`;
+        elCenterToggle.innerHTML = AppState.simRunning
+          ? '<svg aria-hidden="true" class="w-3.5 h-3.5 inline mr-1" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Pause Engine'
+          : '<svg aria-hidden="true" class="w-3.5 h-3.5 inline mr-1" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>Resume Engine';
+      }
+
+      try {
+        const rows = document.querySelectorAll('[data-sim-matrix-id]');
+        if (rows && typeof rows.forEach === 'function') {
+          rows.forEach(row => {
+            const rid = row.getAttribute && row.getAttribute('data-sim-matrix-id');
+            const active = rid === AppState.activeScenario;
+            row.className = 'grid grid-cols-1 lg:grid-cols-12 gap-2.5 items-center p-3 rounded-xl border transition min-w-0 ' +
+              (active
+                ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border-emerald-500 ring-1 ring-emerald-500/70'
+                : 'bg-slate-50/80 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600');
+          });
+        }
+      } catch (e) {}
+    }
+
+    function dispatchSimulationScenarioQuick(scenarioKey, simScenario, title) {
+      if (typeof applyScenarioState === 'function') {
+        applyScenarioState(scenarioKey, title || scenarioKey, { skipRender: true, skipBroadcast: true, skipToast: true });
+      }
+      if (typeof syncEpmsTelemetryForScenario === 'function') {
+        syncEpmsTelemetryForScenario(scenarioKey);
+      } else if (AppState && AppState.epmsTelemetry) {
+        const scMeta = typeof getEpmsScenarioMeta === 'function' ? getEpmsScenarioMeta(scenarioKey) : null;
+        if (scMeta) AppState.epmsTelemetry.scenario = scMeta.slug;
+      }
+      broadcastActionToSimulation({ action: 'setScenario', scenario: simScenario || 'normal', source: 'scenario_impact_matrix' });
+      updateSimulationLiveDom();
+      if (typeof showToast === 'function') {
+        showToast('Dispatched simulation scenario: ' + (title || scenarioKey), 'success');
+      }
+    }
+
+    function applySimulationMatrixFix(scenarioKey, fixId, recId, title) {
+      broadcastActionToSimulation({ action: 'applyFix', fixId: fixId || 'f1', id: fixId || 'f1', source: 'scenario_impact_matrix' });
+      if (recId && AppState && Array.isArray(AppState.recommendations)) {
+        const rec = AppState.recommendations.find(r => r.id === recId);
+        if (rec) {
+          rec.status = 'Applied in simulation';
+          rec.updatedAt = '2026-10-18 05:05';
+        }
+      }
+      if (AppState && Array.isArray(AppState.fleet)) {
+        if (fixId === 'f1') {
+          AppState.fleet.forEach(u => {
+            if (u.dept === 'Sewing' && u.status === 'Idle') {
+              u.currentKw = 0.4;
+              u.periodKwh = Math.max(1200, u.periodKwh - 380);
+            }
+          });
+          const comp = AppState.fleet.find(u => u.id === 'COMP-01');
+          if (comp) { comp.status = 'Running'; comp.currentKw = 15.6; comp.tempC = 54.0; }
+        } else if (fixId === 'f2') {
+          const boil = AppState.fleet.find(u => u.id === 'BOIL-01');
+          if (boil) { boil.status = 'Running'; boil.currentKw = 4.5; boil.tempC = 62.0; boil.periodKwh = Math.max(800, boil.periodKwh - 1000); }
+        } else if (fixId === 'f3') {
+          AppState.fleet.forEach(u => {
+            if (u.dept === 'Utilities' || u.dept === 'Lighting') {
+              u.currentKw = Number((u.currentKw * 0.85).toFixed(1));
+            }
+          });
+        }
+      }
+      AppState.simAvoidedKwh = Number(((AppState.simAvoidedKwh || 0) + 420).toFixed(1));
+      AppState.simSavingsAccruedBdt = Math.round((AppState.simSavingsAccruedBdt || 0) + 5200);
+      if (typeof logActivity === 'function' && AppState.currentUser) {
+        logActivity('Simulation Matrix (' + AppState.currentUser.name + ')', 'Dispatched ' + (fixId || 'f1').toUpperCase() + ' mitigation for ' + (title || scenarioKey));
+      }
+      updateSimulationLiveDom();
+      if (typeof showToast === 'function') {
+        showToast('Applied ' + (fixId || 'f1').toUpperCase() + ' mitigation in simulation (' + (recId || 'REC') + ').', 'success');
+      }
+    }
+
     function renderSimulationControlCenterView(m) {
-      const isDark = document.documentElement.classList.contains('dark') || AppState.theme === 'dark';
+      const isDark = (typeof document !== 'undefined' && document.documentElement && document.documentElement.classList && document.documentElement.classList.contains('dark')) || AppState.theme === 'dark';
       const spd = AppState.simSpeed || 1;
+      const sm = (AppState && AppState.simSyncMeta) || {};
+      const ef = (AppState && AppState.assumptions && AppState.assumptions.gridEmissionFactorKgPerKwh) || 0.560;
+      const demandKw = typeof sm.totalFactoryKw === 'number' && sm.liveConnected ? sm.totalFactoryKw : (m.totalCurrentKw || 124.5);
+      const solarKw = typeof sm.solarOffsetKw === 'number' && sm.liveConnected
+        ? sm.solarOffsetKw
+        : (AppState.activeScenario === 'solar_surge' ? Number((demandKw * 0.25).toFixed(1)) : 0);
+      const netKw = typeof sm.netGridKw === 'number' && sm.liveConnected
+        ? sm.netGridKw
+        : Math.max(0, Number((demandKw - solarKw).toFixed(1)));
+      const liveCarbonRate = (sm.liveConnected && typeof sm.liveCarbonKgHr === 'number')
+        ? Number(sm.liveCarbonKgHr.toFixed(1))
+        : Number((netKw * ef).toFixed(1));
 
       return `
-        <div class="space-y-5">
+        <div class="space-y-4 min-w-0">
           <!-- Live Simulation Header -->
-          <div class="flex flex-wrap items-center justify-between gap-3 p-5 rounded-2xl bg-gradient-to-r from-navy-950 via-slate-900 to-navy-900 border border-emerald-500/30 text-white shadow-xl">
-            <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-emerald-500/30">
-                ${AppIcons.sliders('w-4 h-4 text-emerald-400')}
+          <div class="flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-navy-950 via-slate-900 to-navy-900 border border-emerald-500/30 text-white shadow-xl min-w-0">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-emerald-500/30 shrink-0">
+                ${AppIcons.sliders('w-4 h-4 text-white')}
               </div>
-              <div>
+              <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
                   <h1 class="text-lg font-extrabold tracking-tight">Simulation Control Center</h1>
                   <span id="sim-engine-status-pill" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold ${AppState.simRunning ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-amber-500/20 text-amber-300 border border-amber-400/30'}">
@@ -9943,7 +10784,7 @@
                 ${AppState.simRunning ? '<svg aria-hidden="true" class="w-3.5 h-3.5 inline mr-1" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Pause Engine' : '<svg aria-hidden="true" class="w-3.5 h-3.5 inline mr-1" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>Resume Engine'}
               </button>
               <button type="button" onclick="stepSimulationForward()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition">
-                ⏭ +1 Tick
+                <span class="inline-flex items-center gap-1.5"><svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></svg> +1 Tick</span>
               </button>
               <div class="inline-flex rounded-lg bg-slate-800 p-0.5 border border-slate-700">
                 ${[1, 2, 5].map(s => `
@@ -9957,60 +10798,108 @@
           </div>
 
           <!-- Live Telemetry KPI Strip -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            <div class="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800">
-              <div class="text-[10px] text-slate-500 font-medium">Substation Load</div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 min-w-0">
+            <div class="min-w-0 bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800">
+              <div class="text-[10px] text-slate-500 font-medium truncate">Substation Load</div>
               <div id="sim-kpi-substation" class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5">1,910 kW</div>
               <div class="text-[9px] text-slate-400 font-mono">2,076 kVA • PF 0.92</div>
             </div>
 
-            <div class="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800">
-              <div class="text-[10px] text-slate-500 font-medium">Live Fleet Power</div>
+            <div class="min-w-0 bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800">
+              <div class="text-[10px] text-slate-500 font-medium truncate">Live Fleet Power</div>
               <div id="sim-kpi-fleet-power" class="text-base font-extrabold text-emerald-600 mt-0.5">${formatNum(m.totalCurrentKw, 1)} kW</div>
               <div id="sim-kpi-fleet-sub" class="text-[9px] text-slate-400 font-mono">18 Units Monitored</div>
             </div>
 
-            <div class="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800">
-              <div class="text-[10px] text-slate-500 font-medium">Machine Availability</div>
+            <div class="min-w-0 bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800">
+              <div class="text-[10px] text-slate-500 font-medium truncate">Machine Availability</div>
               <div id="sim-kpi-avail" class="text-base font-extrabold text-sky-600 mt-0.5">${formatNum(m.availabilityPct, 1)}%</div>
               <div class="text-[9px] text-emerald-600 font-mono">Real-time dynamic</div>
             </div>
 
-            <div class="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800">
-              <div class="text-[10px] text-slate-500 font-medium">Simulation Clock</div>
+            <div class="min-w-0 bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800">
+              <div class="text-[10px] text-slate-500 font-medium truncate">Simulation Clock</div>
               <div id="sim-kpi-clock" class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5 font-mono">Tick #${AppState.simTickCount}</div>
               <div id="sim-kpi-clock-time" class="text-[9px] text-slate-400 font-mono">${AppState.lastUpdateTimestamp.split(' ')[1] || '05:04:19'}</div>
             </div>
 
-            <div class="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800">
-              <div class="text-[10px] text-slate-500 font-medium">Accrued Savings</div>
+            <div class="min-w-0 bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800">
+              <div class="text-[10px] text-slate-500 font-medium truncate">Accrued Savings</div>
               <div id="sim-kpi-savings" class="text-base font-extrabold text-emerald-600 mt-0.5">৳ ${formatNum(m.estimatedSavingsBdt, 0)}</div>
               <div id="sim-kpi-savings-sub" class="text-[9px] text-slate-400 font-mono">Realized live</div>
             </div>
 
-            <div class="bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800 cursor-pointer hover:border-emerald-500 transition group" onclick="navigateToRoute('carboniq-report')" title="Click to view Carbon Credit System">
-              <div class="text-[10px] text-slate-500 font-medium flex items-center justify-between">
-                <span>Sim Carbon Credits</span>
-                <span class="text-emerald-500 text-[9px] group-hover:underline">View ↗</span>
+            <div class="min-w-0 bg-white dark:bg-slate-900 rounded-xl p-3 border border-slate-200/90 dark:border-slate-800 cursor-pointer hover:border-emerald-500 transition group" onclick="navigateToRoute('carboniq-report')" title="Click to view Carbon Credit System">
+              <div class="text-[10px] text-slate-500 font-medium flex items-center justify-between gap-1">
+                <span class="truncate">Sim Carbon Credits</span>
+                <span class="text-emerald-500 text-[9px] group-hover:underline shrink-0">View ↗</span>
               </div>
               <div id="sim-kpi-carbon" class="text-base font-extrabold text-emerald-600 mt-0.5 flex items-center gap-1"><span class="text-emerald-500">${AppIcons.coin('w-3.5 h-3.5')}</span> +${formatNum(m.simPotentialCredits, 2)} t</div>
               <div class="text-[9px] text-slate-400 font-mono">৳ ${formatNum(m.simRevenueBdt, 0)} BDT Potential</div>
             </div>
           </div>
 
+          <!-- Bidirectional Simulation Telemetry Sync Strip -->
+          <div id="sim-sync-strip" class="rounded-2xl bg-slate-900/95 border border-emerald-500/30 p-3.5 text-white shadow-lg space-y-2.5 min-w-0">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-xs font-extrabold tracking-wide text-emerald-300 uppercase">Bidirectional Engine Telemetry Sync</span>
+                <span id="sim-sync-status-badge" class="px-2 py-0.5 rounded-full text-[9.5px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">${sm.liveConnected ? '2-WAY SYNC LIVE' : 'SYNC READY'}</span>
+                <span class="text-[10px] font-mono text-slate-400">Channel: gfb_simulation_sync • Clock <strong id="sim-sync-last-at" class="text-slate-200">${sm.lastSyncAt || 'Sync Ready'}</strong></span>
+              </div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <button type="button" onclick="broadcastActionToSimulation({ action: 'requestState' })" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-[11px] font-semibold transition">
+                  Sync Now
+                </button>
+                <button type="button" onclick="navigateTo('digital-twin')" class="px-2.5 py-1 rounded-lg bg-sky-600/30 hover:bg-sky-600/50 text-sky-200 border border-sky-500/40 text-[11px] font-semibold transition">
+                  Open 3D Twin ↗
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 font-mono min-w-0">
+              <div class="min-w-0 rounded-xl bg-slate-950/90 border border-slate-800 px-3 py-2">
+                <div class="text-[9.5px] text-slate-400 uppercase">Engine Demand</div>
+                <div id="sim-sync-demand-kw" class="text-sm font-extrabold text-white mt-0.5 truncate">${formatNum(demandKw, 1)} kW</div>
+                <div class="text-[9px] text-slate-500 truncate">Gross virtual meters</div>
+              </div>
+              <div class="min-w-0 rounded-xl bg-slate-950/90 border border-slate-800 px-3 py-2">
+                <div class="text-[9.5px] text-slate-400 uppercase">Solar PV Offset</div>
+                <div id="sim-sync-solar-kw" class="text-sm font-extrabold text-emerald-300 mt-0.5 truncate">${solarKw > 0 ? '-' : ''}${formatNum(solarKw, 1)} kW</div>
+                <div class="text-[9px] text-slate-500 truncate">320 kWp + BESS-01</div>
+              </div>
+              <div class="min-w-0 rounded-xl bg-slate-950/90 border border-slate-800 px-3 py-2">
+                <div class="text-[9.5px] text-slate-400 uppercase">Net Grid Import</div>
+                <div id="sim-sync-net-kw" class="text-sm font-extrabold text-sky-300 mt-0.5 truncate">${formatNum(netKw, 1)} kW</div>
+                <div class="text-[9px] text-slate-500 truncate">DPDC 11kV incomer</div>
+              </div>
+              <div class="min-w-0 rounded-xl bg-slate-950/90 border border-slate-800 px-3 py-2">
+                <div class="text-[9.5px] text-slate-400 uppercase">Avoided Energy</div>
+                <div id="sim-sync-avoided-kwh" class="text-sm font-extrabold text-amber-300 mt-0.5 truncate">${formatNum(AppState.simAvoidedKwh || 0, 1)} kWh</div>
+                <div class="text-[9px] text-slate-500 truncate">Cumulative AI saved</div>
+              </div>
+              <div class="min-w-0 col-span-2 sm:col-span-1 rounded-xl bg-slate-950/90 border border-slate-800 px-3 py-2">
+                <div class="text-[9.5px] text-slate-400 uppercase">Live Carbon Rate</div>
+                <div id="sim-sync-carbon-rate" class="text-sm font-extrabold text-teal-300 mt-0.5 truncate">${formatNum(liveCarbonRate, 1)} kg CO2e/hr</div>
+                <div class="text-[9px] text-slate-500 truncate">@ 0.560 kg CO2e/kWh</div>
+              </div>
+            </div>
+          </div>
+
           <!-- Canonical Simulation Engine (simulation.html) Embedded Frame -->
-          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xl overflow-hidden">
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xl overflow-hidden min-w-0">
             <div class="p-3.5 bg-gradient-to-r from-navy-950 via-slate-900 to-navy-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 text-white">
-              <div class="flex items-center gap-2.5">
+              <div class="flex items-center gap-2.5 flex-wrap">
                 <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span class="text-xs font-bold font-mono text-emerald-300">CANONICAL SIMULATION ENGINE (simulation.html)</span>
-                <span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700">8 Virtual Sub-Meters · 2-Way Live Sync</span>
+                <span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700">8 Virtual Sub-Meters • 2-Way Live Sync</span>
               </div>
-              <div class="flex items-center gap-2 text-xs">
-                <button type="button" onclick="const f = document.getElementById('sim-engine-iframe'); if (f) f.src = f.src;" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-semibold transition" title="Reload Simulation Engine">
+              <div class="flex items-center gap-2 text-xs flex-wrap">
+                <button type="button" onclick="const f = typeof document !== 'undefined' ? document.getElementById('sim-engine-iframe') : null; if (f) f.src = f.src;" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-semibold transition" title="Reload Simulation Engine">
                   <span class="inline-flex items-center gap-1.5">${AppIcons.refresh('w-3.5 h-3.5')} Reload Engine</span>
                 </button>
-                <button type="button" onclick="const f = document.getElementById('sim-engine-iframe'); if (f.requestFullscreen) f.requestFullscreen(); else if (f.webkitRequestFullscreen) f.webkitRequestFullscreen();" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition">
+                <button type="button" onclick="const f = typeof document !== 'undefined' ? document.getElementById('sim-engine-iframe') : null; if (f && f.requestFullscreen) f.requestFullscreen(); else if (f && f.webkitRequestFullscreen) f.webkitRequestFullscreen();" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold transition">
                   <span class="inline-flex items-center gap-1.5">${AppIcons.expand('w-3.5 h-3.5')} Fullscreen</span>
                 </button>
                 <a href="simulation.html" target="_blank" class="px-3 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 font-semibold transition flex items-center gap-1">
@@ -10018,45 +10907,117 @@
                 </a>
               </div>
             </div>
-            <div class="w-full bg-[#04121b]" style="height: 880px;">
+            <div class="w-full bg-[#04121b] h-[540px] md:h-[780px] lg:h-[860px]">
               <iframe id="sim-engine-iframe" src="simulation.html" class="w-full h-full border-0" allow="fullscreen"></iframe>
             </div>
           </div>
 
-          <!-- Simulation Scenarios Grid (6 Scenarios) -->
-          <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/90 dark:border-slate-800 shadow-xs">
-            <div class="flex items-center justify-between mb-4">
-              <div>
-                <h2 class="text-sm font-bold text-slate-900 dark:text-white">Deterministic Simulation Scenarios (6 Modes)</h2>
-                <p class="text-[11px] text-slate-500">Inject operational events to verify how Green Factory Brain AI responds and protects factory margins.</p>
+          <!-- Scenario Impact Matrix (6 Canonical Fault & Dispatch Scenarios) -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/90 dark:border-slate-800 shadow-xs space-y-3.5 min-w-0">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="min-w-0">
+                <h2 class="text-sm font-bold text-slate-900 dark:text-white">Scenario Impact Matrix &amp; Autonomous Mitigation Dispatch</h2>
+                <p class="text-[11px] text-slate-500">Compare demand, monthly BDT bill impact, tCO2e delta (0.560 kg/kWh DoE Grid), and dispatch 1-click scenarios or AI fixes to simulation.html.</p>
               </div>
-              <span class="text-xs font-mono text-slate-400">Current: <strong id="sim-active-scenario-badge" class="text-emerald-600 uppercase">${AppState.activeScenario}</strong></span>
+              <span class="text-xs font-mono text-slate-400 shrink-0">Current: <strong id="sim-active-scenario-badge" class="text-emerald-600 uppercase">${AppState.activeScenario}</strong></span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <!-- Column Headers (Desktop) -->
+            <div class="hidden lg:grid lg:grid-cols-12 gap-2.5 px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-slate-500 border-b border-slate-200 dark:border-slate-800">
+              <div class="col-span-2">Scenario Mode</div>
+              <div class="col-span-2">kW Delta</div>
+              <div class="col-span-2">Monthly BDT Delta</div>
+              <div class="col-span-2">tCO2e Delta</div>
+              <div class="col-span-2">Recommended Confirmation Gate</div>
+              <div class="col-span-2 text-right">1-Click Dispatch &amp; Fix</div>
+            </div>
+
+            <div id="sim-impact-matrix" class="space-y-2 min-w-0">
+              ${SIMULATION_IMPACT_MATRIX.map(row => {
+                const isActive = AppState.activeScenario === row.id;
+                const badgeCls = row.tone === 'rose'
+                  ? 'bg-rose-500/15 text-rose-600 dark:text-rose-300 border-rose-500/30'
+                  : row.tone === 'amber'
+                    ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30'
+                    : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30';
+                return `
+                  <div data-sim-matrix-id="${row.id}" class="grid grid-cols-1 lg:grid-cols-12 gap-2.5 items-center p-3 rounded-xl border transition min-w-0 ${isActive ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border-emerald-500 ring-1 ring-emerald-500/70' : 'bg-slate-50/80 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600'}">
+                    <div class="lg:col-span-2 min-w-0">
+                      <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="text-xs font-extrabold text-slate-900 dark:text-white">${row.title}</span>
+                        ${isActive ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-emerald-600 text-white">ACTIVE</span>' : ''}
+                      </div>
+                      <span class="inline-block mt-1 px-1.5 py-0.5 rounded text-[9px] font-mono border ${badgeCls}">${row.simScenario.toUpperCase()}</span>
+                    </div>
+
+                    <div class="lg:col-span-2 min-w-0">
+                      <div class="lg:hidden text-[9.5px] font-mono uppercase text-slate-400">kW Delta</div>
+                      <div class="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">${row.kwDelta}</div>
+                    </div>
+
+                    <div class="lg:col-span-2 min-w-0">
+                      <div class="lg:hidden text-[9.5px] font-mono uppercase text-slate-400">Monthly BDT Delta</div>
+                      <div class="text-xs font-mono font-bold ${row.bdtDelta.startsWith('-') ? 'text-emerald-600 dark:text-emerald-400' : (row.bdtDelta.startsWith('+') ? 'text-rose-600 dark:text-rose-400' : 'text-slate-600 dark:text-slate-300')}">${row.bdtDelta}</div>
+                    </div>
+
+                    <div class="lg:col-span-2 min-w-0">
+                      <div class="lg:hidden text-[9.5px] font-mono uppercase text-slate-400">tCO2e Delta</div>
+                      <div class="text-xs font-mono font-bold ${row.co2Delta.startsWith('-') ? 'text-teal-600 dark:text-teal-400' : 'text-slate-700 dark:text-slate-300'}">${row.co2Delta}</div>
+                    </div>
+
+                    <div class="lg:col-span-2 min-w-0">
+                      <div class="lg:hidden text-[9.5px] font-mono uppercase text-slate-400">Recommended Confirmation Gate</div>
+                      <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 leading-snug">${row.gate}</div>
+                    </div>
+
+                    <div class="lg:col-span-2 flex items-center lg:justify-end gap-1.5 flex-wrap min-w-0">
+                      <button type="button" onclick="dispatchSimulationScenarioQuick('${row.id}', '${row.simScenario}', '${row.title}')" class="px-2.5 py-1.5 rounded-lg bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white text-[11px] font-semibold transition cursor-pointer whitespace-nowrap">
+                        Dispatch
+                      </button>
+                      <button type="button" onclick="applySimulationMatrixFix('${row.id}', '${row.fixId}', '${row.recId}', '${row.title}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold transition cursor-pointer whitespace-nowrap">
+                        ${row.actionLabel}
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- Deterministic Simulation Scenarios Cards (Interactive Confirmation Gate Modes) -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/90 dark:border-slate-800 shadow-xs min-w-0">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div>
+                <h2 class="text-sm font-bold text-slate-900 dark:text-white">Deterministic Simulation Scenarios (Interactive Gate Cards)</h2>
+                <p class="text-[11px] text-slate-500">Inject operational events with Confirmation Gate approval to verify how Green Factory Brain AI protects margins.</p>
+              </div>
+              <span class="text-[11px] font-mono text-slate-400">6 Autonomous Agents Monitoring</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5 min-w-0">
               ${[
-                { id: 'baseline', title: '1. Normal Baseline Operations', desc: 'Standard production day across all 18 machines at 52,300 kWh/mo.', badge: 'Standard', color: 'emerald' },
-                { id: 'night_idle', title: '2. Night-Shift Idle Waste', desc: 'Sewing Line 3 left running after-hours (+14% idle drain -> Auto Confirmation Gate).', badge: 'Auto Gate', color: 'amber' },
-                { id: 'peak_grid', title: '3. Peak Grid Tariffs (14.88/kWh)', desc: 'DPDC 17:00-23:00 peak tariff spike -> auto-alert, ROI & Confirmation Gate.', badge: 'Auto Gate', color: 'rose' },
-                { id: 'compressor_leak', title: '4. Compressed Air Leak (COMP-01)', desc: 'COMP-01 header leaks air (31.2 kW / 74.5°C -> Auto Confirmation Gate).', badge: 'Auto Gate', color: 'amber' },
-                { id: 'solar_surge', title: '5. Rooftop Solar Surge', desc: '+10,460 kWh clean rooftop PV offset cuts grid draw & boosts carbon yield.', badge: 'Clean Offset', color: 'emerald' },
-                { id: 'machine_overload', title: '6. Cutting Machine Overload', desc: 'Vacuum blower MCH-CUT-02 spikes to 24.6 kW / 68.4°C thermal trip.', badge: 'Thermal Critical', color: 'rose' },
-                { id: 'shift_change', title: '7. Shift Change Handover', desc: 'Day to Night transition: machines cycle through standby and idle.', badge: 'Operational', color: 'sky' },
-                { id: 'production_surge', title: '8. Production Surge (+22%)', desc: 'Rush export order: all lines running at 105% capacity with peak tariff.', badge: 'Heavy Load', color: 'indigo' }
+                { id: 'baseline', title: '1. Normal Baseline Operations', desc: 'Standard production day across all 18 machines at 52,300 kWh/mo.', badge: 'Standard', delta: '0.0 kW • Nominal' },
+                { id: 'night_idle', title: '2. Night-Shift Idle Waste', desc: 'Sewing Line 3 left running after-hours (+14% idle drain -> Auto Confirmation Gate).', badge: 'Auto Gate', delta: '+16.8 kW • +৳ 18.4k' },
+                { id: 'peak_grid', title: '3. Peak Grid Tariffs (14.88/kWh)', desc: 'DPDC 17:00-23:00 peak tariff spike -> auto-alert, ROI & Confirmation Gate.', badge: 'Auto Gate', delta: '+11.2 kW • +৳ 129.6k' },
+                { id: 'compressor_leak', title: '4. Compressed Air Leak (COMP-01)', desc: 'COMP-01 header leaks air (31.2 kW / 74.5°C -> Auto Confirmation Gate).', badge: 'Auto Gate', delta: '+18.5 kW • +3.18 tCO2e' },
+                { id: 'solar_surge', title: '5. Rooftop Solar Surge', desc: '+10,460 kWh clean rooftop PV offset cuts grid draw & boosts carbon yield.', badge: 'Clean Offset', delta: '-24.9 kW • -5.86 tCO2e' },
+                { id: 'grid_outage', title: '6. DPDC Grid Outage & ATS', desc: '11kV incomer trip tests BESS-01 peak-shaving & essential busbar shedding.', badge: 'ATS Island', delta: '-124.5 kW Grid • BESS' },
+                { id: 'machine_overload', title: '7. Cutting Machine Overload', desc: 'Vacuum blower MCH-CUT-02 spikes to 28.4 kW / 78.2°C thermal trip.', badge: 'Thermal Critical', delta: '+14.2 kW • Fault Alert' },
+                { id: 'production_surge', title: '8. Production Surge (+22%)', desc: 'Rush export order: all lines running at 105% capacity with peak tariff.', badge: 'Heavy Load', delta: '+27.4 kW • Rush SLA' }
               ].map(sc => {
                 const isActive = AppState.activeScenario === sc.id;
                 return `
-                  <div onclick="promptScenarioChange('${sc.id}')" class="cursor-pointer p-4 rounded-xl border transition flex flex-col justify-between ${isActive ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-500 shadow-xs ring-1 ring-emerald-500' : 'bg-slate-50 dark:bg-slate-800/60 hover:bg-emerald-50/40 border-slate-200 dark:border-slate-700'}">
+                  <div onclick="promptScenarioChange('${sc.id}')" class="min-w-0 cursor-pointer p-4 rounded-xl border transition flex flex-col justify-between ${isActive ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-500 shadow-xs ring-1 ring-emerald-500' : 'bg-slate-50 dark:bg-slate-800/60 hover:bg-emerald-50/40 border-slate-200 dark:border-slate-700'}">
                     <div>
                       <div class="flex items-center justify-between gap-1 mb-1.5">
                         <h3 class="text-xs font-bold text-slate-900 dark:text-white">${sc.title}</h3>
-                        <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">${sc.badge}</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 shrink-0">${sc.badge}</span>
                       </div>
                       <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-snug">${sc.desc}</p>
                     </div>
-                    <div class="mt-3 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[11px]">
-                      <span class="font-semibold ${isActive ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-500'}">${isActive ? ('<span class="inline-flex items-center gap-1">' + AppIcons.checkCircle('w-3.5 h-3.5 text-emerald-400') + ' Active Scenario</span>') : 'Click to Activate'}</span>
-                      <span class="text-amber-400">${AppIcons.bolt('w-3.5 h-3.5')}</span>
+                    <div class="mt-3 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between gap-1 text-[10.5px]">
+                      <span class="font-semibold truncate ${isActive ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-500'}">${isActive ? ('<span class="inline-flex items-center gap-1">' + AppIcons.checkCircle('w-3.5 h-3.5 text-emerald-400') + ' Active</span>') : sc.delta}</span>
+                      <span class="text-amber-400 shrink-0">${AppIcons.bolt('w-3.5 h-3.5')}</span>
                     </div>
                   </div>
                 `;
@@ -10065,6 +11026,10 @@
           </div>
         </div>
       `;
+    }
+
+    function renderSimulationView(m) {
+      return renderSimulationControlCenterView(m);
     }
 
     function renderSimulationControlView(m) {
@@ -11258,8 +12223,47 @@
         AppState.assumptions.dailyCapacityPcs = payload.prodToday;
       }
 
+      // Sync structured telemetry cache for the Simulation Sync Strip
+      const ef = (AppState.assumptions && AppState.assumptions.gridEmissionFactorKgPerKwh) || 0.560;
+      const sm = AppState.simSyncMeta || (AppState.simSyncMeta = {});
+      const simSc = payload.activeScenario || payload.scenario;
+      sm.liveConnected = true;
+      if (payload.clock) sm.lastSyncAt = String(payload.clock);
+      if (typeof payload.totalKw === 'number') sm.totalFactoryKw = Number(payload.totalKw.toFixed(1));
+      else if (typeof payload.demandKw === 'number') sm.totalFactoryKw = Number(payload.demandKw.toFixed(1));
+      if (typeof payload.solarKw === 'number') sm.solarOffsetKw = Number(payload.solarKw.toFixed(1));
+      else sm.solarOffsetKw = (simSc === 'solar' || simSc === 'solar_surge') ? Number(((sm.totalFactoryKw || 124.5) * 0.25).toFixed(1)) : 0;
+      const rawNetGridKw = typeof payload.netGridKw === 'number' ? payload.netGridKw : payload.netKw;
+      sm.netGridKw = typeof rawNetGridKw === 'number'
+        ? Number(rawNetGridKw.toFixed(1))
+        : Math.max(0, Number(((sm.totalFactoryKw || 124.5) - (sm.solarOffsetKw || 0)).toFixed(1)));
+      sm.liveCarbonKgHr = typeof payload.carbonRateKgHr === 'number'
+        ? Number(payload.carbonRateKgHr.toFixed(1))
+        : Number((sm.netGridKw * ef).toFixed(1));
+      if (typeof payload.tariff === 'number') sm.tariff = payload.tariff;
+      sm.outage = !!payload.outage;
+      sm.wasteActive = !!payload.wasteActive;
+      sm.surgeActive = !!payload.surgeActive;
+      sm.faults = Array.isArray(payload.faults) ? payload.faults.slice() : [];
+
       // Scenario synchronization
-      if (payload.outage) {
+      const payloadScenarioMap = {
+        normal: 'baseline',
+        baseline: 'baseline',
+        waste: 'night_idle',
+        surge: 'production_surge',
+        tariff: 'peak_grid',
+        comp_leak: 'compressor_leak',
+        compressor_leak: 'compressor_leak',
+        breakdown: 'machine_overload',
+        solar: 'solar_surge',
+        solar_surge: 'solar_surge',
+        outage: 'grid_outage',
+        grid_outage: 'grid_outage'
+      };
+      if (simSc && payloadScenarioMap[simSc]) {
+        AppState.activeScenario = payloadScenarioMap[simSc];
+      } else if (payload.outage) {
         AppState.activeScenario = 'grid_outage';
       } else if (payload.wasteActive) {
         AppState.activeScenario = 'night_idle';
@@ -11417,46 +12421,14 @@
 
       if (AppState.activeRoute === 'simulation' || AppState.activeRoute === 'simulation-control') {
         // Zero-flicker DOM text node update on Simulation route (prevents iframe reload!)
-        const elSub = document.getElementById('sim-kpi-substation');
-        if (elSub) elSub.textContent = `${formatNum(m.totalCurrentKw * 10.2 + 20, 0)} kW`;
-        const elFleet = document.getElementById('sim-kpi-fleet-power');
-        if (elFleet) elFleet.textContent = `${formatNum(m.totalCurrentKw, 1)} kW`;
-        const elAvail = document.getElementById('sim-kpi-avail');
-        if (elAvail) elAvail.textContent = `${formatNum(m.availabilityPct, 1)}%`;
-        const elClock = document.getElementById('sim-kpi-clock');
-        if (elClock) elClock.textContent = `Tick #${AppState.simTickCount}`;
-        const elClockTime = document.getElementById('sim-kpi-clock-time');
-        if (elClockTime && payload.clock) elClockTime.textContent = payload.clock;
-        const elSav = document.getElementById('sim-kpi-savings');
-        if (elSav) elSav.textContent = `৳ ${formatNum(m.estimatedSavingsBdt, 0)}`;
-        const elCarb = document.getElementById('sim-kpi-carbon');
-        if (elCarb) elCarb.innerHTML = `<span class="text-teal-500 inline-block align-middle mr-1">${AppIcons.leaf("w-3.5 h-3.5 inline-block")}</span>${formatNum(m.totalRecSavedCo2, 2)} t`;
-
-        const elBadge = document.getElementById('sim-active-scenario-badge');
-        if (elBadge) elBadge.textContent = AppState.activeScenario.toUpperCase();
-
-        const elStatusPill = document.getElementById('sim-engine-status-pill');
-        const elStatusDot = document.getElementById('sim-engine-status-dot');
-        const elStatusText = document.getElementById('sim-engine-status-text');
-        if (elStatusPill) {
-          elStatusPill.className = `inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold ${AppState.simRunning ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-amber-500/20 text-amber-300 border border-amber-400/30'}`;
-        }
-        if (elStatusDot) {
-          elStatusDot.className = `w-1.5 h-1.5 rounded-full ${AppState.simRunning ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`;
-        }
-        if (elStatusText) {
-          elStatusText.textContent = AppState.simRunning ? 'ENGINE RUNNING (LIVE)' : 'ENGINE PAUSED';
-        }
-        const elCenterToggle = document.getElementById('sim-center-btn-toggle');
-        if (elCenterToggle) {
-          elCenterToggle.className = `px-3.5 py-1.5 rounded-xl font-bold transition shadow-xs ${AppState.simRunning ? 'bg-amber-600 hover:bg-amber-500 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}`;
-          elCenterToggle.innerHTML = AppState.simRunning ? '<svg aria-hidden="true" class="w-3.5 h-3.5 inline mr-1" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Pause Engine' : '<svg aria-hidden="true" class="w-3.5 h-3.5 inline mr-1" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>Resume Engine';
-        }
+        updateSimulationLiveDom(payload);
+      } else if (AppState.activeRoute === 'digital-twin' && AppState.epmsViewMode === '3d') {
+        updateEpmsCommandStripDom();
       } else {
         // Re-render active view for dashboard, analytics, fleet monitoring, etc.
-        const activeEl = document.activeElement;
+        const activeEl = typeof document !== 'undefined' ? document.activeElement : null;
         const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
-        if (!isTyping) {
+        if (!isTyping && typeof renderActiveView === 'function') {
           renderActiveView();
         }
       }
@@ -11472,6 +12444,8 @@
             } else if (ev.data.type === 'GFB_SIM_READY') {
               if (ev.data.payload) ingestSimulationEngineTelemetry(ev.data.payload);
               broadcastActionToSimulation({ action: 'requestState' });
+            } else if (ev.data.type === 'EPMS_TELEMETRY') {
+              ingestEpmsTelemetry(ev.data);
             }
           }
         });
@@ -11486,7 +12460,15 @@
       });
       window.addEventListener('message', ev => {
         if (ev.data) {
-          if (ev.data.type === 'GFB_SIM_SYNC' && ev.data.payload) {
+          if (ev.data.type === 'EPMS_TELEMETRY') {
+            ingestEpmsTelemetry(ev.data);
+          } else if (ev.data.type === 'EPMS_READY') {
+            if (ev.data.payload || typeof ev.data.activePower !== 'undefined' || typeof ev.data.activePowerKw !== 'undefined') {
+              ingestEpmsTelemetry(ev.data.payload || ev.data);
+            }
+            const selId = (AppState.epmsTelemetry && AppState.epmsTelemetry.selectedAsset) || AppState.selectedMachineId || 'BREAKER_CB8-300';
+            epmsSendMessageToIframe({ type: 'SELECT_ASSET', assetId: selId });
+          } else if (ev.data.type === 'GFB_SIM_SYNC' && ev.data.payload) {
             ingestSimulationEngineTelemetry(ev.data.payload);
           } else if (ev.data.type === 'GFB_SIM_READY') {
             if (ev.data.payload) ingestSimulationEngineTelemetry(ev.data.payload);

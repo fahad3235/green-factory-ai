@@ -7,10 +7,32 @@
 [![Python](https://img.shields.io/badge/Backend-FastAPI%20%2B%20Python%203.12-009688.svg?style=flat-square)](src/api/main.py)
 [![Node](https://img.shields.io/badge/Frontend-Node%2018%2B%20%2B%20TypeScript-339933.svg?style=flat-square)](package.json)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+[![CloudCamp 2026](https://img.shields.io/badge/CloudCamp%202026-Submitted%20Master%20212%2F215-2ea44f.svg?style=flat-square)](CLOUDCAMP_SUBMISSION_QA.md)
 
 > **Demo data notice.** Green Factory Brain AI runs on a **simulated factory**. Rupsha Garments Ltd. is a fictional pilot facility, all meters and telemetry are deterministic simulation values, and no physical equipment is ever controlled. Nothing here is a certification, an audit, or a verified carbon-credit claim. See [Demo data & honesty](#demo-data--honesty).
 
 ---
+
+## Contents
+
+- [The problem](#the-problem)
+- [The solution](#the-solution)
+- [Try the live demo](#try-the-live-demo)
+- [How it works](#how-it-works)
+- [Features](#features)
+- [The demo factory & the math](#the-demo-factory--the-math)
+- [Architecture](#architecture)
+- [Repository structure](#repository-structure)
+- [Quick start](#quick-start)
+- [API reference](#api-reference)
+- [Configuration](#configuration)
+- [Verification & tests](#verification--tests)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [Demo data & honesty](#demo-data--honesty)
+- [Team](#team)
+- [CloudCamp 2026 — International AI Builders Congress](#cloudcamp-2026--international-ai-builders-congress)
+- [License](#license)
 
 ## The problem
 
@@ -332,7 +354,7 @@ Built by **Team Probaho** — Ishan Ahmed Fahad (Team Leader), Md. Muhsinul Isla
 
 ## CloudCamp 2026 — International AI Builders Congress
 
-Green Factory Brain AI was submitted to the International AI Builders Congress 2026 (CloudCamp Bangladesh) on 19 November 2026 — **Submitted, awaiting results** ([submission page](https://cloudcampbd.com/submissions/1a0fd307-78b4-4aba-ab53-f662e74288a9)).
+Green Factory Brain AI was submitted to the International AI Builders Congress 2026 (CloudCamp Bangladesh) on 19 November 2026 — **Submitted, awaiting results**.
 
 > "Green Factory Brain AI gives every Bangladeshi garment factory a digital brain — it streams live energy, machine, emission and order data into one AI copilot that explains the plant in plain Bangla, predicts load and waste, simulates carbon-credit revenue, and turns factory operations into audit-ready decisions."
 

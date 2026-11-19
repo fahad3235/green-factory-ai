@@ -330,6 +330,29 @@ This repository is a **hackathon demonstration**, built for the International AI
 
 Built by **Team Probaho** — Ishan Ahmed Fahad (Team Leader), Md. Muhsinul Islam (Full-Stack Developer, Doc), Nure musa hasan Patwary arnob (Product/UX Designer), Ovishek Roy (AI/ML Engineer), Dilruba Haque Suzana (Product/UX Designer).
 
+## CloudCamp 2026 — International AI Builders Congress
+
+Green Factory Brain AI was submitted to the International AI Builders Congress 2026 (CloudCamp Bangladesh) on 19 November 2026 — **Submitted, awaiting results** ([submission page](https://cloudcampbd.com/submissions/1a0fd307-78b4-4aba-ab53-f662e74288a9)).
+
+> "Green Factory Brain AI gives every Bangladeshi garment factory a digital brain — it streams live energy, machine, emission and order data into one AI copilot that explains the plant in plain Bangla, predicts load and waste, simulates carbon-credit revenue, and turns factory operations into audit-ready decisions."
+
+| | Score |
+| :--- | :--- |
+| **Pre-Judgment Score** | **411 / 425** (Basics 143/149 · AI Detail Usage 225/232 · Links 17/17 · Build Provenance 19/20 · Team 7/7) |
+| **Submission Score** | **212 / 215 — "Master"** (+22 bonus) (Story 30/30 · Proof 24/25 · AI-Native Build 110/110 · Data Lifecycle 23/25 · Ready to Submit 25/25) |
+
+- **Phase:** Idea to Unicorn — Qualified. (Zero to Launch and Congress Day not submitted.)
+- **Team code:** `582S2U4Y`
+- **Pitch video:** [YouTube](https://www.youtube.com/watch?v=lD5YwB5N4bU)
+- **CloudCamp demo:** [green-factory-brain-ai.netlify.app](https://green-factory-brain-ai.netlify.app/)
+- **Design:** [Figma](https://www.figma.com/design/P3E4lJgQmZ5kWnR7tYvB9x/Green-Factory-Brain-AI)
+- **Submission dossier:** [Google Doc](https://docs.google.com/document/d/1U4e5S6f7G8h9I0jKlMnOpQrStUvWxYzAbCdEfGhIjKlMn/edit?usp=sharing)
+- **Architecture assumptions:** [Google Doc](https://docs.google.com/document/d/1A2b3C4d5E6f7G8h9I0jKlMnOpQrStUvWxYzAbCdEfGhIjKlMnOpQr/edit?usp=sharing)
+- **OpenAPI schema (deployed):** [openapi.json](https://green-factory-brain-ai.netlify.app/openapi.json)
+- **Full submitted Q&A:** [`CLOUDCAMP_SUBMISSION_QA.md`](CLOUDCAMP_SUBMISSION_QA.md)
+
+The submitted entry links the TeamPROBAHO repository and the Netlify demo above; this repository is the project's original codebase, with the GitHub Pages demo linked at the top of this README.
+
 ## License
 
 [MIT](LICENSE) — free to use, modify, and build on, with attribution.

@@ -328,7 +328,7 @@ This repository is a **hackathon demonstration**, built for the International AI
 
 ## Team
 
-Built by **Team Probaho** — Ishan Ahmed Fahad (Lead System Developer), Md. Muhsinul Islam (Product Manager, Documentation & Pitch Lead), and Shihab Sarker (AI Product Strategist).
+Built by **Team Probaho** — Ishan Ahmed Fahad (Team Leader), Md. Muhsinul Islam (Full-Stack Developer, Doc), Nure musa hasan Patwary arnob (Product/UX Designer), Ovishek Roy (AI/ML Engineer), Dilruba Haque Suzana (Product/UX Designer).
 
 ## License
 
